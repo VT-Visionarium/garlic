@@ -18,6 +18,27 @@ root=/usr/local
 
 # This is sourced in bash scripts from somewhere in $root/src/
 
+# Usage: _PrintLine FILE LINE_NO
+function _PrintLine()
+{
+    echo -n " >> "
+    if [[ "$1" =~ ^/ ]] ; then
+        sed -n "${2},${2}p" "$1" 1>&2
+    else
+        sed -n "${2},${2}p" "$scriptdir/$1" 1>&2
+    fi
+}
+
+# Usage: printStackLine NO
+function printStackLine()
+{
+    echo -n "${indent}${BASH_SOURCE[(($1+1))]}:${BASH_LINENO[(($1))]}\
+  ${FUNCNAME[(($1+1))]}()" 1>&2
+    _PrintLine "${BASH_SOURCE[(($1+1))]}" ${BASH_LINENO[(($1))]}
+    #indent="$indent  "
+}
+
+
 function Fail()
 {
     set +x
@@ -68,26 +89,21 @@ function StackTrace ()
   done
 }
 
-# Usage: PrintLine FILE LINE_NO
-function PrintLine()
-{
-    echo -n " >> "
-    if [[ "$1" =~ ^/ ]] ; then
-        sed -n "${2},${2}p" "$1" 1>&2
-    else
-        sed -n "${2},${2}p" "$scriptdir/$1" 1>&2
-    fi
-}
 
 indent="  "
 
-# Usage: printStackLine NO
-function printStackLine()
+function _PrintVars()
 {
-    echo -n "${indent}${BASH_SOURCE[(($1+1))]}:${BASH_LINENO[(($1))]}\
-  ${FUNCNAME[(($1+1))]}()" 1>&2
-    PrintLine "${BASH_SOURCE[(($1+1))]}" ${BASH_LINENO[(($1))]}
-    #indent="$indent  "
+    cat << EOF || Fail
+
+${BASH_SOURCE[0]} setup:
+
+    scriptdir=$scriptdir
+    name=$name
+    topsrcdir=$topsrcdir
+    prefix=$prefix
+
+EOF
 }
 
 
@@ -106,16 +122,7 @@ function Init()
     cd .. || Fail
     topsrcdir="$PWD"
     cd "$scriptdir" || Fail
-    cat << EOF
-${BASH_SOURCE[0]} setup:
-
-    scriptdir=$scriptdir
-    name=$name
-    topsrcdir=$topsrcdir
-    prefix=$prefix
-
-EOF
-
+    _PrintVars
     [ -e "$root/encap" ] || Fail "encap root $root/encap does not exist"
     [ ! -e "$prefix" ] || Fail "prefix \"$prefix\" exists already"
 }
@@ -152,6 +159,7 @@ $name\x1b[44;37;1m in \x1b[42;34;1m$prefix\x1b[44;37;1m "
     if [ -n "$*" ] ; then
         echo -e "\n \x1b[45;1m $* \x1b[0m\n"
     fi
+    _PrintVars
     if [ -d "$prefix" ] ; then
         echo -e "You may want to run: sudo encap\n"
     fi

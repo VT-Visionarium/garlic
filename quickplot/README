@@ -1,0 +1,17 @@
+# We ran this:
+  git clone https://github.com/lanceman2/quickplot.git git
+
+# The other directories (not git/) are builds for installing.
+#
+# We use git tags and git archive to get different source versions
+
+# to build.  You can use 'git pull' and 'git tag' and
+
+  git log --date-order --tags --simplify-by-decoration --pretty="format:%ai %d"
+
+# This alias is handy:
+
+  alias gittagbydate='git log --date-order --tags --simplify-by-decoration --pretty="format:%ai %d"'
+
+
+# to see whats new to install.
