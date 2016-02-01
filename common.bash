@@ -18,27 +18,6 @@ root=/usr/local
 
 # This is sourced in bash scripts from somewhere in $root/src/
 
-# Usage: _PrintLine FILE LINE_NO
-function _PrintLine()
-{
-    echo -n " >> "
-    if [[ "$1" =~ ^/ ]] ; then
-        sed -n "${2},${2}p" "$1" 1>&2
-    else
-        sed -n "${2},${2}p" "$scriptdir/$1" 1>&2
-    fi
-}
-
-# Usage: printStackLine NO
-function printStackLine()
-{
-    echo -n "${indent}${BASH_SOURCE[(($1+1))]}:${BASH_LINENO[(($1))]}\
-  ${FUNCNAME[(($1+1))]}()" 1>&2
-    _PrintLine "${BASH_SOURCE[(($1+1))]}" ${BASH_LINENO[(($1))]}
-    #indent="$indent  "
-}
-
-
 function Fail()
 {
     set +x
@@ -58,39 +37,13 @@ function Fail()
     done
 
     echo "Bash Call Stack:" 1>&2
-    j="  "
-    let i=$i-1
-    printStackLine $i
-    let i=$i-1
-    j="$j  "
-    while [ "$i" != "0" ] ; do
-        printStackLine $i
-        let i=$i-1
-        j="$j  "
+
+    local frame=0
+    while caller $frame; do
+        ((frame++));
     done
     exit 1
 }
-
-# Print Call Stack
-# TODO remove this unused function
-function StackTrace ()
-{
-  local i=0
-  local FRAMES=${#BASH_LINENO[@]}
-  local j=""
-  echo -e "\nStack Trace\n"
-  for ((i=FRAMES-2; i>=1; i--)); do
-    echo ${j}${BASH_SOURCE[i+1]}:${BASH_LINENO[i]} in ${FUNCNAME[i+1]}
-    # Grab the source code of the line
-    echo
-    sed -n "${BASH_LINENO[i]}{s/^/    /;p}" "${BASH_SOURCE[i+1]}"
-    echo
-    j="$j  "
-  done
-}
-
-
-indent="  "
 
 function _PrintVars()
 {
@@ -122,9 +75,13 @@ function Init()
     cd .. || Fail
     topsrcdir="$PWD"
     cd "$scriptdir" || Fail
-    _PrintVars
     [ -e "$root/encap" ] || Fail "encap root $root/encap does not exist"
     [ ! -e "$prefix" ] || Fail "prefix \"$prefix\" exists already"
+    if [ -f "$topsrcdir/common.bash" ] ; then
+        echo "Sourcing $topsrcdir/common.bash"
+        source "$topsrcdir/common.bash" || Fail
+    fi
+    _PrintVars
 }
 
 Init

@@ -5,18 +5,20 @@ A very crude meta software package management system.
 A repo to track the building of /usr/local on many computers.  These
 computers as used by Dr. Nicholas Polys at Virginia Tech.
 
-
+Notice: If you see this file in /usr/local/src/ this could be working
+clone of a git repository, you should see a .git directory here too; run
+'cat .get/config' to see the source origin.
 
 ## About
 This is only intended to be useful on GNU/Linux or UNIX-like systems.
 This package is intended to make local software installations in
-/usr/local more reproducible, and better documented.  It is not meant to
-make the /usr/local directory tree on all systems that use this package be
+/usr/local more uniform, and better documented.  It is not meant to make
+the /usr/local directory tree on all systems that use this package be
 exactly the same.  Clearly that would be easily done by replicating
 /usr/local between the machines involved via rsync or network file mount.
-We anticipate some differences between computer systems.  Hence this
-project exists to keep common files in /usr/local/src/ on the computers
-involved.
+We anticipate some differences between /usr/local/ on computer systems
+that use this.  Hence this project exists to keep common files in
+/usr/local/src/ on the computers involved.
 
 ## encap
 We use the name encap for this project, because the word is descriptive of
