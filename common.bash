@@ -75,7 +75,7 @@ function Init()
     prefix="$root/encap/$name"
     cd .. || Fail
     topsrcdir="$PWD"
-    ncores="$(grep -c ^processor /proc/cpuinfo)" || Fail
+    ncores="$(nproc)" || Fail
     cd "$scriptdir" || Fail
     [ -e "$root/encap" ] || Fail "encap root $root/encap does not exist"
     [ ! -e "$prefix" ] || Fail "prefix \"$prefix\" exists already"
