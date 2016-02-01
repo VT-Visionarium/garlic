@@ -55,7 +55,7 @@ and read the README or README.md.
 
 We do not commit the source of the packages that are installing, except
 for packages that are native to this package, like encap.   We do not
-commit an generated files from the building process from the building of
+commit any generated files from the building process from the building of
 said packages.  We just keep a runnable script record of where to get the
 source to the packages (wget, git clone, ftp, and whatever), and we keep
 the source of the packages in /usr/local/ on all the systems that we
