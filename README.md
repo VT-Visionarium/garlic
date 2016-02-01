@@ -39,14 +39,15 @@ directory should be the name of the software package.
 
 To start:
 
+   '''
    cd encap/
-
+   '''
 and read on.
 
 To install other packages
-
+  '''
   cd PACKAGE_NAME/
-
+  '''
 and read the README or README.md. 
 
 
@@ -70,7 +71,7 @@ install, without checking them in to this project repo.
 
 ## More details
 In this directory is the source code or binary package archives of all
-things installed in /usr/local/.i
+things installed in /usr/local/.
 
 We use the encap package management system
 (http://www.ks.uiuc.edu/Development/Computers/docs/sysadmin/Build/encap.html)
