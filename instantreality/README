@@ -1,0 +1,8 @@
+We got the source as binary packages:
+
+
+  ftp://ftp.igd.fraunhofer.de/outgoing/irbuild/Ubuntu-x86_64/
+
+for example:
+
+  wget ftp://ftp.igd.fraunhofer.de/outgoing/irbuild/Ubuntu-x86_64/InstantReality-Ubuntu-14.04-x64-2.6.0.31123.deb

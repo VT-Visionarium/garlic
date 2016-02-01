@@ -15,7 +15,6 @@ OSGDATAZIP="$topsrcdir/$DATANAME.zip"
 
 #########################################################################
 
-
 [ -d "$GITDIR" ] || Fail "$GITDIR does not exist as a directory"
 [ -e "$OSGDATAZIP" ] || Fail "$OSGDATAZIP does not exist"
 
@@ -49,8 +48,8 @@ cmake\
  -DCMAKE_INSTALL_RPATH:STRING="$prefix/lib64"\
  -DBUILD_OSG_EXAMPLES:BOOL=ON || Fail
 
-make -j6 VERBOSE=1 || Fail # parallel make, woo ho!
-make -j3 install || Fail
+make -j${ncores} VERBOSE=1 || Fail # parallel make, woo ho!
+make -j5 install || Fail
 
 # Add the OpenSceneGraph-Data examples data to PREFIX/share/
 mkdir -p "$prefix"/share || Fail
