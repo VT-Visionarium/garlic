@@ -18,6 +18,24 @@ root=/usr/local
 
 # This is sourced in bash scripts from somewhere in $root/src/
 
+function _PrintVars()
+{
+    [ -z "$ncores" ] && return
+
+    cat << EOF || Fail
+
+${BASH_SOURCE[0]} setup:
+
+    scriptdir=$scriptdir
+    name=$name
+    topsrcdir=$topsrcdir
+    prefix=$prefix
+    ncores=$ncores
+
+EOF
+}
+
+
 function Fail()
 {
     set +x
@@ -42,22 +60,10 @@ function Fail()
     while caller $frame; do
         ((frame++));
     done
+
+    _PrintVars
+
     exit 1
-}
-
-function _PrintVars()
-{
-    cat << EOF || Fail
-
-${BASH_SOURCE[0]} setup:
-
-    scriptdir=$scriptdir
-    name=$name
-    topsrcdir=$topsrcdir
-    prefix=$prefix
-    ncores=$ncores
-
-EOF
 }
 
 

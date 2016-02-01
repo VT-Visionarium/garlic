@@ -1,0 +1,18 @@
+
+git clone https://github.com/TurboVNC/turbovnc.git git
+
+homepage
+http://www.turbovnc.org/
+
+
+dependencies:
+apt-get install libpam-dev libjpeg-turbo8-dev
+
+
+FILES:
+
+     turbovnc-VERSION/
+
+         Particular Version build contains install.bash
+         script that builds and installs it into prefix
+         /usr/local/encap/turbovnc-VERSION/
