@@ -1,0 +1,17 @@
+
+git clone https://github.com/lanceman2/InstantReality_VTCAVE.git git
+
+
+FILES:
+
+   InstantReality_VTCAVE-VERSION/
+
+        particular version build directory
+
+   common.bash
+
+        used by all install.bash scripts
+
+   git/
+
+        git clone of the source
