@@ -39,15 +39,15 @@ directory should be the name of the software package.
 
 To start:
 
-   '''
+   ```
    cd encap/
-   '''
+   ```
 and read on.
 
 To install other packages
-  '''
+  ```
   cd PACKAGE_NAME/
-  '''
+  ```
 and read the README or README.md. 
 
 
