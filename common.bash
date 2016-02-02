@@ -31,6 +31,7 @@ ${BASH_SOURCE[0]} setup:
     topsrcdir=$topsrcdir
     prefix=$prefix
     ncores=$ncores
+    gitdir=$gitdir
 
 EOF
 }
@@ -81,6 +82,7 @@ function Init()
     prefix="$root/encap/$name"
     cd .. || Fail
     topsrcdir="$PWD"
+    gitdir="$topsrcdir/git"
     ncores="$(nproc)" || Fail
     cd "$scriptdir" || Fail
     [ -e "$root/encap" ] || Fail "encap root $root/encap does not exist"
@@ -94,11 +96,32 @@ function Init()
 
 Init
 
+# Usage: GitCreateClone URL
+function GitCreateClone()
+{
+    [ -z "$1" ] && Fail "Usage: ${FUNCNAME[0]} URL"
 
+    if [ ! -f "$gitdir/.git/config" ] ; then
+        set -x
+        git clone "$1" "$gitdir" || Fail
+        set +x
+    else
+        local url
+        local cwd
+        cwd="$PWD"
+        cd "$gitdir" || Fail
+        url="$(git config --get remote.origin.url)"
+        [ "$url" = "$1" ] || \
+            Fail "git cloned repo is not from $1 it's from $url"
+        cd "$cwd" || Fail
+
+        echo -e "\ngit clone of \"$1\" \"$gitdir\" was found.\n"
+    fi
+}
 
 # Usage: MkBuildDir builddir
 # makes an empty directory in the current directory
-# and set $1 to the directory path
+# and sets $1 to the directory path
 function MkBuildDir()
 {
     for i in build_01 build_02 build_03 build_04 build_05 build_06 ; do
@@ -110,7 +133,29 @@ function MkBuildDir()
             return
         fi
     done
-    Fail "So many builds directories already.  Why not remove some?"
+    Fail "There are so many builds directories already.  Why not remove some?"
+}
+
+#Exmaple: GitToBuildDir 435.8
+#Usage: GitToBuildDir [TAG]
+function GitToBuildDir()
+{
+    local tag
+    local bdir
+    bdir=
+    MkBuildDir bdir
+    if [ -n "$1" ] ; then
+        tag="$1"
+    else
+        tag="$name"
+    fi
+
+    set -x
+    cd "$gitdir" || Fail
+    # dump the source tree of a given version with git tag $tag
+    git archive  --format=tar "$tag" | $(cd "$bdir" && tar -xf -) || Fail
+    cd "$bdir" || Fail
+    set +x
 }
 
 # prints message to stderr

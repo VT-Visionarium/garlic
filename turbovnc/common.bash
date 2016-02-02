@@ -5,42 +5,17 @@
 
 [ -z "$topsrcdir" ] && source /usr/local/src/common.bash
 
-GITDIR="$topsrcdir"/git
-
-
-function _GetSource()
-{
-    if [ ! -d "$GITDIR" ] ; then
-        set -x
-        git clone https://github.com/TurboVNC/turbovnc.git\
- "$GITDIR" || Fail
-        set +x
-    else
-        echo -e "\ngit clone "$GITDIR" was found.\n"
-    fi
-}
-
-# example: Install 2.0.1
-# Usage: Install TAG
 function Install()
 {
-    [ -n "$1" ] || Fail "Usage: Install TAG"
+    [ -z "$1" ] && Fail "Usage: ${FUNCNAME[0]} TAG"
     local tag
     tag="$1"
+    shift 1
 
-    _GetSource
-
-    builddir=
-    MkBuildDir builddir
+    GitCreateClone https://github.com/TurboVNC/turbovnc.git
+    GitToBuildDir $tag
 
     set -x
-
-    cd "$GITDIR" || Fail
-
-
-    # dump the source tree of a given version with git tag $tag
-    git archive  --format=tar "$tag" | $(cd "$builddir" && tar -xf -) || Fail
-    cd "$builddir" || Fail
 
 # note:  Could not find a apt-get package for the TurboJPEG JAR file
 # /opt/libjpeg-turbo/classes/turbojpeg.jar.  TODO: add it later.

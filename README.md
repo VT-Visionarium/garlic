@@ -20,6 +20,11 @@ We anticipate some differences between /usr/local/ on computer systems
 that use this.  Hence this project exists to keep common files in
 /usr/local/src/ on the computers involved.
 
+To get this source code:
+```
+git clone https://github.com/VT-Visionarium/encap.git
+```
+
 ## encap
 We use the name encap for this project, because the word is descriptive of
 one of the functions of this project, keeping installed software
