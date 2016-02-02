@@ -19,7 +19,7 @@ function Install()
 
     set -x
     cmake "$@" || Fail
-    make -j$ncores || Fail
+    make VERBOSE=1 -j$ncores || Fail
     make -j3 || Fail
 
     # Add the OpenSceneGraph-Data examples data to PREFIX/share/

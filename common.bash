@@ -1,3 +1,7 @@
+# Do not this source more than once
+[ -n "$__usr_local_src_common_bash__" ] && return
+__usr_local_src_common_bash__=nonzero
+
 ######################################################################
 #               CONFIGURATION
 ######################################################################
@@ -5,7 +9,6 @@
 # The prefix directory (tree) that has all this stuff installed.
 # If you have a DIR/bin than root=DIR
 root=/usr/local
-
 
 
 
@@ -125,7 +128,7 @@ function GitCreateClone()
 function MkBuildDir()
 {
     for i in build_01 build_02 build_03 build_04 build_05 build_06 ; do
-        d="${PWD}/$i"
+        d="$scriptdir/$i"
         if [ ! -e "$d" ] ; then
             mkdir -p "$d" || Fail
             echo "Build directory set to $d" 1>&2
@@ -142,16 +145,21 @@ function GitToBuildDir()
 {
     local tag
     local bdir
-    bdir=
-    MkBuildDir bdir
     if [ -n "$1" ] ; then
         tag="$1"
     else
         tag="$name"
     fi
 
-    set -x
     cd "$gitdir" || Fail
+    if ! git rev-parse $tag >/dev/null 2>&1 ; then
+        Fail "git tag \"$tag\" not found"
+    fi
+
+    bdir=
+    MkBuildDir bdir
+
+    set -x
     # dump the source tree of a given version with git tag $tag
     git archive  --format=tar "$tag" | $(cd "$bdir" && tar -xf -) || Fail
     cd "$bdir" || Fail
