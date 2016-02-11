@@ -1,0 +1,25 @@
+
+# This was only installed on anvil.sv.vt.edu
+
+# We got the package files like so:
+
+wget ftp://public.dhe.ibm.com/storage/tivoli-storage-management/maintenance/client/v6r4/Linux/LinuxX86/BA/v643/6.4.3.0-TIV-TSMBAC-LinuxX86.tar
+
+tar -xvf 6.4.3.0-TIV-TSMBAC-LinuxX86.tar
+
+
+# We ran this from this directory as root:
+
+rpm -ivh gskcrypt64-8.0.14.43.linux.x86_64.rpm 
+rpm -ivh gskssl64-8.0.14.43.linux.x86_64.rpm 
+yum localinstall TIVsm-API64.x86_64.rpm 
+yum localinstall TIVsm-BA.x86_64.rpm 
+
+# Now there will be files in /opt/tivoli/tsm/client
+# like /opt/tivoli/tsm/client/ba/bin/dsmc
+#
+# Add /opt/tivoli/tsm/client/ba/bin/dsm.opt
+# Add /opt/tivoli/tsm/client/ba/bin/dsm.sys
+#
+cp dsm.opt dsm.sys /opt/tivoli/tsm/client/ba/bin/
+
