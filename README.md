@@ -31,8 +31,8 @@ one of the functions of this project, keeping installed software
 encapsulated.  It makes installed software easier to manage using simple
 UNIX shell commands.
 
-This project includes, as a sub component a software, that predates this
-package, a package called encap.
+This project includes, as a sub component, a software that predates this
+package, a package, by the same name, encap.
 
 This older encap package does not appear to be maintained or distributed
 anywhere (but here) but there is some related web pages at URL
