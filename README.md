@@ -75,6 +75,14 @@ still in the stone ages, not using git repos, (or svn, CVS, and like) we
 keep copies of the different tar-like files for each version that we
 install, without checking them in to this project repo.
 
+## Development note
+
+We renamed the project to garlic so
+
+```
+git remote remove origin && git remote add origin https://github.com/VT-Visionarium/garlic.git
+```
+
 
 ## More details
 In this directory is the source code or binary package archives of all
