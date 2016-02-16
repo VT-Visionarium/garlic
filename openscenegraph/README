@@ -1,0 +1,14 @@
+# We got open scene graph (osg) from github.  In this
+# directory we ran:
+
+  git clone https://github.com/openscenegraph/osg.git git
+
+# We built/installed from the directories in here other than git/
+# The directory corresponds with the installed osg version.
+# At the time of this writing just OpenSceneGraph-3.5.1/
+# which we 'git archive TAG' to get from this local git repo.
+
+# Open Scene Graph has many dependences, see file 'dependences'.
+
+# cd to OpenSceneGraph-3.5.1/ and look at ./install.bash
+

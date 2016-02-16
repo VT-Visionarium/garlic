@@ -1,0 +1,137 @@
+#!/bin/csh -f 
+# encap "The Encapsulated Software Manager" by jwessel@uiuc.edu
+# Version 1.2 front end for encap.pl
+# usage: encap [-c] [-nc] [-q] [-v] [-r] [-nr] [-a] [-na] [-e] [-ne]
+
+# Put the directories that house the encapsulated software in the 
+#    ENCAP_AREA variable delimited by a space.
+# Put the directories where the old links should be cleaned out in
+#    the ENCAP_CLEAN
+# ENCAP_LIB is the points to the directory where encap.pl lives
+#-----------------BASIC SETUP--------------------------------------------
+
+set ENCAP_CLEAN_HOME="/usr/local"
+set ENCAP_CLEAN="bin sbin lib lib32 lib64 include include man libexec etc info libdata share"
+set ENCAP_AREA="/usr/local/encap"
+# directory where encap.pl is:
+set ENCAP_LIB="/usr/local/sbin"
+set PERL_LOCATION="/usr/bin/perl"
+
+#-----------------END BASIC SETUP----------------------------------------
+############## Default settings and advanced encap options ##############
+
+# Encap Default setings (1 = YES/Do it)  (0 = NO/Don't do it)
+set QUIET = 0         #
+set CLEAN = 1         # Clean up all links that don't point to stuff
+set EXCLUDE_KILL = 1  # Remove links in target if they are in encap.exclude
+set RESOLVE = 1       # Confilict resolution in encap area
+set ASK_RESOLVE = 1   # Sets interactive asking of conflict resolution mode
+
+# Advanced options
+set TARGET_AREA = ""  # Only set this if your target area is not one level
+                      # above the encap area
+set LINK_PREFIX = ""  # This options should probably only be used if some
+# machine is linking the encap area into a target area for another
+# machine.  The TARGET_AREA must be set inorder to use this option The
+# LINK_PREFIX is the path pre-pended to the links in the TARGET_AREA
+# in place of ENCAP_AREA.  When this is set, the CLEANING behavior is
+# also altered so that the links in the TARGET_AREA will resolve to
+# ENCAP_AREA, and not be removed since without the resolution, the
+# links in the TARGET area would normally not point to anything.
+# Since this probably confusing check out the documentation on
+# ftp://uiarchive.uiuc.edu/pub/encap/
+
+#------No more user serviceable parts below here-----------------------
+# parse comand line options
+foreach opt ($*) 
+   if ("$opt" == '-c') then
+	set CLEAN = 1
+   else if ("$opt" == '-nc') then
+	set CLEAN = 0
+   else if ("$opt" == '-q') then
+	set QUIET = 1
+   else if ("$opt" == '-v') then
+	set QUIET = 0
+   else if ("$opt" == '-r') then
+	set RESOLVE = 1
+   else if ("$opt" == '-nr') then
+	set RESOLVE = 0
+   else if ("$opt" == '-a') then
+	set ASK_RESOLVE = 1
+   else if ("$opt" == '-na') then
+	set ASK_RESOLVE = 0
+   else if ("$opt" == '-e') then
+	set EXCLUDE_KILL = 1
+   else if ("$opt" == '-ne') then
+	set EXCLUDE_KILL = 0
+   else
+        echo "usage: encap [-c] [-nc] [-q] [-v] [-r] [-nr] [-a] [-na] [-e] [-ne]"
+	echo "  -c  Run the cleaning phase"
+        echo "  -nc No clean, skip the cleaning phase"
+	echo "  -q  quiet mode, suppress all output but errors"
+	echo "  -v  verbose mode, watch the encap.pl do stuff"
+	echo "  -r  Resolve conflicts between software in the encap area and"
+	echo "        software that alread exists in the target area"
+	echo "  -nr No Resolving, skip the resolution analysis"
+	echo "  -a  Ask questions interactively when resolving conflicts"
+        echo "  -na No asking of questions while reolving conflicts "
+	echo "          (always answers yes to questions)"
+	echo "  -e  Remove files from the target area that exist in the exclude file"
+	echo "  -ne No exclusion removal will be done"
+	echo "  -view View the encap defaults"
+	exit(1);
+   endif
+end
+set CLEANOPT = ""
+set EXCLEAN = ""
+if ($QUIET) then
+  set CLEANOPT = "-q "
+endif
+if ($LINK_PREFIX != "") then
+  set EXCLEAN = "$ENCAP_AREA $LINK_PREFIX"
+endif
+while (!(-x $PERL_LOCATION))
+    echo "Couldn't find the PERL binary at $PERL_LOCATION"
+    echo "You may want to put the path to perl (PERL_LOCATION) in this script"
+    echo "so this question doesn't continue to pop up."
+    echo " "
+    echo "It might also be the case that this is the first time you are running"
+    echo "encap and perl is not yet linked into the target area."
+    echo "Type the full path to the perl binary. It might be something like: "
+    echo "/usr/local/encap/perl-5.003/bin/perl or /usr/bin/perl"
+    echo -n "Path to perl? "
+    set PERL_LOCATION = $<
+end
+if ($CLEAN) then
+    foreach a ($ENCAP_CLEAN_HOME)
+       foreach e ($ENCAP_CLEAN)
+	  if (-d "$a/$e") then
+	     if (! $QUIET) then
+    	        echo cleaning $a/$e
+             endif
+	     $PERL_LOCATION $ENCAP_LIB/encap.pl -c $CLEANOPT $a/$e $EXCLEAN
+ 	  endif
+       end
+    end
+    if (! $QUIET) then
+	echo "-------------Cleaning Complete----------------"
+    endif
+endif
+
+set EXENCAP = "$TARGET_AREA $LINK_PREFIX"
+set ENCAPOPT = ""
+if ($QUIET) then
+    set ENCAPOPT = "-q "
+endif
+if ($EXCLUDE_KILL) then
+    set ENCAPOPT = "$ENCAPOPT -e "
+endif
+if ($RESOLVE) then
+    set ENCAPOPT = "$ENCAPOPT -r "
+endif
+if ($RESOLVE && ! $ASK_RESOLVE) then
+    set ENCAPOPT = "$ENCAPOPT -kl -kf "
+endif
+foreach e ($ENCAP_AREA)
+   $PERL_LOCATION $ENCAP_LIB/encap.pl $ENCAPOPT $e $EXENCAP
+end

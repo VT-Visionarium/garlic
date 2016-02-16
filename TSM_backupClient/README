@@ -1,0 +1,33 @@
+
+
+Tivoli Storage Manager for UNIX Using the Backup-Archive Clients
+http://publib.boulder.ibm.com/tividd/td/TSMC/SH26-4122-01/en_US/HTML/ans50016.htm
+
+
+FILES:
+
+  centOS/
+
+      haves files in info to install on TSM client software
+      on CentOS using rpms.  At the time of writnig this it's
+      just for one machine anvil.sv.vt.edu
+
+
+  backupRestore/
+
+      locally developed scripts we use to do backup and restore
+      using the TSM client software
+
+
+
+
+
+
+TSM Client on to make and restore backups using
+Virginia Techs' Tivoli Storage Manager (TSM)
+
+http://www.shellhacks.com/en/HowTo-Install-TSM-Client-on-CentOS-RHEL 
+
+more private notes at:
+viz3:$HOME/Admin/TSM_backupRestore/
+

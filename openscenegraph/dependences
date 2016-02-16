@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# We wanted you to look at this before you run it so it's not executable.
+
+# Not all of this is required to make Open Scene Graph, but documentation
+# and related utilities are nice to have.  It's not finding all required
+# packages because because all GNU/Linux distributions do not use the same
+# naming scheme and what goes into the packages is not necessarily how the
+# down-stream developer defines it.  They can brake one project-package
+# into many distro-packages, or maybe combine many project-packages into
+# single distro-packages.  Also package names change over time.
+
+apt-get install\
+ libfltk1.3-dev\
+ fltk1.3-doc\
+ libjpeg-dev\
+ libqt4-dev\
+ qt4-dev-tools\
+ qt4-doc\
+ libqt4-dev-bin\
+ libqt4-help\
+ libqt4-opengl-dev\
+ libgtkgl2.0-dev\
+ libgtk2.0-dev\
+ libgtkglext1-dev\
+ libgtkglext1-doc\
+ libjasper-dev\
+ libxml2-dev\
+ libxml2-doc\
+ libxml2-utils\
+ libgdal-dev\
+ libgdal-doc\
+ gnutls-bin\
+ libgstreamer1.0-dev\
+ libsdl2-dev\
+ freeglut3-dev\
+ librsvg2-dev\
+ librsvg2-doc\
+ devhelp\
+ libpoppler-glib-dev\
+ libpoppler-glib-doc\
+ libwxgtk3.0-dev\
+ libwxgtk2.8-dev\
+ freeglut3-dev\
+ libxt-doc\
+ wx2.8-doc\
+ libsocket++-dev socket

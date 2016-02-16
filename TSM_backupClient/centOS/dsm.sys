@@ -1,0 +1,14 @@
+SErvername  adsm
+   COMMMethod         tcpip
+   TCPPort            1500
+   TCPServeraddress   canoe.cc.vt.edu
+   nodename           ANVIL.SV.VT.EDU
+   Passwordaccess     generate
+   schedlogretention  10
+   schedlogname       /var/log/dsmsched.log
+   errorlogretention  30
+   errorlogname       /var/log/dsmerror.log
+   managedservices    schedule
+   compression        yes
+   domain             all-local
+   exclude "/.../core"

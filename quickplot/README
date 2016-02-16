@@ -1,0 +1,17 @@
+# Installing quickplot home page: http://quickplot.sf.net/
+
+
+FILES:
+
+  git/
+
+      a git clone of quickplot
+
+  common.bash
+
+      common install bash script used by all install.bash scripts
+
+  quickplot-VERSION/
+
+      a particular quickplot build directory
+      common.bash is sourced by install.bash in this directory
