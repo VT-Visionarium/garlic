@@ -92,6 +92,18 @@ still in the stone ages, not using git repos, (or svn, CVS, and like) we
 keep copies of the different tar-like files for each version that we
 install, without checking them in to this project repo.
 
+## Development note
+
+We changed the name of this repository from encap to garlic so to continue
+using a encap clone as a garlic clone run in the top encap repo directory,
+/usr/local/src/:
+
+```
+git pull
+git remote set-url origin https://github.com/VT-Visionarium/garlic.git 
+git pull
+```
+
 
 ## More details
 In this directory is the source code or binary package archives of all
