@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-# encap
-=======
 # garlic
->>>>>>> d3c4aea9fcf858ff884d562134808afdb20326c9
 
 A very crude meta software package management system.
 
@@ -26,8 +22,7 @@ that use this.  Hence this project exists to keep common files in
 
 To get this source code:
 ```
-<<<<<<< HEAD
-git clone https://github.com/VT-Visionarium/encap.git
+git clone https://github.com/VT-Visionarium/garlic.git
 ```
 
 ## encap
@@ -35,23 +30,7 @@ We use the name encap for this project, because the word is descriptive of
 one of the functions of this project, keeping installed software
 encapsulated.  It makes installed software easier to manage using simple
 UNIX shell commands.
-=======
-git clone https://github.com/VT-Visionarium/garlic.git
-```
-
-## garlic
-It makes installed software easier to manage using simple UNIX shell
-commands.
->>>>>>> d3c4aea9fcf858ff884d562134808afdb20326c9
-
-This project includes, as a sub component, a software that predates this
-package, a package, by the same name, encap.
-
-<<<<<<< HEAD
-This older encap package does not appear to be maintained or distributed
-=======
 This encap package does not appear to be maintained or distributed
->>>>>>> d3c4aea9fcf858ff884d562134808afdb20326c9
 anywhere (but here) but there is some related web pages at URL
 http://www.ks.uiuc.edu/Development/Computers/docs/sysadmin/Build/encap.html
 from 08 Aug 2005.
