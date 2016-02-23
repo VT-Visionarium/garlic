@@ -25,6 +25,9 @@ To get this source code:
 git clone https://github.com/VT-Visionarium/garlic.git
 ```
 
+Now move this git src tree to /usr/local/src/ and that's it.
+
+
 ## encap
 We use the name encap for this project, because the word is descriptive of
 one of the functions of this project, keeping installed software
