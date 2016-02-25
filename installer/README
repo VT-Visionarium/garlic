@@ -1,0 +1,32 @@
+This directory is to help automate the installing of many software
+packages on the system proper visa apt-get (or yum) in addition
+to picking the packages that are install on a named system, like
+on the system with hostname (hostname -s) viz3.
+
+
+CAUTION: in order to get dependences install we had to run sudo apt-get
+in scripts in this directory.
+
+You may want to run 'apt-get update && apt-get dist-upgrade'
+before run any of this stuff.
+
+
+FILES:
+
+   apt-get_common.bash
+
+       installs lots of deb packages via apt-get,
+       and removes the ubuntu update-manager which is
+       a pain in the ass.
+
+
+   install.bash
+
+        runs the stuff in file `hostname -s`.  For example
+        viz3 in this directory.
+
+
+   files with names that are hosts
+
+        For example viz3
+

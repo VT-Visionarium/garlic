@@ -136,7 +136,8 @@ function MkBuildDir()
             return
         fi
     done
-    Fail "There are so many builds directories already.  Why not remove some?"
+    Fail "There are so many builds directories ($scriptdir/build_0?)\
+ already.\n  Why not remove some?"
 }
 
 #Exmaple: GitToBuildDir 435.8

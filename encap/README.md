@@ -1,8 +1,10 @@
 # encap
 a fork of The Encapsulated Software Manager by jwessel@uiuc.edu
 
+This package depends on csh: apt-get install csh
+
 ## install
-See file install.bash (or just run it) for details
+See file root_install.bash (or just run it) for details
 
 ## old documentation
 This small package does not appear to be maintained or distributed

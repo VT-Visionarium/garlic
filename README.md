@@ -16,6 +16,13 @@ clone of a git repository, you should see a .git directory here too; run
 It's called garlic because the name potato was already taken by another
 software project.
 
+Most sys-admins keep notes.  We take it one step farther, by putting these
+sys-admin notes in the form of executable scripts which explain exactly
+how the system is built.  Warning: both notes and scripts experience
+bit-rot.  Operating systems change over time, so some bit-rot cannot be
+helped.
+
+
 ## About
 This is only intended to be useful on GNU/Linux or UNIX-like systems.
 This package is intended to make local software installations in
@@ -35,6 +42,9 @@ git clone https://github.com/VT-Visionarium/garlic.git
 Now move this git src tree to /usr/local/src/ and that's it, now just
 keep pushing it and /usr/local/src/ will not suffer from bit-root.
 
+The main idea is that when I get hit by a bus someone can just looks at
+the scripts and notes here-in to do my job in a semi-automated fashion;
+put another way, I'm writing code to replace myself.
 
 ## encap
 We use the name encap for this project, because the word is descriptive of
@@ -141,6 +151,10 @@ Some files in this directory:
    Open Scene Graph installations to be sym-linked into /usr/local/bin/,
    /usr/local/lib64/, and so on; encap manages that choice with the file
    /usr/local/encap/encap.exclude.
+
+   So of these projects have a root_install.bash install script which
+   needs to be run as the root super user.  Read it first!  Then run
+   'sudo ./root_install.bash' or 'su -' it if you like.
 
    Not all packages come in the same source form, some are just tarballs,
    some are git repos, some are .deb binary packages, some are svn repos,
