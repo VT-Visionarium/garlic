@@ -1,9 +1,13 @@
 # garlic
 
-A very crude meta software package management system.
+A very crude meta software package management system, or local software
+build system.  Mostly bash scripts and some imposed directory structure.
 
-A repo to track the building of /usr/local on many computers.  These
-computers as used by Dr. Nicholas Polys at Virginia Tech.
+A repo to track the building and installing of software in /usr/local on
+many computers.  These computers as used by Dr. Nicholas Polys at Virginia
+Tech.  There is even some automation common system administration tasks,
+i.e. stuff running apt-get and putting in /etc/ for setting up LDAP client
+authentication.
 
 Notice: If you see this file in /usr/local/src/ this could be working
 clone of a git repository, you should see a .git directory here too; run
@@ -28,7 +32,8 @@ To get this source code:
 git clone https://github.com/VT-Visionarium/garlic.git
 ```
 
-Now move this git src tree to /usr/local/src/ and that's it.
+Now move this git src tree to /usr/local/src/ and that's it, now just
+keep pushing it and /usr/local/src/ will not suffer from bit-root.
 
 
 ## encap
@@ -41,7 +46,7 @@ anywhere (but here) but there is some related web pages at URL
 http://www.ks.uiuc.edu/Development/Computers/docs/sysadmin/Build/encap.html
 from 08 Aug 2005.
 
-## installing
+## installing stuff
 Each directory in this top source directory contains files, scripts and
 whatnot, used to install a particular software package.  The name of the
 directory should be the name of the software package.
