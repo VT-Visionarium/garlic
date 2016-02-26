@@ -5,12 +5,16 @@ source /usr/local/src/common.bash
 
 ############################# STUFF TO CONFIGURE ########################
 
-TAR="$topsrcdir/$name-source.tar.gz"
+TAR="$topsrcdir/$name-source.tar.bz2"
 
 #########################################################################
 
+URL="http://repository.timesys.com/buildsources/f/fltk/fltk-1.1.10/fltk-1.1.10-source.tar.bz2"
 
-[ -e "$TAR" ] || Fail "TAR file $TAR does not exist"
+if [ ! -f "$TAR" ] ; then
+    set -x
+    wget $URL -O $TAR || Fail
+fi
 
 
 #########################################################################

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 apt-get -y install\
  manpages-dev\
  manpages-posix-dev\
@@ -10,6 +12,10 @@ apt-get -y install\
  doxygen-doc\
  vim-gtk\
  cscope\
+ cmake\
+ cmake-doc || exit 1
+
+apt-get -y install\
  htop\
  tree\
  libreoffice\
@@ -20,7 +26,13 @@ apt-get -y install\
  vim-doc\
  sox\
  libsox-fmt-all\
- rsync || exit 1
+ rsync\
+ gdebi\
+ xmlstarlet || exit 1
 
 apt-get -y purge update-manager || exit 1
- 
+
+# this will remove wayland
+# this is dangerous.  We need to reboot after this
+apt-get install libgl1-mesa-dev libgl1-mesa-glx xorg || exit 1
+

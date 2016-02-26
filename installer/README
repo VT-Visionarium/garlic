@@ -10,6 +10,15 @@ in scripts in this directory.
 You may want to run 'apt-get update && apt-get dist-upgrade'
 before run any of this stuff.
 
+What to do?:
+
+  run: app-get_common.bash
+
+  and maybe reboot to get X11 working with the system.
+
+  and then run: install.bash
+
+
 
 FILES:
 
