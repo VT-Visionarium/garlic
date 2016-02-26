@@ -15,6 +15,10 @@ apt-get -y install\
  cmake\
  cmake-doc || exit 1
 
+# this will remove wayland
+# this is dangerous.  We need to reboot after this
+#apt-get install libgl1-mesa-dev libgl1-mesa-glx xorg mesa-utils || exit 1
+
 apt-get -y install\
  htop\
  tree\
@@ -28,12 +32,12 @@ apt-get -y install\
  libsox-fmt-all\
  rsync\
  gdebi\
+ python-pip\
+ paraview\
+ python-astropy\
+ python-scipy\
+ python-astropy\
  xmlstarlet || exit 1
 
 apt-get -y purge update-manager || exit 1
-
-# this will remove wayland
-# this is dangerous.  We need to reboot after this
-apt-get install libgl1-mesa-dev libgl1-mesa-glx xorg mesa-utils || exit 1
-
 
