@@ -4,17 +4,19 @@
 
 # 'hostname -s' is the name of the file list of projects to install
 
+scriptdir="$(dirname ${BASH_SOURCE[$i]})" || exit $?
+cd "$scriptdir" || exit $?
+scriptdir="$PWD" # now we have full path
+cd .. || exit $?
 
-topsrc=/usr/local/src
-srcdir=/usr/local/src/installer
-cwd="$PWD"
+
 progs[0]=
 
 function Fail()
 {
-    [ -n "$1" ] && echo "$*"
+    [ -n "$1" ] && echo -e "$*"
     echo
-    echo "running script $0 from $cwd FAILED"
+    echo "running scripti ${BASH_SOURCE[$i]} FAILED"
     echo
     exit 1
 }
@@ -54,17 +56,18 @@ function InstallPackages()
 }
 
 
-host="$(hostname -s)" || exit 1
+host="$(hostname -s)" || exit $?
 [ -n "$host" ] || exit 1
-hostfile="$srcdir/$host"
+hostfile="$scriptdir/$host"
 [ -f "$hostfile" ] ||\
-    Fail "FILE LIST for host $host ($hostfile) was not found"
+    Fail "FILE LIST for host $host ($hostfile) was not found\n\
+\n\
+  Copy an existing one from $scriptdir to $hostfile and edit it."
+
 
 echo
 echo "Running install scripts from $hostfile"
 echo
-
-cd "$topsrc" || Fail
 
 InstallPackages "$hostfile"
 

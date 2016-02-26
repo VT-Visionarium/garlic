@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# this script does not do much, just copies
+# some files into /etc/skel/
+
 function Fail()
 {
     echo -e "\n$*\n"

@@ -1,6 +1,9 @@
 #!/bin/bash
 
-source /usr/local/src/common.bash
+scriptdir="$(dirname ${BASH_SOURCE[$i]})" || exit $?
+cd "$scriptdir" || exit $?
+scriptdir="$PWD" # now we have full path
+source ../../common.bash
 
 
 ############################# STUFF TO CONFIGURE ########################

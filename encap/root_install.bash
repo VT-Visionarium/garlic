@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# This script serves only to record how this encap package was installed.
-# Running is just tells you how to install this encap thingy.
-
 scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
 cd "$scriptdir" || exit $?
 scriptdir="$PWD"

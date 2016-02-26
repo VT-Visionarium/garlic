@@ -3,37 +3,18 @@
 # This is sourced by install.bash file in the directories in this
 # directory.
 
-[ -z "$topsrcdir" ] && source /usr/local/src/common.bash
-
-GITDIR="$topsrcdir"/git
-
-
-function _GetSource()
-{
-    if [ ! -d "$GITDIR" ] ; then
-        set -x
-        git clone https://github.com/lanceman2/InstantReality_VTCAVE.git\
- "$GITDIR" || Fail
-        set +x
-    else
-        echo -e "\ngit clone "$GITDIR" was found.\n"
-    fi
-}
+# Do not source this more than once.
+[ -n "$cscriptdir" ] && return
+cscriptdir="$(dirname ${BASH_SOURCE[$i]})" || exit $?
+cd "$cscriptdir" || exit $?
+cscriptdir="$PWD" # now we have full path
+[ -z "$topsrcdir" ] && source ../common.bash
+unset cscriptdir
 
 function Install()
 {
-    _GetSource
-
-    builddir=
-    MkBuildDir builddir
-
-    set -x
-
-    cd "$GITDIR" || Fail
-
-    # dump the source tree of a given version with a git tag $name
-    git archive  --format=tar $name | $(cd "$builddir" && tar -xf -) || Fail
-    cd "$builddir" || Fail
+    GitCreateClone clone https://github.com/lanceman2/InstantReality_VTCAVE.git
+    GitToBuildDir
 
     make -j3 PREFIX=$prefix || Fail # parallel make, woo ho!
     make install PREFIX=$prefix || Fail

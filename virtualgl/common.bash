@@ -3,24 +3,26 @@
 # This is sourced by install.bash file in the directories in this
 # directory.
 
-[ -z "$topsrcdir" ] && source /usr/local/src/common.bash
+# Do not source this more than once.
+[ -n "$cscriptdir" ] && return
+cscriptdir="$(dirname ${BASH_SOURCE[$i]})" || exit $?
+cd "$cscriptdir" || exit $?
+cscriptdir="$PWD" # now we have full path
+[ -z "$topsrcdir" ] && source ../common.bash
+unset cscriptdir
 
-# Usage: Install TAG CMAKE_OPTIONS
-function Install()
+
+function PreInstall()
 {
-    [ -z "$2" ] && Fail "Usage: ${FUNCNAME[0]} TAG CMAKE_OPTIONS"
-    local tag
-    tag="$1"
-    shift 1
+    [ -z "$1" ] && Fail "Usage: ${FUNCNAME[0]} GIT_TAG"
 
     GitCreateClone https://github.com/VirtualGL/virtualgl.git
-    GitToBuildDir $tag
-
-    set -x
-    cmake "$@" || Fail
-    make VERBOSE=1 -j$ncores || Fail
-    make -j3 || Fail
-
-    PrintSuccess
+    GitToBuildDir $1 # $1 = git tag
 }
 
+function Install()
+{
+    make VERBOSE=1 -j$ncores || Fail
+    make -j3 install || Fail
+    PrintSuccess
+}

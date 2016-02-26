@@ -46,6 +46,19 @@ The main idea is that when I get hit by a bus someone can just looks at
 the scripts and notes here-in to do my job in a semi-automated fashion;
 put another way, I'm writing code to replace myself.
 
+We make installing scripts that only rely on the relative path of file
+that are in this package, so that we can put this package top source
+directory anywhere, without braking any of the scripts in it.  For example
+we could put it in /usr/local/src/ or in /usr/local/src/garlic/ or in
+/home/joe/projects/git/garlic/ and all the build/installer scripts will
+still work fine.  You may change the default installation root prefix
+prefix from /usr/local to what ever you like by editing common.bash in the
+top source directory changing, for example, <em>root=/usr/local</em> to
+<em>root=/home/joe/installed</em>.  Because of the relative path thingy,
+you can't move scripts to between directories without editing them.  They
+are assumed to be in a fixed relative location.  As it the standard with
+most software build tools.
+
 ## encap
 We use the name encap for this project, because the word is descriptive of
 one of the functions of this project, keeping installed software
