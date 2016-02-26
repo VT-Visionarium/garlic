@@ -1,6 +1,6 @@
 This being kept in a git repo keeps a common /etc/skel files.
 
-See 'man useradd'.
+See 'man adduser'.
 
 FILES:
 
