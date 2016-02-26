@@ -51,7 +51,7 @@ chmod 640 /etc/nslcd.conf || exit $?
 apt-get install ssh || exit $?
 
 
-Prompt "NEXT We'll edit /etc/ssh/sshd_conf with vim and add a AllowUsers lance ..."
+Prompt "NEXT We'll edit /etc/ssh/sshd_config with vim and add a AllowUsers lance ..."
 
 set -x
 vim /etc/ssh/sshd_config || exit $?
