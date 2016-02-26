@@ -18,11 +18,11 @@ function Prompt()
     local a
     set +x
     echo
-    echo "< Cntl-C > to quit"
+    echo "    < Cntl-C > to quit"
     if [ -n "$1" ] ; then
-        echo -ne "\n\n$* ===>>"
+        echo -ne "\n\n$*\n ===< enter to continue > ===>>>"
     else
-        echo -ne "\n\nOkay to go ===>>"
+        echo -ne "\n\n ===< enter to continue > ===>>>"
     fi
     read a
 }
