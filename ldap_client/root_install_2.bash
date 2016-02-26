@@ -67,7 +67,7 @@ cat << EOF >> /etc/pam.d/common-session || exit $?
 session required    pam_mkhomedir.so  skel=/etc/skel  umask=0022
 EOF
 
-Prompt "NEXT Check the addition of pam_mkhomedir.so to /etc/pam.d/common-session"
+Prompt "NEXT with vim check the addition of pam_mkhomedir.so to /etc/pam.d/common-session"
 
 set -x
 vim /etc/pam.d/common-session || exit $?
