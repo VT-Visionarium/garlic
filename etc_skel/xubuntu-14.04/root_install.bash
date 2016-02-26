@@ -12,6 +12,7 @@ function Fail()
 # run as root or not at all
 [ "$(id -u)" = 0 ] || Fail "You must run this as root"
 
+set -x
 scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
 cd "$scriptdir" || exit $?
 scriptdir="$PWD"
