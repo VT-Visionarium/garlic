@@ -10,6 +10,7 @@ sbin=/usr/local/sbin
 
 if [ "$(id -u)" = 0 ] ; then
     set -x
+    apt-get -y install csh
     mkdir -p $sbin || exit 1
     cp -f $scriptdir/encap $scriptdir/encap.pl $sbin || exit 1
     chmod 755 $sbin/encap || exit 1
