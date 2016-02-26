@@ -34,5 +34,6 @@ apt-get -y purge update-manager || exit 1
 
 # this will remove wayland
 # this is dangerous.  We need to reboot after this
-apt-get install libgl1-mesa-dev libgl1-mesa-glx xorg || exit 1
+apt-get install libgl1-mesa-dev libgl1-mesa-glx xorg mesa-utils || exit 1
+
 
