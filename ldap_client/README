@@ -10,7 +10,7 @@ some points in the process.  The root_install_?.bash scripts are
 interactive.
 
 On Xbuntu 10.04
-Look at and then run: sudo ./root_install_0.bash  and then sudo
+Look at them and then run: sudo ./root_install_0.bash  and then sudo
 ./root_install_1.bash and so on.
 
 --------------------------------------------------------------------------

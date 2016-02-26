@@ -31,8 +31,12 @@ function Prompt()
 Prompt "Note this script (2) is interactive, it steps through things"
 
 set -x
-# wget the server's public key thingy with:
-#wget --no-check-certificate http://www.middleware.vt.edu/pubs/vt-cachain.pem
+
+if [ ! -f vt-cachain.pem ] ; then
+    # wget the server's public key thingy with:
+    wget --no-check-certificate\
+ http://www.middleware.vt.edu/pubs/vt-cachain.pema || Fail
+fi
 
 cp vt-cachain.pem /etc/ca-certificates/vt-cachain.pem || exit $?
 chmod 644 /etc/ca-certificates/vt-cachain.pem || exit $?
@@ -81,12 +85,14 @@ set +x
 
 cat << EOF
 
-Now run some ssh tests with a user that have an LDAP account
-both with and without a local home directory.
+  Now run some ssh tests with a user that have an LDAP account
+  both with and without a local home directory.
 
-start and stop nscd and nslcd
+  start and stop nscd and nslcd via 'service nscd start' and so on.
 
-if it all works leave the services ssh, nscd, and nslcd running
+  if it all works leave the services ssh, nscd, and nslcd running
 
+
+      that's it...
 EOF
 

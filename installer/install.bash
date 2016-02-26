@@ -53,24 +53,18 @@ function InstallPackages()
     echo
 }
 
-function Init()
-{
-    local host
-    local hostfile
-    host="$(hostname -s)" || exit 1
-    [ -n "$host" ] || exit 1
-    hostfile="$srcdir/$host"
-    [ -f "$hostfile" ] ||\
-        Fail "FILE LIST for host $host ($hostfile) was not found"
 
-    echo
-    echo "Running install scripts from $hostfile"
-    echo
+host="$(hostname -s)" || exit 1
+[ -n "$host" ] || exit 1
+hostfile="$srcdir/$host"
+[ -f "$hostfile" ] ||\
+    Fail "FILE LIST for host $host ($hostfile) was not found"
 
-    cd "$topsrc" || Fail
+echo
+echo "Running install scripts from $hostfile"
+echo
 
-    InstallPackages "$hostfile"
-}
+cd "$topsrc" || Fail
 
-Init
+InstallPackages "$hostfile"
 
