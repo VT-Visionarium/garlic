@@ -10,34 +10,35 @@ apt-get -y install\
  gnuplot-doc\
  doxygen\
  doxygen-doc\
- vim-gtk\
  cscope\
+ htop\
+ strace\
+ rsync\
+ gdebi\
+ csh\
+ xmlstarlet\
+ vim\
+ tree\
  cmake\
- cmake-doc || exit 1
+ lynx\
+ markdown\
+ cmake-doc || exit $?
 
 # this will remove wayland
 # this is dangerous.  We need to reboot after this
 #apt-get install libgl1-mesa-dev libgl1-mesa-glx xorg mesa-utils || exit 1
 
 apt-get -y install\
- htop\
- tree\
  libreoffice\
- strace\
- csh\
- vim\
  vim-gtk\
  vim-doc\
  sox\
  libsox-fmt-all\
- rsync\
- gdebi\
  python-pip\
  paraview\
  python-astropy\
  python-scipy\
- python-astropy\
- xmlstarlet || exit 1
+ python-astropy || exit $?
 
-apt-get -y purge update-manager || exit 1
+apt-get -y purge update-manager || exit $?
 

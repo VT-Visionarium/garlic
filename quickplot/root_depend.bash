@@ -26,7 +26,5 @@ apt-get -y install\
  imagemagick-doc\
  imagemagick\
  libasound2-doc\
- libpulse-dev\
- lynx\
- markdown
+ libpulse-dev || exit $?
 
