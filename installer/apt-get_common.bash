@@ -21,6 +21,7 @@ apt-get -y install\
  tree\
  cmake\
  lynx\
+ at\
  markdown\
  cmake-doc || exit $?
 
