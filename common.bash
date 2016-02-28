@@ -74,13 +74,24 @@ function Fail()
 function Init()
 {
     local i
+    local script
     i=${#BASH_SOURCE[@]}
     let i=$i-1
 
     # now BASH_SOURCE[$i] the top bash script file
-    scriptdir="$(dirname ${BASH_SOURCE[$i]})"
-    cd "$scriptdir" || Fail "cd to scriptdir \"$scriptdir\" failed"
-    scriptdir="$PWD" # now we have full path
+    # scriptdir is the directory where the first script is located
+    if [ -z "$scriptdir" ] ; then
+        # A previous script has not set the scriptdir variable
+        scriptdir="$(dirname ${BASH_SOURCE[$i]})"
+        cd "$scriptdir" || Fail "cd to scriptdir \"$scriptdir\" failed"
+        scriptdir="$PWD" # now we have full path
+    else
+        # A previous script has set the scriptdir variable
+        script="$(basename ${BASH_SOURCE[$i]})"
+        # scriptdir is set, lets assume some things about it
+        [ -x "$scriptdir/$script" ] || Fail "scriptdir=$scriptdir was set wrong"
+    fi
+
     name="$(basename $scriptdir)" || Fail
     prefix="$root/encap/$name"
     cd .. || Fail
