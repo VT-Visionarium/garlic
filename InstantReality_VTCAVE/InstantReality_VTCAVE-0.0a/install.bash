@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # this will also source ../common.bash
-scriptdir="$(dirname ${BASH_SOURCE[$i]})" || exit $?
+scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
 cd "$scriptdir" || exit $?
 scriptdir="$PWD" # now we have full path
 source ../../common.bash

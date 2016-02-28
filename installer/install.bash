@@ -4,7 +4,7 @@
 
 # 'hostname -s' is the name of the file list of projects to install
 
-scriptdir="$(dirname ${BASH_SOURCE[$i]})" || exit $?
+scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
 cd "$scriptdir" || exit $?
 scriptdir="$PWD" # now we have full path
 cd .. || exit $?
@@ -16,7 +16,7 @@ function Fail()
 {
     [ -n "$1" ] && echo -e "$*"
     echo
-    echo "running scripti ${BASH_SOURCE[$i]} FAILED"
+    echo "running script ${BASH_SOURCE[$i]} FAILED"
     echo
     exit 1
 }

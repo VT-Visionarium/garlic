@@ -5,7 +5,7 @@
 
 # Do not source this more than once.
 [ -n "$cscriptdir" ] && return
-cscriptdir="$(dirname ${BASH_SOURCE[$i]})" || exit $?
+cscriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
 cd "$cscriptdir" || exit $?
 cscriptdir="$PWD" # now we have full path
 [ -z "$topsrcdir" ] && source ../common.bash
