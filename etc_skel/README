@@ -1,6 +1,10 @@
 This being kept in a git repo keeps a common /etc/skel files.
+/etc/skel/ has in it the file that are copied to /home/user/
+when a user is created.
+
 
 See 'man adduser'.
+
 
 FILES:
 
