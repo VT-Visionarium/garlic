@@ -34,4 +34,5 @@ mv /etc/skel $bakdir || exit $?
 
 cp -r skel /etc/ || exit $?
 chmod -R a+r /etc/skel || exit $?
-
+set +x
+echo "SUCCESS"
