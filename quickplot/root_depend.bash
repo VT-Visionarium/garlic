@@ -24,5 +24,6 @@ apt-get -y install\
  libgtk-3-doc\
  imagemagick-doc\
  imagemagick\
+ lynx\
  || exit $?
 

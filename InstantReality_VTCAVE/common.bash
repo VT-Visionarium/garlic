@@ -13,7 +13,7 @@ unset cscriptdir
 
 function Install()
 {
-    GitCreateClone clone https://github.com/lanceman2/InstantReality_VTCAVE.git
+    GitCreateClone https://github.com/lanceman2/InstantReality_VTCAVE.git
     GitToBuildDir
 
     make -j3 PREFIX=$prefix || Fail # parallel make, woo ho!
