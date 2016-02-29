@@ -7,11 +7,13 @@ scriptdir="$PWD" # now we have full path
 source ../../common.bash
 
 DATANAME=OpenSceneGraph-Data-3.4.0
+ZIP=${DATANAME}.zip
 
-if [ ! -f "$topsrcdir/$DATANAME" ] ; then
+
+if [ ! -f "$ZIP" ] ; then
     wget\
- http://trac.openscenegraph.org/downloads/developer_releases/${DATANAME}.zip\
- -O "$topsrcdir/${DATANAME}.zip" || Fail
+ http://trac.openscenegraph.org/downloads/developer_releases/$ZIP\
+ -O "$ZIP" || Fail
 fi
 
 
