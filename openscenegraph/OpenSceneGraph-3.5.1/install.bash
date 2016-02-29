@@ -8,6 +8,13 @@ source ../../common.bash
 
 DATANAME=OpenSceneGraph-Data-3.4.0
 
+if [ ! -f "$topsrcdir/$DATANAME" ] ; then
+    wget\
+ http://trac.openscenegraph.org/downloads/developer_releases/${DATANAME}.zip\
+ -O "$topsrcdir/$DATANAME" || Fail
+fi
+
+
 PreInstall $name # git tag
 
 set -x
