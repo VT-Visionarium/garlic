@@ -92,6 +92,10 @@ cat << EOF
 
   if it all works leave the services ssh, nscd, and nslcd running
 
+      try:
+
+          id ambrown7
+
 
       that's it...
 
