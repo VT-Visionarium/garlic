@@ -19,6 +19,8 @@ apt-get -y install\
  xmlstarlet\
  vim\
  tree\
+ talk\
+ aptitude\
  cmake\
  lynx\
  markdown\
