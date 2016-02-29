@@ -50,26 +50,32 @@ chmod 640 /etc/nslcd.conf || exit $?
 
 apt-get install ssh || exit $?
 
+date="$(date)" || exit $?
 
+set +x
 Prompt "NEXT We'll edit /etc/ssh/sshd_config with vim and add a AllowUsers lance ..."
 
 set -x
+
+cat << EOF >> /etc/ssh/sshd_config || exit $?
+
+# Added by lance on $date
+AllowUsers lance lanceman npolys faiz89 fabidi89
+EOF
+
 vim /etc/ssh/sshd_config || exit $?
 
 
-date="$(date)" || exit $?
+set +x
+Prompt "NEXT with add/check with vim  pam_mkhomedir.so to /etc/pam.d/common-session"
 
-# TODO: consider pam_mkhomedir in /etc/pam.d/common-session-noninteractive
-
+set -x
 cat << EOF >> /etc/pam.d/common-session || exit $?
 
-#lance added next line $date
+# lance added next line $date
 session required    pam_mkhomedir.so  skel=/etc/skel  umask=0022
 EOF
 
-Prompt "NEXT with vim check the addition of pam_mkhomedir.so to /etc/pam.d/common-session"
-
-set -x
 vim /etc/pam.d/common-session || exit $?
 
 
