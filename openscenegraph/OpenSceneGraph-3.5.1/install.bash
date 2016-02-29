@@ -11,7 +11,7 @@ DATANAME=OpenSceneGraph-Data-3.4.0
 if [ ! -f "$topsrcdir/$DATANAME" ] ; then
     wget\
  http://trac.openscenegraph.org/downloads/developer_releases/${DATANAME}.zip\
- -O "$topsrcdir/$DATANAME" || Fail
+ -O "$topsrcdir/${DATANAME}.zip" || Fail
 fi
 
 
