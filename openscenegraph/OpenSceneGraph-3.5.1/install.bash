@@ -11,9 +11,11 @@ ZIP=${DATANAME}.zip
 
 
 if [ ! -f "$ZIP" ] ; then
+    set -x
     wget\
  http://trac.openscenegraph.org/downloads/developer_releases/$ZIP\
  -O "$ZIP" || Fail
+    set +x
 fi
 
 
