@@ -23,6 +23,8 @@ apt-get -y install\
  lynx\
  at\
  markdown\
+ aptitude\
+ talk\
  cmake-doc || exit $?
 
 # this will remove wayland
