@@ -41,6 +41,9 @@ apt-get -y install\
  paraview\
  python-astropy\
  python-scipy\
+ libcr-dev\
+ mpich2\
+ mpich2-doc\
  python-astropy || exit $?
 
 apt-get -y purge update-manager || exit $?
