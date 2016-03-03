@@ -42,8 +42,8 @@ apt-get -y install\
  python-astropy\
  python-scipy\
  libcr-dev\
- mpich2\
  mpich2-doc\
+ mpich2\
  python-astropy || exit $?
 
 apt-get -y purge update-manager || exit $?
