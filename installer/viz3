@@ -1,10 +1,12 @@
-# List of packages to install using this files
-# that are in /usr/local/src/
+# List of packages to install using these files
+# that are in this git repo directory.
 
 
 sudo encap/root_install.bash
 
 sudo quickplot/root_depend.bash
 quickplot/quickplot-1.0.1rc/install.bash
-
+sudo encap
 quickscope/quickscope-0.1.0/install.bash
+sudo encap
+
