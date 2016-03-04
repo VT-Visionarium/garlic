@@ -44,6 +44,7 @@ apt-get -y install\
  libcr-dev\
  mpich2-doc\
  mpich2\
+ mesa-utils\
  python-astropy || exit $?
 
 apt-get -y purge update-manager || exit $?
