@@ -45,6 +45,7 @@ apt-get -y install\
  mpich2-doc\
  mpich2\
  mesa-utils\
+ cmake-curses-gui\
  python-astropy || exit $?
 
 apt-get -y purge update-manager || exit $?
