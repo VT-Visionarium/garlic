@@ -33,6 +33,8 @@ apt-get -y install\
 # this is dangerous.  We need to reboot after this
 #apt-get install libgl1-mesa-dev libgl1-mesa-glx xorg mesa-utils libglu1-mesa-dev || exit 1
 
+apt-get install sshfs
+
 apt-get -y install\
  libreoffice\
  vim-gtk\
