@@ -50,29 +50,42 @@ chmod 640 /etc/nslcd.conf || exit $?
 
 apt-get install ssh || exit $?
 
+date="$(date)" || exit $?
 
+set +x
 Prompt "NEXT We'll edit /etc/ssh/sshd_config with vim and add a AllowUsers lance ..."
 
 set -x
+
+cat << EOF >> /etc/ssh/sshd_config || exit $?
+
+# Added by lance on $date
+AllowUsers lance lanceman npolys faiz89 fabidi89
+EOF
+
 vim /etc/ssh/sshd_config || exit $?
 
 
-date="$(date)" || exit $?
-
-# TODO: consider pam_mkhomedir in /etc/pam.d/common-session-noninteractive
-
-cat << EOF >> /etc/pam.d/common-session || exit $?
-
-#lance added next line $date
-session required    pam_mkhomedir.so  skel=/etc/skel  umask=0022
-EOF
-
-Prompt "NEXT with vim check the addition of pam_mkhomedir.so to /etc/pam.d/common-session"
+set +x
+Prompt "NEXT with add/check with vim  pam_mkhomedir.so to /etc/pam.d/common-session"
 
 set -x
+cat << EOF >> /etc/pam.d/common-session || exit $?
+
+# lance added next line $date
+session required    pam_mkhomedir.so  skel=/etc/skel  umask=0077
+EOF
+
 vim /etc/pam.d/common-session || exit $?
 
 
+set +x
+Prompt "NEXT we vim edit /etc/login.defs to change the default UMASK to 077"
+
+set -x
+vim +152 /etc/login.defs || exit $?
+
+set +x
 Prompt "NEXT this script will Restart ssh, nscd, and nslcd"
 
 set -x
@@ -91,6 +104,10 @@ cat << EOF
   start and stop nscd and nslcd via 'service nscd start' and so on.
 
   if it all works leave the services ssh, nscd, and nslcd running
+
+      try:
+
+          id ambrown7
 
 
       that's it...

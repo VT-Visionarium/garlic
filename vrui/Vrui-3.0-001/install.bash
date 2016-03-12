@@ -8,11 +8,12 @@ source ../../common.bash
 
 ############################# STUFF TO CONFIGURE ########################
 
-TAR="$topsrcdir/$name-source.tar.bz2"
+TAR="$topsrcdir/$name.tar.gz"
+
 
 #########################################################################
 
-URL="http://repository.timesys.com/buildsources/f/fltk/fltk-1.1.10/fltk-1.1.10-source.tar.bz2"
+URL="http://idav.ucdavis.edu/~okreylos/ResDev/Vrui/$name.tar.gz"
 
 if [ ! -f "$TAR" ] ; then
     set -x
@@ -29,14 +30,12 @@ cd "$builddir" || Fail
 
 set -x
 
-tar -xvf "$TAR" || Fail
+tar -xf "$TAR" || Fail
 cd "$builddir"/"$name" || Fail
 
-CFLAGS="-g"\
- ./configure\
- --prefix=$prefix\
- --enable-shared || Fail
-make -j10 || Fail # parallel make, woo ho!
-make install || Fail
+make INSTALLDIR="$prefix"  -j || Fail # parallel make, woo ho!
+make INSTALLDIR="$prefix" install || Fail
 
-PrintSuccess
+#cd "$builddir"/"$name"/ExamplePrograms && make INSTALLDIR="$prefix" || Fail
+
+PrintSuccess #"run:\n$buildir/$name/ExamplePrograms/bin/ShowEarthModels\n"

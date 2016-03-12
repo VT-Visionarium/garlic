@@ -1,12 +1,23 @@
 #!/bin/bash
 
-scriptdir="$(dirname ${BASH_SOURCE[$i]})" || exit $?
+scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
 cd "$scriptdir" || exit $?
 scriptdir="$PWD" # now we have full path
 # this will source ../common.bash too
 source ../../common.bash
 
 DATANAME=OpenSceneGraph-Data-3.4.0
+ZIP=${DATANAME}.zip
+
+
+if [ ! -f "$ZIP" ] ; then
+    set -x
+    wget\
+ http://trac.openscenegraph.org/downloads/developer_releases/$ZIP\
+ -O "$ZIP" || Fail
+    set +x
+fi
+
 
 PreInstall $name # git tag
 

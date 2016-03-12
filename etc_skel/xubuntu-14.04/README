@@ -2,6 +2,12 @@ This is to Xubuntu 10.04 systems
 
 This is for /etc/skel 
 
+Look at root_install.bash and if you like what is will do run:
+
+    sudo ./root_install.bash
+
+
+
 see 'man adduser'
 
 

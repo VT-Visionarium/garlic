@@ -1,5 +1,7 @@
 
-We got the source for FTLK from http://www.fltk.org/software.php
+We got the source for FTLK from http://www.fltk.org/software.php]
+We got the version fltk-1.1.10-source.tar.bz2 (1.1.10) because that
+was found to work with DTK (Diverse ToolKit).  See ../diverse/
 
 
 FILES:

@@ -11,8 +11,6 @@
 # single distro-packages.  Also package names change over time.
 
 apt-get install\
- libfltk1.3-dev\
- fltk1.3-doc\
  libjpeg-dev\
  libqt4-dev\
  qt4-dev-tools\

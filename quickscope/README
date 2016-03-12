@@ -1,5 +1,9 @@
-
+Most of the dependencies you can get from ../quickplot/
 
 git clone https://github.com/lanceman2/quickscope.git git
 
+
+dependency
+
+   apt-get install markdown
 

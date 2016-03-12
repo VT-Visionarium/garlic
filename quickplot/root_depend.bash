@@ -22,9 +22,8 @@ apt-get -y install\
  libgtk2.0-doc\
  libgtk-3-dev\
  libgtk-3-doc\
- libasound-dev\
  imagemagick-doc\
  imagemagick\
- libasound2-doc\
- libpulse-dev || exit $?
+ lynx\
+ || exit $?
 
