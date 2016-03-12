@@ -42,27 +42,10 @@ apt-get -y install\
  python-astropy\
  python-scipy\
  libcr-dev\
- mpich2-doc\
  mpich2\
+ mpich2-doc\
  mesa-utils\
- cmake-curses-gui\
  python-astropy || exit $?
 
-# optional libraries for a better VRUI experience
-apt-get -y install\
-    libudev-dev\ 
-    libusb-1.0-0-dev\ 
-    libpng-dev\ 
-    libjpeg-dev\ 
-    libtiff-dev\ 
-    libasound-dev\
-    libdc1394-22-dev\ 
-    libspeex-dev\ 
-    libogg-dev\ 
-    libtheora-dev\ 
-    libbluetooth-dev\ 
-    libopenal-dev || exit $?
-
 apt-get -y purge update-manager || exit $?
-
 
