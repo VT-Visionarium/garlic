@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Do not source ../common.bash with this too.
-
 # 'hostname -s' is the name of the file list of projects to install
 
 scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
@@ -12,7 +10,7 @@ function Fail()
 {
     [ -n "$1" ] && echo -e "$*"
     echo
-    echo "running script ${BASH_SOURCE[$i]} FAILED"
+    echo "running script $0 FAILED"
     echo
     exit 1
 }
@@ -31,7 +29,7 @@ echo
 echo "Running install scripts from $hostfile"
 echo
 
-source "$hostfile"
+source "$hostfile" || Fail
 
 set +x
 echo

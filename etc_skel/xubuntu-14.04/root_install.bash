@@ -9,6 +9,7 @@ function Fail()
     exit 1
 }
 
+
 # run as root or not at all
 [ "$(id -u)" = 0 ] || Fail "You must run this as root"
 
@@ -35,4 +36,10 @@ mv /etc/skel $bakdir || exit $?
 cp -r skel /etc/ || exit $?
 chmod -R a+r /etc/skel || exit $?
 set +x
-echo "SUCCESS"
+
+if [ "$(hostname -s)" = "cube" ] ; then
+    echo "install host cube skel into /etc/skel yourself"
+    echo "by mergeing in stuff from cube_skel into /etc/skel"
+else
+    echo "SUCCESS"
+fi
