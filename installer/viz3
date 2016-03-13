@@ -1,12 +1,15 @@
 # List of packages to install using these files
 # that are in this git repo directory.
 
+cd .. || Fail
 
-sudo encap/root_install.bash
+set -x
 
-sudo quickplot/root_depend.bash
-quickplot/quickplot-1.0.1rc/install.bash
-sudo encap
-quickscope/quickscope-0.1.0/install.bash
+sudo encap/root_install.bash || Fail
+
+sudo quickplot/root_depend.bash || Fail
+quickplot/quickplot-1.0.1rc/install.bash || Fail
+sudo encap || Fail
+quickscope/quickscope-0.1.0/install.bash || Fail
 sudo encap
 
