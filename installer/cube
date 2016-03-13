@@ -1,0 +1,15 @@
+#!/bin/bash
+
+bakdir=$(date +%s)
+bakdir=/root/bak_${bakdir}
+
+sudo mkdir -p $bakdir || Fail
+sudo mv\
+ xdg/autostart/light-locker.desktop $bakdir
+sudo mv\
+ /etc/xdg/xdg-xubuntu/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml\
+ $bakdir
+sudo cp cube_xfce4-session.xml\
+ /etc/xdg/xdg-xubuntu/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml\
+ || Fail
+
