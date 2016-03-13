@@ -1,0 +1,71 @@
+
+require File.dirname(__FILE__) + "/hy_projectors_common"
+require 'optparse'
+
+def usage()
+
+    prog = File.basename($0)
+    nprojs = $projectorIPs.length
+    puts <<EOF
+
+  Usage: #{prog} [PROJ_WALL ...]|[-h|--help]
+
+   Turn @on@ projectors via the ethernet TCP/IP interface.
+
+
+   Examples:
+
+          #{prog}
+
+   will turn @on@ all #{nprojs.to_s} hypercube projectors,
+
+
+          #{prog} LT FB
+
+   will turn @on@ the left top (LT) and floor bottom (FB) projectors.
+
+
+   Possible PROJ_WALL values are:
+
+EOF
+    print '    '
+    $projectorIPs.each { |p,ip| print p + ' ' }
+    puts
+    puts
+
+    puts <<EOF
+
+    Example, another way using shell command:
+
+        echo -e ":@CMD@\\r" | nc #{$projectorIPs['LT']} 1025
+
+    where the IP addresses (#{$projectorIPs['LT']}) are:
+
+EOF
+
+    $projectorIPs.each { |p,ip| puts '           ' + p + '  ' + ip }
+    puts
+
+    
+
+    exit 1
+end
+
+$proj = []
+ARGV.each do |arg|
+    case arg
+        when '--help' then usage
+        when '-h' then usage
+        else $proj << arg
+    end
+end
+
+
+if $proj.length == 0
+    # defaults to all projectors @on@
+    send('@CMD@')
+else
+    # send command to array of projectors
+    $proj.each { |p| sendToName('@CMD@',p) }
+end
+

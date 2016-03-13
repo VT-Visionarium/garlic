@@ -1,0 +1,20 @@
+We call this project HyperCube VT for hyper cube at Virginia Tech.  It
+contains programs that are specific to the Virginia Tech Hyper Cube or
+VisCube or CAVE, whatever you call it.
+
+All CAVE's are different.  They have different projection systems,
+tracking systems, computer systems, and the Virginia Tech CAVE has a 6
+degree-of-freedom motion platform.  They also run different mixtures of
+computer operating systems. Very few CAVEs are the same.
+
+All the programs that are installed from this project have the prefix hy_
+
+
+This project is only good for the VT CAVE, so it need not follow the
+garlic standard install methods.
+
+To install run:
+
+    make install
+
+
