@@ -8,7 +8,7 @@ def usage()
     nprojs = $projectorIPs.length
     puts <<EOF
 
-  Usage: #{prog} [PROJ_WALL ...]|[-h|--help]
+  Usage: #{prog} [-m|--mono][PROJ_WALL ...]|[-h|--help]
 
    Turn @on@ projectors via the ethernet TCP/IP interface.
 
@@ -23,6 +23,13 @@ def usage()
           #{prog} LT FB
 
    will turn @on@ the left top (LT) and floor bottom (FB) projectors.
+
+
+               OPTIONS
+
+    -h|--help         print this help and exit
+    -m|--mono         turn projectors on with mono viewing.  Default is stereo
+
 
 
    Possible PROJ_WALL values are:
@@ -52,20 +59,61 @@ EOF
 end
 
 $proj = []
+$stereo = true
+
 ARGV.each do |arg|
     case arg
         when '--help' then usage
         when '-h' then usage
+        when '-m' then $stereo = false
+        when '--mono' then $stereo = false
         else $proj << arg
     end
 end
 
-
 if $proj.length == 0
-    # defaults to all projectors @on@
-    send('@CMD@')
+    $projectorIPs.each { |name,ip| $proj << name }
 else
-    # send command to array of projectors
-    $proj.each { |p| sendToName('@CMD@',p) }
+    $proj.each do |p|
+        if not $projectorIPs[p.upcase]
+            puts "Projector \"" + p.upcase + "\" not found."
+            usage
+        end
+    end
 end
 
+# send command to array of projectors
+$proj.each { |p| sendToName('@CMD@',p) }
+
+
+exit unless '@CMD@' == 'POWR1'
+
+# We are turning on projectors
+
+if $stereo
+
+    # stereo on (0=off, 1=frame sequential, 2=side-by-side, 3=dual-head)
+    send('TDSM3')
+    # genlock phase delay to 0
+    #send('TDGD0')
+    # swap eyes to 1
+    #send('TDSE1')
+    # set left eye to display port 1
+    #send('IABS17 0')
+    # set right eye to display port 2
+    send('IABS18 1')
+
+else # mono
+
+    # stereo (0= off, 1=frame sequential, 2=side-by-side, 3=dual-head)
+    send('TDSM0')
+    # genlock phase delay to 0
+    #send('TDGD0')
+    # set left eye to display port 1
+    #send('IABS17 0')
+    # set right eye to display port 2
+    #send('IABS18 1')
+    # swap eyes to 0
+    send('TDSE0')
+
+end
