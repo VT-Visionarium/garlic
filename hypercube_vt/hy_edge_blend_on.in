@@ -12,25 +12,24 @@ else
     source "@BIN@/hy_edge_blend_common"
 fi
 
-
 # blend_on DISPLAY GRAPHIC_NUM BOTTOM|TOP
-blend_on :2.0 2 -b
-blend_on :2.1 4 -b
-blend_on :2.2 6 -t
-blend_on :2.3 8 -t
+blend_on :0.0 2 -b
+blend_on :0.1 4 -b
+blend_on :0.2 6 -t
+blend_on :0.3 8 -t
 
-blend_on :2.4 12 -b
-blend_on :2.5 14 -b
-blend_on :2.6 16 -t
-blend_on :2.7 18 -t
+blend_on :0.4 12 -b
+blend_on :0.5 14 -b
+blend_on :0.6 16 -t
+blend_on :0.7 18 -t
 
-blend_on :2.8 22 -b
-blend_on :2.9 24 -b
-blend_on :2.10 26 -t
-blend_on :2.11 28 -t
+blend_on :0.8 22 -b
+blend_on :0.9 24 -b
+blend_on :0.10 26 -t
+blend_on :0.11 28 -t
 
-blend_on :2.12 32 -b
-blend_on :2.13 34 -b
-blend_on :2.14 36 -t
-blend_on :2.15 38 -t
+blend_on :0.12 32 -b
+blend_on :0.13 34 -b
+blend_on :0.14 36 -t
+blend_on :0.15 38 -t
 
