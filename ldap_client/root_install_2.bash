@@ -73,14 +73,14 @@ set -x
 cat << EOF >> /etc/pam.d/common-session || exit $?
 
 # lance added next line $date
-session required    pam_mkhomedir.so  skel=/etc/skel  umask=0077
+session required    pam_mkhomedir.so  skel=/etc/skel  umask=0022
 EOF
 
 vim /etc/pam.d/common-session || exit $?
 
 
 set +x
-Prompt "NEXT we vim edit /etc/login.defs to change the default UMASK to 077"
+Prompt "NEXT we vim edit /etc/login.defs to change the default UMASK to 022"
 
 set -x
 vim +152 /etc/login.defs || exit $?
