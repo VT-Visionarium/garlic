@@ -46,6 +46,7 @@ apt-get -y install\
  mpich2\
  mesa-utils\
  cmake-curses-gui\
+ python2.7-dev\
  python-astropy || exit $?
 
 # optional libraries for a better VRUI experience
