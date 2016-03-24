@@ -1,0 +1,172 @@
+#!/usr/bin/ruby -w
+
+require File.dirname(__FILE__) + "/hy_projectors_common"
+require 'optparse'
+
+def usage()
+
+    prog = File.basename($0)
+    nprojs = $projectorIPs.length
+    puts <<EOF
+
+  Usage: #{prog} [-m|--mono][PROJ_WALL ...]|[-h|--help]
+
+   Turn @on@ projectors via the ethernet TCP/IP interface.
+
+
+   Examples:
+
+          #{prog}
+
+   will turn @on@ all #{nprojs.to_s} hypercube projectors,
+
+
+          #{prog} LT FB
+
+   will turn @on@ the left top (LT) and floor bottom (FB) projectors.
+
+
+               OPTIONS
+
+    -h|--help         print this help and exit
+    -m|--mono         turn projectors on with mono viewing.  Default is stereo
+
+
+
+   Possible PROJ_WALL values are:
+
+EOF
+    print '    '
+    $projectorIPs.each { |p,ip| print p + ' ' }
+    puts
+    puts
+
+    puts <<EOF
+
+    Example, another way using shell command:
+
+        echo -e ":@CMD@\\r" | nc #{$projectorIPs['LT']} 1025
+
+    where the IP addresses (#{$projectorIPs['LT']}) are:
+
+EOF
+
+    $projectorIPs.each { |p,ip| puts '           ' + p + '  ' + ip }
+    puts
+
+    
+
+    exit 1
+end
+
+$proj = []
+$stereo = true
+
+ARGV.each do |arg|
+    case arg
+        when '--help' then usage
+        when '-h' then usage
+        when '-m' then $stereo = false
+        when '--mono' then $stereo = false
+        else $proj << arg
+    end
+end
+
+if $proj.length == 0
+    $projectorIPs.each { |name,ip| $proj << name }
+else
+    $proj.each do |p|
+        if not $projectorIPs[p.upcase]
+            puts "Projector \"" + p.upcase + "\" not found."
+            usage
+        end
+    end
+end
+
+# send command to array of projectors
+$proj.each { |p| sendToName('@CMD@',p) }
+
+
+exit unless '@CMD@' == 'POWR1'
+
+# We are turning on projectors
+
+if $stereo
+
+    # set input to display port 1
+    send('IDIP1')
+
+    # set EDID resolution for dp1 to WQXGA@60hz (17 is 60hz, 18 is 120hz)
+    send('EDIR17 25')
+    # set EDID resolution for dp2 to WQXGA@60hz (17 is 60hz, 18 is 120hz)
+    send('EDIR17 26')
+
+    # display port eq settings (0=normal, 1=high, 2=low)
+    send('DPE11')
+    send('DPE21')
+
+    # Installation->synchronization
+    # 2D framelock to source
+    send('FLSO0') 
+    # 3D display sync to SYNC1
+    send('TDLR1')
+    # 3D display sync to source for first projector in chain
+    sendToName('TDLR0', 'LT')
+    # set SYNC1 to input
+    send('TBO10')
+    # set SYNC2 to display sync 
+    send('TBO23')
+    # set SYNC2 to glasses sync for first projector
+    sendToName('TBO22', 'LT')
+    # set SYNC3 to display sync
+    send('TBO33')
+    # set SYNC3 to glasses sync for first projector
+    sendToName('TBO32', 'LT')
+
+    # 3D 
+    # stereo on (1=frame sequential, 2=side-by-side, 3=dual-head)
+    send('TDSM3')
+    # glasses type: IR (only for F35)
+    #TDGT1 ALL
+    # genlock phase delay to 0
+    send('TDGD0')
+    # swap eyes to 1
+    send('TDSE1')
+
+    # 3D->Dual head setup
+    # set left eye to display port 1
+    send('IABS17 0')
+    # set right eye to display port 2
+    send('IABS18 1')
+
+    # Installation
+    # image orientation to desktop rear (DESK is desktop front)
+    send('RDES')
+    # image orientation to ceiling front (RCEI is ceiling rear)
+    sendToName('CEIL', 'FT')
+    sendToName('DESK', 'FB')
+
+    # No BARCO splash logo
+    send('SPLH0')
+
+    # Full lamp power (range 0-350). Make floor slightly dimmer to match walls
+    # These should not change
+    #sendToName('LPW1350', 'LT')
+    #sendToName('LPW1350', 'LB')
+    #sendToName('LPW1350', 'CT')
+    #sendToName('LPW1350', 'CB')
+    #sendToName('LPW1350', 'RT')
+    #sendToName('LPW1350', 'RB')
+    
+    #sendToName('LPW1280', 'FT')
+    #sendToName('LPW1280', 'FB')
+
+
+else # mono
+
+    # stereo (0= off, 1=frame sequential, 2=side-by-side, 3=dual-head)
+    send('TDSM0')
+    # swap eyes to 0
+    send('TDSE0')
+
+end

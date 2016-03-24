@@ -19,6 +19,8 @@ apt-get -y install\
  xmlstarlet\
  vim\
  tree\
+ talk\
+ aptitude\
  cmake\
  lynx\
  at\
@@ -31,6 +33,8 @@ apt-get -y install\
 # this is dangerous.  We need to reboot after this
 #apt-get install libgl1-mesa-dev libgl1-mesa-glx xorg mesa-utils libglu1-mesa-dev || exit 1
 
+apt-get install sshfs
+
 apt-get -y install\
  libreoffice\
  vim-gtk\
@@ -42,28 +46,15 @@ apt-get -y install\
  python-astropy\
  python-scipy\
  libcr-dev\
- mpich2-doc\
  mpich2\
+ mpich2-doc\
  mesa-utils\
+<<<<<<< HEAD
  cmake-curses-gui\
  python2.7-dev\
+=======
+>>>>>>> ec1d5674826f4532b3a99f628b9c754cddc7012f
  python-astropy || exit $?
 
-# optional libraries for a better VRUI experience
-apt-get -y install\
-    libudev-dev\ 
-    libusb-1.0-0-dev\ 
-    libpng-dev\ 
-    libjpeg-dev\ 
-    libtiff-dev\ 
-    libasound-dev\
-    libdc1394-22-dev\ 
-    libspeex-dev\ 
-    libogg-dev\ 
-    libtheora-dev\ 
-    libbluetooth-dev\ 
-    libopenal-dev || exit $?
-
 apt-get -y purge update-manager || exit $?
-
 

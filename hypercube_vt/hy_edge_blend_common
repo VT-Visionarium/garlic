@@ -1,0 +1,42 @@
+#!/bin/bash
+
+cscriptdir="$(dirname ${BASH_SOURCE[0]})"
+cd "$cscriptdir" || exit 1
+cscriptdir="$PWD"
+
+blend="$cscriptdir/nv-control-blend-visbox"
+unset cscriptdir
+
+
+# Usage: blend DPY NUM OPT
+
+# example: blend :0.4 12 -b
+# will blend X11 screen 4, graphic thingy 12, bottom
+
+# example: blend :0.2 6 -t
+# will blend X11 screen 2, graphic thingy 6, top
+function blend_on()
+{
+    [ -n $3 ] || exit 1
+
+    # I expect this code is will not have a representative
+    # return code, so we are not doing: '$run || exit 1'
+    # or like thing.
+    set -x
+    DISPLAY=$1 $blend $2 $3 640 -g 1.65
+    set +x
+}
+
+# Usage: blend DPY NUM
+function blend_off()
+{
+    [ -n $2 ] || exit 1
+
+    # I expect this code is will not have a representative
+    # return code, so we are not doing: '$run || exit 1'
+    # or like thing.
+    set -x
+    DISPLAY=$1 $blend $2 2560 1600
+    set +x
+}
+

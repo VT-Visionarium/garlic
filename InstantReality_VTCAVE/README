@@ -3,6 +3,9 @@ apt-get install xmlstarlet
 
 git clone https://github.com/lanceman2/InstantReality_VTCAVE.git git
 
+In the VT CAVE we have no head monitor on the main graphics render
+computer so we must ssh to it.  Note remember to use 'ssh -X nodename'.
+
 
 FILES:
 

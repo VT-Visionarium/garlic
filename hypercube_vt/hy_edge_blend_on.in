@@ -1,0 +1,35 @@
+#!/bin/bash
+
+scriptdir="$(dirname ${BASH_SOURCE[0]})"
+cd "$scriptdir" || exit 1
+scriptdir="$PWD"
+
+if [ -f "$scriptdir/hy_edge_blend_common" ] ; then
+    # running from the source directory
+    source "$scriptdir/hy_edge_blend_common"
+else
+    # after it's installed in BIN
+    source "@BIN@/hy_edge_blend_common"
+fi
+
+# blend_on DISPLAY GRAPHIC_NUM BOTTOM|TOP
+blend_on :0.0 2 -b
+blend_on :0.1 4 -b
+blend_on :0.2 6 -t
+blend_on :0.3 8 -t
+
+blend_on :0.4 12 -b
+blend_on :0.5 14 -b
+blend_on :0.6 16 -t
+blend_on :0.7 18 -t
+
+blend_on :0.8 22 -b
+blend_on :0.9 24 -b
+blend_on :0.10 26 -t
+blend_on :0.11 28 -t
+
+blend_on :0.12 32 -b
+blend_on :0.13 34 -b
+blend_on :0.14 36 -t
+blend_on :0.15 38 -t
+

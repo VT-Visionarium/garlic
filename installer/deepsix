@@ -1,10 +1,13 @@
 # List of packages to install using this files
 # that are in /usr/local/src/
 
+cd .. || Fail
 
-sudo encap/root_install.bash
+set -x
 
-sudo quickplot/root_depend.bash
-quickplot/quickplot-1.0.1rc/install.bash
+sudo encap/root_install.bash || Fail
 
-quickscope/quickscope-0.1.0/install.bash
+sudo quickplot/root_depend.bash || Fail
+quickplot/quickplot-1.0.1rc/install.bash || Fail
+
+quickscope/quickscope-0.1.0/install.bash || Fail
