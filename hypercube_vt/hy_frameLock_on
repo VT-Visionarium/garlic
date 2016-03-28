@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# This was for the most part copied from 
+# Paul Rajilich of visbox.com, file:
+# NVIDIA-ENABLE-FRAMELOCK.sh
+
+# See Nvidia README Chapter 30F /usr/share/docs/NVIDIA_GLX-1.0/README.txt
+
+if [ -n "$1" ] ; then
+    cat << EOF
+  Usage: $0"
+
+  Enable nvidia frame locking for all 4 nvidia graphics cards.  See
+  also: "hy_frameLock_off -h"
+
+  Without framelocking enabled there may be image tearing between
+  adjacent screens.
+
+EOF
+
+fi
+
+set -x
+# set master (GPU 0 is attached to stereo port, does it matter?)
+nvidia-settings -a [gpu:1.dpy:DVI-I-1]/FrameLockDisplayConfig=2 || exit $?
+
+# set slaves
+nvidia-settings -a [gpu:1.dpy:DVI-D-0]/FrameLockDisplayConfig=1 || exit $?
+nvidia-settings -a [gpu:2.dpy:DVI-I-1]/FrameLockDisplayConfig=1 || exit $?
+nvidia-settings -a [gpu:2.dpy:DVI-D-0]/FrameLockDisplayConfig=1 || exit $?
+
+# complains that unconnected outputs can only be set to 0
+# nvidia-settings -a [gpu:2.dpy]/FrameLockDisplayConfig=1
+
+# enable framelock on master GPU
+nvidia-settings -a [gpu:1]/FrameLockEnable=1 || exit $?
+
+# enable framelock on slaves
+nvidia-settings -a [gpu:2]/FrameLockEnable=1

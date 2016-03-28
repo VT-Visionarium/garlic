@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# This was for the most part copied from 
+# Paul Rajilich of visbox.com, file:
+# NVIDIA-DISABLE-FRAMELOCK.sh.sh
+
+# See Nvidia README Chapter 30F /usr/share/docs/NVIDIA_GLX-1.0/README.txt
+
+if [ -n "$1" ] ; then
+    echo "  Usage: $0"
+    echo
+    echo "  Disable nvidia frame locking.  See also \"hy_frameLock_on -h\""
+    echo
+    exit 1
+fi
+
+# disable framelock
+set -x
+exec nvidia-settings -a [gpu]/FrameLockEnable=0
