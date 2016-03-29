@@ -1,4 +1,6 @@
 
+apt-get install graphviz-dev graphviz-doc
+
 # Note the --recursive option:
 git clone --recursive https://gitlab.kitware.com/paraview/paraview.git git
 
