@@ -49,11 +49,8 @@ apt-get -y install\
  mpich2\
  mpich2-doc\
  mesa-utils\
-<<<<<<< HEAD
  cmake-curses-gui\
  python2.7-dev\
-=======
->>>>>>> ec1d5674826f4532b3a99f628b9c754cddc7012f
  python-astropy || exit $?
 
 apt-get -y purge update-manager || exit $?
