@@ -1,3 +1,5 @@
+The install.bash in paraview-v5.0.1/ depends on ../vrpn being installed
+
 
 apt-get install graphviz-dev graphviz-doc libqt4-dev libxt-dev mpich2-doc mpich2
 
