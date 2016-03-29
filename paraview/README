@@ -1,5 +1,5 @@
 
-apt-get install graphviz-dev graphviz-doc libqt4-dev libxt-dev
+apt-get install graphviz-dev graphviz-doc libqt4-dev libxt-dev mpich2-doc mpich2
 
 # Note the --recursive option:
 git clone --recursive https://gitlab.kitware.com/paraview/paraview.git git
