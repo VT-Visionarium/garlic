@@ -1,3 +1,9 @@
 
+# Note the --recursive option:
+git clone --recursive https://gitlab.kitware.com/paraview/paraview.git git
 
-git clone https://gitlab.kitware.com/paraview/paraview.git git
+
+http://www.paraview.org/
+
+https://github.com/Kitware/ParaView/tree/master/Web/Documentation/guides/configure_and_build_pvweb
+

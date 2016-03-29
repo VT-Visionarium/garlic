@@ -117,7 +117,7 @@ function GitCreateClone()
 
     if [ ! -f "$gitdir/.git/config" ] ; then
         set -x
-        git clone "$1" "$gitdir" || Fail
+        git clone --recursive "$1" "$gitdir" || Fail
         set +x
     else
         local url
@@ -138,6 +138,7 @@ function GitCreateClone()
 # and sets $1 to the directory path
 function MkBuildDir()
 {
+    [ -n "$1" ] || Fail
     for i in build_01 build_02 build_03 build_04 build_05 build_06 ; do
         d="$scriptdir/$i"
         if [ ! -e "$d" ] ; then
@@ -151,12 +152,36 @@ function MkBuildDir()
  already.\n  Why not remove some?"
 }
 
+# List submodules with 'cat .git/config'
+# you must be in the build dir (or build_0?/src/)
+# to run this.
+function GitTarSubMod()
+{
+    [ -n "$2" ] || Fail "Usage: ${FUNCNAME[0]} DIR TAG"
+    cwd="$PWD"
+    cd "$1" || Fail
+    to="$PWD"
+    set -x
+    cd "$gitdir/$1" || Fail
+    git archive  --format=tar "$2" | $(cd "$to" && tar -xf -) || Fail
+    cd "$cwd" || Fail
+}
+
 #Exmaple: GitToBuildDir 435.8
-#Usage: GitToBuildDir [TAG]
+#Usage: GitToBuildDir [TAG [--separate-src-build]]
+#
+#  Option: --separate-src-build puts source in src/
+#                   and then cd to build/ in the new
+#                   build0?/ dir.  So with this option
+#                   you make build0?/src/ with the source
+#                   and build0?/build/ to build in using
+#                   build0?/src/
+# 
 function GitToBuildDir()
 {
     local tag
     local bdir
+    local sdir
     if [ -n "$1" ] ; then
         tag="$1"
     else
@@ -168,12 +193,24 @@ function GitToBuildDir()
         Fail "git tag \"$tag\" not found"
     fi
 
-    bdir=
-    MkBuildDir bdir
+    sdir=
+    MkBuildDir sdir
+
+    if [ "$2" = "--separate-src-build" ] ; then
+        # We make more file structure for stupid packages
+        # like paraview that cannot build in the same dir
+        # as the source.
+        bdir="$sdir/build"
+        sdir="$sdir/src"
+        mkdir "$bdir" "$sdir" || Fail
+    else
+        # build dir is the source dir
+        bdir="$sdir"
+    fi
 
     set -x
     # dump the source tree of a given version with git tag $tag
-    git archive  --format=tar "$tag" | $(cd "$bdir" && tar -xf -) || Fail
+    git archive  --format=tar "$tag" | $(cd "$sdir" && tar -xf -) || Fail
     cd "$bdir" || Fail
     set +x
 }
