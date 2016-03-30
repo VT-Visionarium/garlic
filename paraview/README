@@ -1,7 +1,7 @@
 The install.bash in paraview-v5.0.1/ depends on ../vrpn being installed
 
 
-apt-get install graphviz-dev graphviz-doc libqt4-dev libxt-dev mpich2-doc mpich2
+apt-get install graphviz-dev graphviz-doc libqt4-dev libxt-dev mpich2-doc mpich2 qt4-dev-tools qt4-doc-html qt-assistant-compat
 
 # Note the --recursive option:
 git clone --recursive https://gitlab.kitware.com/paraview/paraview.git git

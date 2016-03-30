@@ -222,4 +222,3 @@ cmake ../src\
  || Fail
 
  Install
-
