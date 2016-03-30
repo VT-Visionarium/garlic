@@ -16,4 +16,5 @@ fi
 
 # disable framelock
 set -x
+export DISPLAY=:0.0
 exec nvidia-settings -a [gpu]/FrameLockEnable=0

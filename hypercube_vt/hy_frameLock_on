@@ -21,6 +21,8 @@ EOF
 fi
 
 set -x
+export DISPLAY=:0.0
+
 # set master (GPU 0 is attached to stereo port, does it matter?)
 nvidia-settings -a [gpu:1.dpy:DVI-I-1]/FrameLockDisplayConfig=2 || exit $?
 
