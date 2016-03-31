@@ -1,0 +1,379 @@
+#!/bin/bash
+
+# This is a attempt at making a script that acts like Patick Shinpaugh's
+# InstantReality-cave which ran on a previous generation of computers that
+# drove the VT-CAVE (or VT viscube).  We tried to keep most of the
+# interfaces as in Patrick's old script while making it more flexible.
+
+######################################################################
+#                        CONFIGURATION
+######################################################################
+
+# set up defaults
+
+# The next 3 (4) dirs are not valid until it's installed.  They are just
+# directories that files are installed into so we can find file that this
+# script uses, and not related to user files.
+# The 3 (4) dirs are @ENGINES_DIR@ @PLUGINS_DIR@ @NAVS_DIR@
+
+# TODO: install some models with this player, making 4 install dirs
+#MODELS_DIR="@MODELS_DIR@"
+
+
+# default_stereo= with without
+#default_stereo=without
+default_stereo=with
+
+
+# head tracking with OR without
+#default_head=without
+default_head=with
+
+
+# Set default_wand to without, simple OR raycast
+# TODO: add more wand modes and nav modes
+# default_wand= without simple raycasting
+#default_wand=simple
+#default_wand=without
+default_wand=raycast
+
+
+
+# We where going to use the program 'InstantPlayer' but it did not support
+# more than one X11 screen at a time.  sax seem to be like InstantPlayer
+# without the GUI.
+#
+player=/opt/instantReality/bin/sax
+InstantPlayer=/opt/instantReality/bin/InstantPlayer
+
+
+######################################################################
+#                 END CONFIGURATION
+######################################################################
+
+# Notes on "display engine":
+#
+# * one display engine
+# We use only one <engine>, we make it that way as a design decision,
+# and whether or not we can play with more than one <engine> at runtime
+# we do not concern ourselves with in this script.
+#
+# There orthogonal parameters to determine the display engines
+#
+#     stereo(3 values:on|off),
+#     head tracker(2 values:on|off),
+#     wand(3 values:raycast|simple|off)
+#
+#     ===> 2 x 2 x 3 = 12 run modes
+#
+#     and more, but we start somewhere...
+#
+#
+
+scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
+cwd="$PWD"
+cd "$scriptdir" || exit $?
+scriptdir="$PWD" # now we have full path
+cd "$cwd" || exit $?
+
+
+progName="$(basename ${BASH_SOURCE[0]})" || exit 1
+
+stereo=$default_stereo
+wand="$default_wand"
+head=$default_head
+cwd=
+report=
+run="$player"
+IR_args=
+
+
+function Usage()
+{
+  [ -n "$1" ] && echo -e "$*\n\n"
+
+  cat << EOF
+
+  $progName [${progName}_OPTIONS] [InstantPlayer_OPTIONS] [MODELFILE1 ...]
+
+  Run InstantPlayer in the Virginia Tech VisCube (VTCAVE).  Load
+  MODELFILE1 and all model files listed.  This script just composes a
+  single IntstantPlayer command to run and runs it (or not at your
+  option).  All ${progName}_OPTIONS work with single - prefix and double --
+  prefix, for example arguemnt option -head is the same as --head.
+
+
+          ${progName}_OPTIONS
+  
+    -?|-h|-help     Print this help and exit
+    -cd             Change directory to the first model file's directory
+    -head           Use head tracking
+    -m|-mono        Use mono display or no stereo
+    -no-head        Don't use the head tracker
+    -no-wand        Don't use the tracked wand
+    -no-tracking    Same as --no-wand --no-head
+    -report         Print the one line InstantPlayer (sax) command and exit
+    -s|-stereo      Use stereo projection wall displays
+    -wand           Use tracked wand without interaction
+    -wr|-raycast    Use tracked wand with raycasting 
+
+
+
+  All options other than those listed above are passed to InstantPlayer.
+  You will not get to use --wand and --raycast together, the latter of the
+  two will be the one used.
+
+  The program sax is undocumented but seems to have some of the InstantPlayer
+  program options.  The following is from running 'InstantPlayer --help':
+
+
+         InstantPlayer_OPTIONS
+
+EOF
+
+    $InstantPlayer --help 2> /dev/null | tail -n +2
+
+    cat << EOF
+
+  
+
+  Note that with power comes responsibility; some InstantPlayer options
+  may conflict with the ${progName} options, like --load-modules=MOD
+  where MOD is a conflicting module plug-in.  ${progName}_OPTIONS
+  are parsed in the order given, if you have -no-head --head, you will
+  have head tracking, except --help, and --report will override all actions. 
+
+
+Examples:
+
+   $progName myModel.x3d
+
+   $progName myModel1.x3d myModel2.x3d myModel3.wrl
+
+   $progName myModel1.x3d myModel2.x3d --mono
+
+   $progName --mono --no-tracking myModel.x3d
+
+
+$progName DEFAULTS:
+
+   $default_stereo stereo
+   $default_head head tracking
+   $default_wand wand
+
+EOF
+  exit 1
+}
+
+
+function CheckIRVersion()
+{
+    if [ ! -x $player ] ; then
+        echo "$player was not found"
+        exit 1
+    fi
+}
+
+
+function ParseArgs()
+{
+    while [ -n "$1" ] ; do
+        case "$1" in
+            -cd|--cd)
+                cwd=yes
+                ;;
+            -h|-help|-\?|--h|--\?|--help)
+                Usage
+                ;;
+            -s|--s|-stereo|--stereo)
+                stereo=with
+                ;;
+            -m|--m|-mono|--mono)
+                stereo=without
+                ;;
+            -head|--head)
+                head=with
+                ;;
+            -wand|--wand)
+                wand=simple
+                ;;
+            -wr|--wr|-raycast|--raycast)
+                wand=raycast
+                ;;
+            -no-wand|--no-wand)
+                wand=without
+                ;;
+            -no-head|--no-head)
+                head=without
+                ;;
+            -report|--report)
+                report=report
+                ;;
+            -walls|--walls)
+                walls=with
+                ;;
+            -no-walls|--no-walls)
+                walls=without
+                ;;
+            *)
+                if [ -n "$IR_args" ] ; then
+                    IR_args="$IR_args $1"
+                else
+                    IR_args=" $1"
+                fi
+                ;;
+        esac
+        shift
+    done
+
+    # if we had no -h or --help than we make it
+    # to here.
+}
+
+
+
+function ComposeCommand()
+{
+    local engine
+    local nav
+
+    if [ ! -f "$scriptdir/wandjoystick_raycast-nav.wrl" ] ||\
+        [ ! -f "$scriptdir/cave_stereo_head_engineer.bash" ] ; then
+        # We are running from an installed script
+        engine=" @ENGINES_DIR@/"
+        nav=" @NAVS_DIR@/"
+        # This may be how the plugins are found by dlopen(3)
+        # via the dynamic linker/loader
+        if [ -n "$LD_LIBRARY_PATH" ] ; then
+            export LD_LIBRARY_PATH="@PLUGINS_DIR@:${LD_LIBRARY_PATH}"
+        else
+            export LD_LIBRARY_PATH="@PLUGINS_DIR@"
+        fi
+    else
+        # We are running from the source code
+        engine=" "
+        nav=" "
+        # LD_LIBRARY_PATH is not set which will make sax using lopen()
+        # look in the current working directory for plugins.
+        # This will break if the plugins DSOs are not found.
+    fi
+
+    case "$stereo" in
+        with)
+            engine="${engine}cave_stereo"
+            ;;
+        without)
+            engine="${engine}cave_mono"
+            ;;
+        *)
+            echo "BAD code error stereo=$stereo"
+            exit 1
+            ;;
+    esac
+
+    case "$head" in
+        with)
+            engine="${engine}_head-engine.x3d"
+            ;;
+        without)
+            engine="${engine}-engine.x3d"
+            ;;
+        *)
+            echo "BAD code error head=$head"
+            exit 1
+            ;;
+    esac
+
+    case "$wand" in
+        raycast)
+            nav="${nav}wandjoystick_raycast-nav.wrl"
+            ;;
+        simple)
+            nav="${nav}wandjoystick-nav.wrl"
+            ;;
+        without)
+            nav=""
+            ;;
+        *)
+            echo "BAD code error head=$head"
+            exit 1
+            ;;
+    esac
+
+
+    run="${run}${engine}${nav}${IR_args}"
+
+
+    if [ -n "$report" ] ; then
+        echo "$run"
+        exit
+    fi
+}
+
+function ReportSettings()
+{
+
+    cat << EOF
+
+Running:
+
+   $stereo stereo
+   $head head tracking
+   $wand wand
+
+   InstantReality (sax) options:${IR_args}
+
+EOF
+}
+
+function catcher()
+{
+    # InstantReality does not seem to exit after getting a
+    # SIGINT so we give it a SIGTERM here
+    kill -TERM $pid
+    # This would be if InstantReality did a poor job cleaning
+    # itself up:
+    #killall $player 2> /dev/null
+    #sleep 0.2
+    #killall -s KILL $player 2> /dev/null
+}
+
+function CheckCd()
+{
+    if [ -n "$cwd" ] && [ -n "${IR_args}" ] ; then
+
+        for i in ${IR_args} ; do
+            case "$i" in
+                -*)
+                    ;;
+                *)
+                    cwd="$(dirname $i)"
+                    set -x
+                    cd "$cwd" || exit $?
+                    set +x
+                    break
+                    ;;
+            esac
+        done
+    fi
+}
+
+
+CheckIRVersion
+ParseArgs $*
+ComposeCommand
+ReportSettings
+CheckCd
+
+
+trap catcher SIGINT SIGTERM SIGQUIT
+
+echo "$run"
+
+$run &
+
+pid=$!
+
+wait
+
+catcher

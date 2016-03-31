@@ -1,0 +1,65 @@
+<X3D>
+    <scene>
+        <group>
+
+            <transform translation='-1 0 -1'>
+                <shape DEF='greenY'>
+                    <appearance>
+                        <material diffuseColor='0 1 0'/>
+                    </appearance>
+                    <cylinder radius='0.05' height='2'/>
+                </shape>
+            </transform>
+            <transform translation='1 0 -1'>
+                <shape USE='greenY'/>
+            </transform>
+            <transform translation='1 0 1'>
+                <shape USE='greenY'/>
+            </transform>
+            <transform translation='-1 0 1'>
+                <shape USE='greenY'/>
+            </transform>
+
+            <transform translation='0 -1 -1'>
+                <transform DEF='redX' rotation='0 0 1 1.570796'>
+                    <shape>
+                        <appearance>
+                            <material diffuseColor='1 0 0'/>
+                        </appearance>
+                        <cylinder radius='0.05' height='2'/>
+                    </shape>
+                </transform>
+            </transform>
+            <transform translation='0 1 -1'>
+                <transform USE='redX'/>
+            </transform>
+            <transform translation='0 1 1'>
+                <transform USE='redX'/>
+            </transform>
+            <transform translation='0 -1 1'>
+                <transform USE='redX'/>
+            </transform>
+
+            <transform translation='-1 -1 0'>
+                <transform DEF='blueZ' rotation='1 0 0 1.570796'>
+                    <shape>
+                        <appearance>
+                            <material diffuseColor='0 0 1'/>
+                        </appearance>
+                        <cylinder radius='0.05' height='2'/>
+                    </shape>
+                </transform>
+            </transform>
+            <transform translation='1 -1 0'>
+                <transform USE='blueZ'/>
+            </transform>
+            <transform translation='1 1 0'>
+                <transform USE='blueZ'/>
+            </transform>
+            <transform translation='-1 1 0'>
+                <transform USE='blueZ'/>
+            </transform>
+
+        </group>
+    </scene>
+</X3D>

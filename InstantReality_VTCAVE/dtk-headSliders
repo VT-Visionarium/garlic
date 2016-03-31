@@ -1,0 +1,13 @@
+#!/bin/bash
+
+export DISPLAY=localhost:10.0
+
+exec dtk-floatSliders head\
+ -N 6\
+ -s 0 -1.5 1.5 0\
+ -s 1 -1.5 1.5 0\
+ -s 2 -1.5 1.5 0\
+ -s 3 -190 190 0\
+ -s 4 -190 190 0\
+ -s 5 -190 190 0\
+ -l x y z H P R

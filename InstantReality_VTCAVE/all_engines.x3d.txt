@@ -1,0 +1,675 @@
+<?xml version='1.0'?>
+<!-- 
+    The <IF*> tags get processed out in addition to replacing @values@
+
+    Generate *.x3d by engines files by running:
+
+            ./desktopStereoSideBySide_engineer.bash 
+
+    and other *_engineer.bash files.  This is run in by using the
+    GNUmakefile by running 'make'.
+
+
+    The <IF*> tags are selectors, if selected, they are just removed
+    leaving the stuff (child nodes) in them, or if they are not selected,
+    they are used to remove the tags (branches) they enclose.
+
+    Ya, okay, it's a quick hack that, but we do not have need to make
+    or use another language.  We just need to make this code manageable.
+    Without this <IF*> stuff (or like thing) this would be about 16 times
+    more lines of code.
+
+    If you edit this keep in mind the <IF*> tags are not processed with a
+    top-of-line parser, it's just sed scripts; so you can't extend the
+    <IF*> tags over multiple lines.
+
+-->
+<X3D>
+    <Engine>
+        <RenderJob DEF='render'>
+            <WindowGroup>
+
+                <IFdesktopStereoSideBySide>
+                    <LocalWindow position='0 0' size='1000 500'
+                        fullScreen='FALSE' pipe=':0.0' border='TRUE'
+                        drawCursor='TRUE' drawToolBar='TRUE'>
+
+                        <Viewarea lowerLeft='0 0' upperRight='500 500'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <ProjectionViewModifier
+                                DEF='desktopStereoSideBySide_leftEye'
+                                surface='-1 -1 -1, 1 -1 -1, 1 1 -1, -1 1 -1'
+                                mono='FALSE' eyeSeparation='0.065'
+                                leftEye='TRUE' rightEye='FALSE'>
+                            </ProjectionViewModifier>
+                        </Viewarea>
+
+                        <Viewarea lowerLeft='500 0' upperRight='1000 500'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <ProjectionViewModifier
+                                DEF='desktopStereoSideBySide_rightEye'
+                                surface='-1 -1 -1, 1 -1 -1, 1 1 -1, -1 1 -1'
+                                mono='FALSE' eyeSeparation='0.065'
+                                leftEye='FALSE' rightEye='TRUE'>
+                            </ProjectionViewModifier>
+                        </Viewarea>
+                    </LocalWindow>
+                </IFdesktopStereoSideBySide>
+
+                <IFdesktopMono>
+                    <LocalWindow position='0 0' size='900 900'
+                        fullScreen='FALSE' border='TRUE'
+                        drawCursor='TRUE' drawToolBar='TRUE'>
+                        <Viewarea lowerLeft='0 0' upperRight='900 900'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                             <ProjectionViewModifier
+                                    DEF='desktopMono_oneEye'
+                                    surface='-1.524 -1.524 1.524,
+                                        -1.524 -1.524 -1.524,
+                                        -1.524 1.524 -1.524,
+                                        -1.524 1.524 1.524'
+                                    mono='TRUE'>
+                                </ProjectionViewModifier>
+                        </Viewarea>
+                    </LocalWindow>
+                </IFdesktopMono>
+
+
+
+
+                <IFcaveWalls>
+
+                    <!-- LEFT WALL -->
+                    <LocalWindow position='0 0' size='2560 1600'
+                        fullScreen='FALSE' pipe=':0.0' border='FALSE'
+                        drawCursor='TRUE' drawToolBar='FALSE'>
+                        <Viewarea
+                            lowerLeft='0 0' upperRight='2560 1600'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <IFcaveStereo>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoLT_leftEye'
+                                    surface='-1.524 -0.381 1.524,
+                                        -1.524 -0.381 -1.524,
+                                        -1.524 1.524 -1.524,
+                                        -1.524 1.524 1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='TRUE'
+                                    rightEye='FALSE'>
+                                </ProjectionViewModifier>
+                            </IFcaveStereo>
+                            <IFcaveMono>
+                                <ProjectionViewModifier
+                                    DEF='caveMonoLT_oneEye'
+                                    surface='-1.524 -0.381 1.524,
+                                        -1.524 -0.381 -1.524,
+                                        -1.524 1.524 -1.524,
+                                        -1.524 1.524 1.524'
+                                        mono='TRUE'>
+                                </ProjectionViewModifier>
+                            </IFcaveMono>
+                        </Viewarea>
+                    </LocalWindow>
+
+                    <IFcaveStereo>
+                        <LocalWindow position='0 0' size='2560 1600'
+                            fullScreen='FALSE' pipe=':0.1' border='FALSE'
+                            drawCursor='TRUE' drawToolBar='FALSE'>
+                            <Viewarea
+                                lowerLeft='0 0' upperRight='2560 1600'
+                                leftBuffer='FALSE' rightBuffer='TRUE'>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoLT_rightEye'
+                                    surface='-1.524 -0.381 1.524,
+                                        -1.524 -0.381 -1.524,
+                                        -1.524 1.524 -1.524,
+                                        -1.524 1.524 1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='FALSE'
+                                    rightEye='TRUE'>
+                                </ProjectionViewModifier>
+                            </Viewarea>
+                        </LocalWindow>
+                    </IFcaveStereo>
+
+                    <LocalWindow position='0 0' size='2560 1600'
+                        fullScreen='FALSE' pipe=':0.2' border='FALSE'
+                        drawCursor='TRUE' drawToolBar='FALSE'>
+                        <Viewarea
+                            lowerLeft='0 0' upperRight='2560 1600'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <IFcaveStereo>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoLB_leftEye'
+                                    surface='-1.524 -1.524 1.524,
+                                        -1.524 -1.524 -1.524,
+                                        -1.524 0.381 -1.524,
+                                        -1.524 0.381 1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='TRUE'
+                                    rightEye='FALSE'>
+                                </ProjectionViewModifier>
+                            </IFcaveStereo>
+                            <IFcaveMono>
+                                <ProjectionViewModifier
+                                    DEF='caveMonoLB_oneEye'
+                                    surface='-1.524 -1.524 1.524,
+                                        -1.524 -1.524 -1.524,
+                                        -1.524 0.381 -1.524,
+                                        -1.524 0.381 1.524'
+                                    mono='TRUE'>
+                                </ProjectionViewModifier>
+                            </IFcaveMono>
+                        </Viewarea>
+                    </LocalWindow>
+
+                    <IFcaveStereo>
+                        <LocalWindow position='0 0' size='2560 1600'
+                            fullScreen='FALSE' pipe=':0.3' border='FALSE'
+                            drawCursor='TRUE' drawToolBar='FALSE'>
+                            <Viewarea
+                                lowerLeft='0 0' upperRight='2560 1600'
+                                leftBuffer='FALSE' rightBuffer='TRUE'>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoLB_rightEye'
+                                    surface='-1.524 -1.524 1.524,
+                                        -1.524 -1.524 -1.524,
+                                        -1.524 0.381 -1.524,
+                                        -1.524 0.381 1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='FALSE'
+                                    rightEye='TRUE'>
+                                </ProjectionViewModifier>
+                            </Viewarea>
+                        </LocalWindow>
+                    </IFcaveStereo>
+                    <!-- END LEFT WALL -->
+
+
+
+
+
+
+
+                    <!-- CENTER WALL -->
+                    <LocalWindow position='0 0' size='2560 1600'
+                        fullScreen='FALSE' pipe=':0.4' border='FALSE'
+                        drawCursor='TRUE' drawToolBar='FALSE'>
+                        <Viewarea
+                            lowerLeft='0 0' upperRight='2560 1600'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <IFcaveStereo>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoCT_leftEye'
+                                    surface='-1.524 -0.381 -1.524,
+                                        1.524 -0.381 -1.524,
+                                        1.524 1.524 -1.524,
+                                        -1.524 1.524 -1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='TRUE'
+                                    rightEye='FALSE'>
+                                </ProjectionViewModifier>
+                            </IFcaveStereo>
+                            <IFcaveMono>
+                                <ProjectionViewModifier
+                                    DEF='caveMonoCT_oneEye'
+                                    surface='-1.524 -0.381 -1.524,
+                                        1.524 -0.381 -1.524,
+                                        1.524 1.524 -1.524,
+                                        -1.524 1.524 -1.524'
+                                        mono='TRUE'>
+                                </ProjectionViewModifier>
+                            </IFcaveMono>
+                        </Viewarea>
+                    </LocalWindow>
+
+                    <IFcaveStereo>
+                        <LocalWindow position='0 0' size='2560 1600'
+                            fullScreen='FALSE' pipe=':0.5' border='FALSE'
+                            drawCursor='TRUE' drawToolBar='FALSE'>
+                            <Viewarea
+                                lowerLeft='0 0' upperRight='2560 1600'
+                                leftBuffer='FALSE' rightBuffer='TRUE'>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoCT_rightEye'
+                                    surface='-1.524 -0.381 -1.524,
+                                        1.524 -0.381 -1.524,
+                                        1.524 1.524 -1.524,
+                                        -1.524 1.524 -1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='FALSE'
+                                    rightEye='TRUE'>
+                                </ProjectionViewModifier>
+                            </Viewarea>
+                        </LocalWindow>
+                    </IFcaveStereo>
+
+
+                    <LocalWindow position='0 0' size='2560 1600'
+                        fullScreen='FALSE' pipe=':0.6' border='FALSE'
+                        drawCursor='TRUE' drawToolBar='FALSE'>
+                        <Viewarea
+                            lowerLeft='0 0' upperRight='2560 1600'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <IFcaveStereo>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoCB_leftEye'
+                                    surface='-1.524 -1.524 -1.524,
+                                        1.524 -1.524 -1.524,
+                                        1.524 0.381 -1.524,
+                                        -1.524 0.381 -1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='TRUE'
+                                    rightEye='FALSE'>
+                                </ProjectionViewModifier>
+                            </IFcaveStereo>
+                            <IFcaveMono>
+                                <ProjectionViewModifier
+                                    DEF='caveMonoCB_oneEye'
+                                    surface='-1.524 -1.524 -1.524,
+                                        1.524 -1.524 -1.524,
+                                        1.524 0.381 -1.524,
+                                        -1.524 0.381 -1.524'
+                                    mono='TRUE'>
+                                </ProjectionViewModifier>
+                            </IFcaveMono>
+                        </Viewarea>
+                    </LocalWindow>
+
+                    <IFcaveStereo>
+                        <LocalWindow position='0 0' size='2560 1600'
+                            fullScreen='FALSE' pipe=':0.7' border='FALSE'
+                            drawCursor='TRUE' drawToolBar='FALSE'>
+                            <Viewarea
+                                lowerLeft='0 0' upperRight='2560 1600'
+                                leftBuffer='FALSE' rightBuffer='TRUE'>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoCB_rightEye'
+                                    surface='-1.524 -1.524 -1.524,
+                                        1.524 -1.524 -1.524,
+                                        1.524 0.381 -1.524,
+                                        -1.524 0.381 -1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='FALSE'
+                                    rightEye='TRUE'>
+                                </ProjectionViewModifier>
+                            </Viewarea>
+                        </LocalWindow>
+                    </IFcaveStereo>
+                    <!-- END CENTER WALL -->
+
+
+                    <!-- RIGHT WALL -->
+                    <LocalWindow position='0 0' size='2560 1600'
+                        fullScreen='FALSE' pipe=':0.8' border='FALSE'
+                        drawCursor='TRUE' drawToolBar='FALSE'>
+                        <Viewarea
+                            lowerLeft='0 0' upperRight='2560 1600'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <IFcaveStereo>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoRT_leftEye'
+                                    surface='1.524 -0.381 -1.524,
+                                        1.524 -0.381 1.524,
+                                        1.524 1.524 1.524,
+                                        1.524 1.524 -1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='TRUE'
+                                    rightEye='FALSE'>
+                                </ProjectionViewModifier>
+                            </IFcaveStereo>
+                            <IFcaveMono>
+                                <ProjectionViewModifier
+                                    DEF='caveMonoRT_oneEye'
+                                    surface='1.524 -0.381 -1.524,
+                                        1.524 -0.381 1.524,
+                                        1.524 1.524 1.524,
+                                        1.524 1.524 -1.524'
+                                        mono='TRUE'>
+                                </ProjectionViewModifier>
+                            </IFcaveMono>
+                        </Viewarea>
+                    </LocalWindow>
+
+                    <IFcaveStereo>
+                        <LocalWindow position='0 0' size='2560 1600'
+                            fullScreen='FALSE' pipe=':0.9' border='FALSE'
+                            drawCursor='TRUE' drawToolBar='FALSE'>
+                            <Viewarea
+                                lowerLeft='0 0' upperRight='2560 1600'
+                                leftBuffer='FALSE' rightBuffer='TRUE'>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoRT_rightEye'
+                                    surface='1.524 -0.381 -1.524,
+                                        1.524 -0.381 1.524,
+                                        1.524 1.524 1.524,
+                                        1.524 1.524 -1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='FALSE'
+                                    rightEye='TRUE'>
+                                </ProjectionViewModifier>
+                            </Viewarea>
+                        </LocalWindow>
+                    </IFcaveStereo>
+
+
+                    <LocalWindow position='0 0' size='2560 1600'
+                        fullScreen='FALSE' pipe=':0.10' border='FALSE'
+                        drawCursor='TRUE' drawToolBar='FALSE'>
+                        <Viewarea
+                            lowerLeft='0 0' upperRight='2560 1600'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <IFcaveStereo>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoRB_leftEye'
+                                    surface='1.524 -1.524 -1.524,
+                                        1.524 -1.524 1.524,
+                                        1.524 0.381 1.524,
+                                        1.524 0.381 -1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='TRUE'
+                                    rightEye='FALSE'>
+                                </ProjectionViewModifier>
+                            </IFcaveStereo>
+                            <IFcaveMono>
+                                <ProjectionViewModifier
+                                    DEF='caveMonoRB_oneEye'
+                                    surface='1.524 -1.524 -1.524,
+                                        1.524 -1.524 1.524,
+                                        1.524 0.381 1.524,
+                                        1.524 0.381 -1.524'
+                                    mono='TRUE'>
+                                </ProjectionViewModifier>
+                            </IFcaveMono>
+                        </Viewarea>
+                    </LocalWindow>
+
+                    <IFcaveStereo>
+                        <LocalWindow position='0 0' size='2560 1600'
+                            fullScreen='FALSE' pipe=':0.11' border='FALSE'
+                            drawCursor='TRUE' drawToolBar='FALSE'>
+                            <Viewarea
+                                lowerLeft='0 0' upperRight='2560 1600'
+                                leftBuffer='FALSE' rightBuffer='TRUE'>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoRB_rightEye'
+                                    surface='1.524 -1.524 -1.524,
+                                        1.524 -1.524 1.524,
+                                        1.524 0.381 1.524,
+                                        1.524 0.381 -1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='FALSE'
+                                    rightEye='TRUE'>
+                                </ProjectionViewModifier>
+                            </Viewarea>
+                        </LocalWindow>
+                    </IFcaveStereo>
+                    <!-- END RIGHT WALL -->
+
+                    <!-- FLOOR WALL -->
+                    <LocalWindow position='0 0' size='2560 1600'
+                        fullScreen='FALSE' pipe=':0.12' border='FALSE'
+                        drawCursor='TRUE' drawToolBar='FALSE'>
+                        <Viewarea
+                            lowerLeft='0 0' upperRight='2560 1600'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <IFcaveStereo>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoFT_leftEye'
+                                    surface='-1.524 -1.524 0.381,
+                                        1.524 -1.524 0.381,
+                                        1.524 -1.524 -1.524,
+                                        -1.524 -1.524 -1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='TRUE'
+                                    rightEye='FALSE'>
+                                </ProjectionViewModifier>
+                            </IFcaveStereo>
+                            <IFcaveMono>
+                                <ProjectionViewModifier
+                                    DEF='caveMonoFT_oneEye'
+                                    surface='-1.524 -1.524 0.381,
+                                        1.524  -1.524 0.381,
+                                        1.524 -1.524 -1.524,
+                                        -1.524 -1.524 -1.524'
+                                        mono='TRUE'>
+                                </ProjectionViewModifier>
+                            </IFcaveMono>
+                        </Viewarea>
+                    </LocalWindow>
+
+                    <IFcaveStereo>
+                        <LocalWindow position='0 0' size='2560 1600'
+                            fullScreen='FALSE' pipe=':0.13' border='FALSE'
+                            drawCursor='TRUE' drawToolBar='FALSE'>
+                            <Viewarea
+                                lowerLeft='0 0' upperRight='2560 1600'
+                                leftBuffer='FALSE' rightBuffer='TRUE'>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoFT_rightEye'
+                                    surface='-1.524 -1.524 0.381,
+                                        1.524 -1.524 0.381,
+                                        1.524 -1.524 -1.524,
+                                        -1.524 -1.524 -1.524'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='FALSE'
+                                    rightEye='TRUE'>
+                                </ProjectionViewModifier>
+                            </Viewarea>
+                        </LocalWindow>
+                    </IFcaveStereo>
+
+
+                    <LocalWindow position='0 0' size='2560 1600'
+                        fullScreen='FALSE' pipe=':0.14' border='FALSE'
+                        drawCursor='TRUE' drawToolBar='FALSE'>
+                        <Viewarea
+                            lowerLeft='0 0' upperRight='2560 1600'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <IFcaveStereo>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoFB_leftEye'
+                                    surface='-1.524 -1.524 1.524,
+                                        1.524 -1.524 1.524,
+                                        1.524 -1.524 -0.381,
+                                        -1.524 -1.524 -0.381'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='TRUE'
+                                    rightEye='FALSE'>
+                                </ProjectionViewModifier>
+                            </IFcaveStereo>
+                            <IFcaveMono>
+                                <ProjectionViewModifier
+                                    DEF='caveMonoFB_oneEye'
+                                    surface='-1.524 -1.524 1.524,
+                                        1.524 -1.524 1.524,
+                                        1.524 -1.524 -0.381,
+                                        -1.524 -1.524 -0.381'
+                                    mono='TRUE'>
+                                </ProjectionViewModifier>
+                            </IFcaveMono>
+                        </Viewarea>
+                    </LocalWindow>
+
+                    <IFcaveStereo>
+                        <LocalWindow position='0 0' size='2560 1600'
+                            fullScreen='FALSE' pipe=':0.15' border='FALSE'
+                            drawCursor='TRUE' drawToolBar='FALSE'>
+                            <Viewarea
+                                lowerLeft='0 0' upperRight='2560 1600'
+                                leftBuffer='FALSE' rightBuffer='TRUE'>
+                                <ProjectionViewModifier
+                                    DEF='caveStereoFB_rightEye'
+                                    surface='-1.524 -1.524 1.524,
+                                        1.524 -1.524 1.524,
+                                        1.524 -1.524 -0.381,
+                                        -1.524 -1.524 -0.381'
+                                    mono='FALSE'
+                                    eyeSeparation='0.065'
+                                    leftEye='FALSE'
+                                    rightEye='TRUE'>
+                                </ProjectionViewModifier>
+                            </Viewarea>
+                        </LocalWindow>
+                    </IFcaveStereo>
+                    <!-- END FLOOR WALL -->
+
+                </IFcaveWalls>
+
+
+
+
+                <IFtwoDifferentX11Screens>
+                    <LocalWindow pipe=':0.1' />
+                    <LocalWindow pipe=':0.1' />
+                </IFtwoDifferentX11Screens>
+
+ 
+            </WindowGroup>
+        </RenderJob>
+
+
+        <IFhead>
+            <IOSensor DEF='dtkInstantIOHead'
+                type='dtkInstantIOHead'
+                isActive='TRUE'>
+                <field accessType='outputOnly' name='head' type='SFMatrix4f'/>
+            </IOSensor>
+        </IFhead>
+
+        <IFhead>
+            <IFdesktopStereoSideBySide>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='desktopStereoSideBySide_leftEye'
+                    toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='desktopStereoSideBySide_rightEye'
+                    toField='set_eyeTransform'/>
+            </IFdesktopStereoSideBySide>
+        </IFhead>
+
+        <IFhead>
+            <IFcaveStereo>
+                <!-- LEFT WALL -->
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoLT_leftEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoLT_rightEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoLB_leftEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoLB_rightEye' toField='set_eyeTransform'/>
+                <!-- CENTER WALL -->
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoCT_leftEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoCT_rightEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoCB_leftEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoCB_rightEye' toField='set_eyeTransform'/>
+                <!-- RIGHT WALL -->
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoRT_leftEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoRT_rightEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoRB_leftEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoRB_rightEye' toField='set_eyeTransform'/>
+                <!-- FLOOR WALL -->
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoFT_leftEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoFT_rightEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoFB_leftEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveStereoFB_rightEye' toField='set_eyeTransform'/>
+            </IFcaveStereo>
+        </IFhead>
+
+        <IFhead>
+            <IFcaveMono>
+                <!-- LEFT WALL -->
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveMonoLT_oneEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveMonoLB_oneEye' toField='set_eyeTransform'/>
+                <!-- CENTER WALL -->
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveMonoCT_oneEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveMonoCB_oneEye' toField='set_eyeTransform'/>
+                <!-- RIGHT WALL -->
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveMonoRT_oneEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveMonoRB_oneEye' toField='set_eyeTransform'/>
+                <!-- FLOOR WALL -->
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveMonoFT_oneEye' toField='set_eyeTransform'/>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='caveMonoFB_oneEye' toField='set_eyeTransform'/>
+            </IFcaveMono>
+        </IFhead>
+
+        <IFhead>
+            <IFdesktopMono>
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
+                    toNode='desktopMono_oneEye' toField='set_eyeTransform'/>
+            </IFdesktopMono>
+        </IFhead>
+
+    </Engine>
+
+
+    <IFmanyViewPoints>
+        <Scene>
+            <Viewpoint position='0 0 0' description='(0 0 0)'/>
+            <Viewpoint position='0 0 1' description='(0 0 1)'/>
+            <Viewpoint position='0 0 -1' description='(0 0 -1)'/>
+            <Viewpoint position='0 0 1' description='(0 0 1)'/>
+            <Viewpoint position='0 1 0' description='(0 1 0)'/>
+        </Scene>
+    </IFmanyViewPoints>
+
+    <IFtestViewPoint>
+        <Scene>
+            <Viewpoint position='1 0.15 0.1' description='testViewPoint'/>
+        </Scene>
+    </IFtestViewPoint>
+
+    <IForiginViewPoint>
+        <Scene>
+            <Viewpoint position='0 0 0' description='origin'/>
+        </Scene>
+    </IForiginViewPoint>
+
+    <IFsweetViewPoint>
+        <Scene>
+            <Viewpoint position='0 0.3 1' description='origin'/>
+        </Scene>
+    </IFsweetViewPoint>
+
+
+
+
+
+
+</X3D>

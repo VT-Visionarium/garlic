@@ -1,22 +1,67 @@
-This depends on ../instantreality/ and ../diverse/dtk*
-apt-get install xmlstarlet
+Files in this directory are made into something installed or
+are installed as they are.
 
-git clone https://github.com/lanceman2/InstantReality_VTCAVE.git git
+In the VT CAVE we have no monitor on the main graphics render
+computer so remember to 'ssh' to it with the '-X' option.
 
-In the VT CAVE we have no head monitor on the main graphics render
-computer so we must ssh to it.  Note remember to use 'ssh -X nodename'.
+Rules that the GNUmakefile makes are:
+
+  *.cpp files are made into *.iio files installed as InstantIO plug-ins
+  *-nav.xd3 and *-nav.wrl are installed as InstantPlayer navigations
+  *-engine.x3d and *-engine.wrl are installed as  InstantPlayer engines
+  other *.x3d and *.wrl are installed as models.
+  bash script are
+
+These models are used to add pop-ups as debugging tools.
 
 
-FILES:
+see GNUmakefile for default installation directories.
 
-   InstantReality_VTCAVE-VERSION/
+In short:
 
-        particular version build directory
+  *.cpp -> *.iio            ->   plug-ins
 
-   common.bash
+  *-nav.x3d *-nav.wrl       ->   navs
 
-        used by all install.bash scripts
+  *-engine.x3d *-engine.wrl ->   engines
 
-   git/
+  *.x3d *.wrl               ->   models
 
-        git clone of the source
+  executable scripts        ->   bin
+
+exceptions test files are not installed
+
+  none of the *_test bash script files are installed
+  none of the *_test-engine.* files are installed
+  none of the *_test-nav.* files are installed
+  none of the *_test.* files are installed
+
+
+just add files following these wildcard (glob) rules and you will not have
+to change GNUmakefile.  If you have a C++ plug-in that has more then one
+source file you'll need to edit GNUmakefile.  The CMakeLists.txt file was
+just a test to see how bad CMake sucks.  It's just very bad at wildcards
+and filename string patterns, and like things.  It can't do regrex replace
+with groups of filenames in a reasonable way.  GNU make kicks it's ass.
+
+To build and test stuff:
+
+   make
+
+and then run one of *.bash or an InstantPlayer command.
+
+
+To install run:
+
+   make -j4 && make install
+
+To remove generated files:
+
+   make clean
+
+
+------------------------------------------------------------------------------
+Develment notes:
+
+  moving a window: wmctrl -i -r $WID -e 0,50,50,250,250
+
