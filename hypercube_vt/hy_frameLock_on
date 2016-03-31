@@ -23,19 +23,29 @@ fi
 set -x
 export DISPLAY=:0.0
 
-# set master (GPU 0 is attached to stereo port, does it matter?)
-nvidia-settings -a [gpu:1.dpy:DVI-I-1]/FrameLockDisplayConfig=2 || exit $?
+# set master (LTL)
+nvidia-settings -a [gpu:0.dpy:DP-0]/FrameLockDisplayConfig=2
 
-# set slaves
-nvidia-settings -a [gpu:1.dpy:DVI-D-0]/FrameLockDisplayConfig=1 || exit $?
-nvidia-settings -a [gpu:2.dpy:DVI-I-1]/FrameLockDisplayConfig=1 || exit $?
-nvidia-settings -a [gpu:2.dpy:DVI-D-0]/FrameLockDisplayConfig=1 || exit $?
+# set slaves (other 15 outputs)
+nvidia-settings -a [gpu:0.dpy:DP-2]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:0.dpy:DP-4]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:0.dpy:DP-6]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:1.dpy:DP-0]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:1.dpy:DP-2]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:1.dpy:DP-4]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:1.dpy:DP-6]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:2.dpy:DP-0]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:2.dpy:DP-2]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:2.dpy:DP-4]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:2.dpy:DP-6]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:3.dpy:DP-0]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:3.dpy:DP-2]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:3.dpy:DP-4]/FrameLockDisplayConfig=1
+nvidia-settings -a [gpu:3.dpy:DP-6]/FrameLockDisplayConfig=1
 
-# complains that unconnected outputs can only be set to 0
-# nvidia-settings -a [gpu:2.dpy]/FrameLockDisplayConfig=1
-
-# enable framelock on master GPU
-nvidia-settings -a [gpu:1]/FrameLockEnable=1 || exit $?
-
-# enable framelock on slaves
+# enable framelock on all GPUs
+nvidia-settings -a [gpu:0]/FrameLockEnable=1
+nvidia-settings -a [gpu:1]/FrameLockEnable=1
 nvidia-settings -a [gpu:2]/FrameLockEnable=1
+nvidia-settings -a [gpu:3]/FrameLockEnable=1
+
