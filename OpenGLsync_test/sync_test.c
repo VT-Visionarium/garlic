@@ -57,8 +57,27 @@ static int ctxErrorHandler( Display *dpy, XErrorEvent *ev )
     return 0;
 }
 
+static int usage(const char *argv0)
+{
+    printf("\n"
+            "   Usage: %s [-h|--help]\n"
+            "\n"
+            " Run a simple two window, two process, OpenGL program.\n"
+            " Just used to test frame locking.\n"
+            "\n"
+            " You can set environment variable CHILD_DISPLAY like for example:\n"
+            "\n"
+            "     bash prompt%c  CHILD_DISPLAY=:0.1 %s\n"
+            "\n",
+            argv0, '%', argv0);
+    return 1;
+}
+
 int main(int argc, char* argv[])
 {
+  if(argc > 1)
+      return usage(argv[0]);
+
   pid_t pid;
 
   pid = fork();
