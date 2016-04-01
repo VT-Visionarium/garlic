@@ -5,6 +5,6 @@ cd "$scriptdir" || exit $?
 
 make || exit $?
 
-export CHILD_DISPLAY=:0.1
+export CHILD_DISPLAY=:0.2
 ./sync_test
 
