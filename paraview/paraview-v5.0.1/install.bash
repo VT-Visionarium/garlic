@@ -221,4 +221,18 @@ cmake ../src\
  -DVTK_LEGACY_REMOVE:BOOL=OFF\
  || Fail
 
- Install
+Install
+
+
+file=ParaViewTutorialData.tar.gz
+url=http://www.paraview.org/Wiki/images/5/5d/$file
+tarfile="$srcdir/$file"
+if [ ! -f "$tarfile" ] ; then
+    set -x
+    wget $url -O "$tarfile" || Fail
+fi
+
+set -x
+cd "$prefix" || Fail
+tar -xzvf "$tarfile" || Fail
+echo "ParaViewTutorialData" > "$prefix/encap.exclude" || Fail
