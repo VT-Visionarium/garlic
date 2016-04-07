@@ -6,8 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <signal.h>
+#include <time.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <GL/gl.h>
@@ -73,12 +76,58 @@ static int usage(const char *argv0)
     return 1;
 }
 
+static bool running = true;
+
+
+static void catcher(int sig)
+{
+    printf("\npid=%d caught signal %d, exiting\n",
+            getpid(), sig);
+    running = false;
+}
+
+static inline double
+timeDiff(const struct timespec *tv2, const struct timespec *tv1)
+{
+    return (double) (tv2->tv_sec - tv1->tv_sec + 1.0e-9 * (tv2->tv_nsec - tv1->tv_nsec));
+}
+
+static void checkFrames(void)
+{
+   static uint64_t nframes = 0, reportFrames = 600; // report every number frames
+   static struct timespec tv = { 0, 0 };
+
+   if(tv.tv_sec == 0)
+        clock_gettime(CLOCK_REALTIME, &tv);
+
+   ++nframes;
+
+  if(!(nframes % reportFrames))
+  {
+      double t;
+      struct timespec ctv;
+
+      clock_gettime(CLOCK_REALTIME, &ctv);
+      t = timeDiff(&ctv, &tv);
+      if(t > 6.0 /*seconds*/)
+      {
+        printf("pid %d:    %lg frames per second\n", getpid(), ((double) reportFrames)/t);
+        memcpy(&tv, &ctv, sizeof(tv));
+      }
+    }
+}
+
 int main(int argc, char* argv[])
 {
+
   if(argc > 1)
       return usage(argv[0]);
 
   pid_t pid;
+
+  signal(SIGINT,catcher);
+  signal(SIGTERM,catcher);
+  signal(SIGQUIT,catcher);
 
   pid = fork();
 
@@ -304,32 +353,31 @@ int main(int argc, char* argv[])
 
   printf( "Making context current\n" );
 
+#define USEC 300
 
-while(1)
+while(running)
 {
-  
+   int i;
+
   glXMakeCurrent( display, win, ctx );
 
-  glClearColor( 0, 0.5, 1, 1 );
-  glClear( GL_COLOR_BUFFER_BIT );
-  glXSwapBuffers ( display, win );
+  for(i=0;i<1000 && running;++i)
+  {
+    glClearColor( 0, 0.5, 1, 1 );
+    glClear( GL_COLOR_BUFFER_BIT );
+    //if(pid) usleep(USEC);
+    glXSwapBuffers ( display, win );
+    checkFrames();
+   }
 
-  if(pid)
-    // parent process
-    usleep(4100000);
-  else
-    usleep(300000);
-
-  glClearColor ( 1, 0.5, 0, 1 );
-  glClear ( GL_COLOR_BUFFER_BIT );
-  glXSwapBuffers ( display, win );
-
-  if(pid)
-      // parent process
-     usleep(4200000);
-  else
-     usleep(300000);
-
+  for(i=0;i<1000 && running;++i)
+  {
+    glClearColor ( 1, 0.5, 0, 1 );
+    glClear ( GL_COLOR_BUFFER_BIT );
+    //if(pid) usleep(USEC);
+    glXSwapBuffers ( display, win );
+    checkFrames();
+  }
 }
 
 
