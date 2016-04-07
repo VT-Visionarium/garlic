@@ -1,0 +1,17 @@
+#!/bin/bash
+
+
+if [ -n "$1" ] ; then
+    cat << EOF
+  Usage: $0"
+
+  Disable nvidia sync to VBlank.
+
+EOF
+
+fi
+
+set -x
+export DISPLAY=:0.0
+
+nvidia-settings --load-config-only --assign="SyncToVBlank=0"
