@@ -10,4 +10,7 @@ Look at root_install.bash and if you like what is will do run:
 
 see 'man adduser'
 
-
+# The SKEL variable specifies the directory containing "skeletal" user
+# files; in other words, files such as a sample .profile that will be
+# copied to the new user's home directory when it is created.
+SKEL=/etc/skel
