@@ -1,0 +1,23 @@
+This is an attempt keep notes about general computer system
+administration for the Virginia Tech Visionarium.  I need to keep these
+notes somewhere that can be easily accessed by others.  Since there are
+no secrets in this information can be put on github.com.
+
+I was using google drive, but to it interfaces suck to much time.
+I can run git pull and git push faster than loading a web page and
+the N other pages needed to navigate to folders in google drive.
+
+FILES:
+
+   sv.dat
+
+       The current sv.vt.edu domain name list that was submitted and
+       accepted by emailing to hostmaster@vt.edu.  There are no spaces
+       on lines longer than 76 chars.  See details at:
+       http://groupw.cns.vt.edu/~benchoff/dnl-draft/
+
+  sv.dat_submitted
+
+      Submitted but not accepted yet.  See sv.dat.
+
+

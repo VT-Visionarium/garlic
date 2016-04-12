@@ -1,5 +1,0 @@
-This is just so we have a clue as to how to use the Virginia Tech Tivoli Storage
-Manager (TSM) from the TSM client programs that IBM provides.
-
-Good reference for the commands to the dsmc shell program (interactive and non-interactive).
-http://publib.boulder.ibm.com/tividd/td/TSMC/SH26-4122-01/en_US/HTML/ans50016.htm
