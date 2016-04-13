@@ -8,5 +8,5 @@ source ./mkEngines.bash
 # not.  It's like adding IF conditionals to manage the insertion of blocks
 # to XML.
 
-AddFeatures head caveWalls caveStereo sweetViewPoint
+AddFeatures head caveWalls caveStereo
 
