@@ -1,3 +1,17 @@
+NOTES:
+
+service dsmcad
+start
+stop
+restart
+status
+
+chkconfig --add dsmcad
+
+
+
+
+
 
 
 Tivoli Storage Manager for UNIX Using the Backup-Archive Clients
