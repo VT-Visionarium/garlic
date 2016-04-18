@@ -1,18 +1,6 @@
-NOTES:
 
-service dsmcad
-start
-stop
-restart
-status
-
-chkconfig --add dsmcad
-
-
-
-
-
-
+# to list files
+dpkg --contents file.deb
 
 Tivoli Storage Manager for UNIX Using the Backup-Archive Clients
 http://publib.boulder.ibm.com/tividd/td/TSMC/SH26-4122-01/en_US/HTML/ans50016.htm
@@ -49,6 +37,15 @@ We looked at:
 http://www.shellhacks.com/en/HowTo-Install-TSM-Client-on-CentOS-RHEL 
 
 
+
+
+# make a version of dsm.opt and dsm.sys
+
+# Add /opt/tivoli/tsm/client/ba/bin/dsm.opt
+# Add /opt/tivoli/tsm/client/ba/bin/dsm.sys
+#
+cp dsm.opt dsm.sys /opt/tivoli/tsm/client/ba/bin/
+
 # We ran this from this directory we ran:
 mkdir 7.1.4.0-TIV-TSMBAC-LinuxX86
 cd 7.1.4.0-TIV-TSMBAC-LinuxX86
@@ -60,11 +57,7 @@ gdebi gskcrypt64_8.0-50.52.linux.x86_64.deb
 gdebi gskssl64_8.0-50.52.linux.x86_64.deb
 gdebi tivsm-api64.amd64.deb
 gdebi tivsm-ba.amd64.deb
-
-# make a version of dsm.opt and dsm.sys
-
-# Add /opt/tivoli/tsm/client/ba/bin/dsm.opt
-# Add /opt/tivoli/tsm/client/ba/bin/dsm.sys
-#
-cp dsm.opt dsm.sys /opt/tivoli/tsm/client/ba/bin/
+update-rc.d dsmcad defaults
+update-rc.d dsmcad enable
+service dsmcad start
 
