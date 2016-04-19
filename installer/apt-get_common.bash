@@ -7,6 +7,9 @@ apt-get -y install\
  manpages-posix-dev\
  octave\
  gnuplot\
+ autoconf\
+ automake\
+ libtool\
  gnuplot-doc\
  doxygen\
  doxygen-doc\
