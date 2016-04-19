@@ -5,5 +5,4 @@ git clone https://github.com/lanceman2/quickscope.git git
 
 dependency
 
-   apt-get install markdown
-
+   apt-get install markdown libasound2-dev libasound2-doc libpulse-dev alsa-tools alsa-utils 
