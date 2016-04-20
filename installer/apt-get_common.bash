@@ -34,9 +34,13 @@ apt-get -y install\
 
 # this will remove wayland
 # this is dangerous.  We need to reboot after this
-#apt-get install libgl1-mesa-dev libgl1-mesa-glx xorg mesa-utils libglu1-mesa-dev || exit 1
 
-apt-get install sshfs
+#apt-get install xorg || exit 1
+
+#apt-get install python-pip paraview python-astropy python-scipy python2.7-dev
+
+
+apt-get -y install sshfs
 
 apt-get -y install\
  libreoffice\
@@ -44,17 +48,13 @@ apt-get -y install\
  vim-doc\
  sox\
  libsox-fmt-all\
- python-pip\
- paraview\
- python-astropy\
- python-scipy\
  libcr-dev\
  mpich2\
  mpich2-doc\
  mesa-utils\
+ libglu1-mesa-dev\
  cmake-curses-gui\
- python2.7-dev\
- python-astropy || exit $?
+ || exit $?
 
 apt-get -y purge update-manager || exit $?
 
