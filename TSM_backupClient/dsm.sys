@@ -11,4 +11,5 @@ SErvername  adsm
    managedservices    schedule
    compression        yes
    domain             all-local
+   exclude.compression *.png
    exclude "/.../core"
