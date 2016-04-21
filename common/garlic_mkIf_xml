@@ -24,7 +24,7 @@ function Usage()
   This program reads InFile and writes to OutFile.  This reads XML from
   stdin and removes all tags like <IfFeatureRemove> ... </IfFeatureRemove>
   and the tags within thoses tags which are not listed in the Feature
-  optional argument list, and then after that removes any inclosing
+  optional argument list, and then after that removes any enclosing
   <IfFeatureKeep> ... </IfFeatureKeep> tags keeping the enclosed tags.
 
   If no OutFile is given this will generate AllFeaturesFile from InFile.
