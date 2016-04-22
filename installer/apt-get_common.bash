@@ -24,13 +24,40 @@ apt-get -y install\
  tree\
  talk\
  aptitude\
+ cmake-doc\
  cmake\
  lynx\
  at\
  markdown\
  aptitude\
  talk\
- cmake-doc || exit $?
+ autoconf\
+ autoconf-doc\
+ libtool\
+ libtool-doc\
+ automake\
+ libsndfile-dev\
+ libreadline-dev\
+ libgtk2.0-dev\
+ libgtk2.0-doc\
+ libgtk-3-dev\
+ libgtk-3-doc\
+ imagemagick-doc\
+ imagemagick\
+ lynx\
+ markdown\
+ libasound2-dev\
+ libasound2-doc\
+ libpulse-dev\
+ alsa-tools\
+ alsa-utils\
+ libreoffice\
+ vim-gtk\
+ vim-doc\
+ sox\
+ libsox-fmt-all\
+ xmlstarlet\
+ || exit $?
 
 # this will remove wayland
 # this is dangerous.  We need to reboot after this
@@ -43,11 +70,6 @@ apt-get -y install\
 apt-get -y install sshfs
 
 apt-get -y install\
- libreoffice\
- vim-gtk\
- vim-doc\
- sox\
- libsox-fmt-all\
  libcr-dev\
  mpich2\
  mpich2-doc\
@@ -56,5 +78,7 @@ apt-get -y install\
  cmake-curses-gui\
  || exit $?
 
+# This software updater is a pain, it runs 'apt-get update'
+# and 'apt-get dist-upgrade'
 apt-get -y purge update-manager || exit $?
 

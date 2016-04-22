@@ -63,5 +63,5 @@ To remove generated files:
 ------------------------------------------------------------------------------
 Develment notes:
 
-  moving a window: wmctrl -i -r $WID -e 0,50,50,250,250
+  Moving a window: wmctrl -i -r $WID -e 0,50,50,250,250
 
