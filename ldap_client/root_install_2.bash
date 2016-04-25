@@ -47,6 +47,9 @@ chmod 644 /etc/nsswitch.conf || exit $?
 cp nslcd.conf /etc/nslcd.conf || exit $?
 chmod 640 /etc/nslcd.conf || exit $?
 
+cp adduser.conf /etc/adduser.conf || exit $?
+chmod 640 /etc/adduser.conf || exit $?
+
 
 apt-get install ssh || exit $?
 
