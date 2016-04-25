@@ -1,3 +1,5 @@
 
 
 git clone https://github.com/vrpn/vrpn.git git
+
+wget http://www.intersense.com/uploads/archive/InterSense_Library_4.2381.zip
