@@ -536,19 +536,79 @@
                 <!-- DEEPSIX DISPLAY -->
                 <IFdeepsixDisplay>
 
-                    <LocalWindow position='0 0' size='2560 1600'
-                        fullScreen='FALSE' pipe=':0.10' border='FALSE'
+                    <LocalWindow position='0 0' size='7680 3200'
+                        fullScreen='FALSE' pipe=':0.0' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
                             lowerLeft='0 0' upperRight='2560 1600'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <ProjectionViewModifier
-                                DEF='sixCenterBottom'
-                                surface='1.524 -1.524 -1.524,
-                                    1.524 -1.524 1.524,
-                                    1.524 0.381 1.524,
-                                    1.524 0.381 -1.524'
-                                mono='TRUE'>
+                                DEF='deepsixLB'
+                                surface='-0.92 -0.4 -0.672,
+                                    -0.37 -0.4 -0.99,
+                                    -0.37 0 -0.99,
+                                    -0.92 0 -0.672'
+                                    mono='TRUE'>
+                            </ProjectionViewModifier>
+                        </Viewarea>
+                        <Viewarea
+                            lowerLeft='0 1600' upperRight='2560 3200'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <ProjectionViewModifier
+                                DEF='deepsixLT'
+                                surface='-0.92 0.05 -0.672,
+                                    -0.37 0.05 -0.99,
+                                    -0.37 0.45 -0.99,
+                                    -0.92 0.45 -0.672'
+                                    mono='TRUE'>
+                            </ProjectionViewModifier>
+                        </Viewarea>
+                        <Viewarea
+                            lowerLeft='2560 0' upperRight='5120 1600'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <ProjectionViewModifier
+                                DEF='deepsixCB'
+                                surface='-0.32 -0.4 -1,
+                                    0.32 -0.4 -1,
+                                    0.32 0 -1,
+                                    -0.32 0 -1'
+                                    mono='TRUE'>
+                            </ProjectionViewModifier>
+                        </Viewarea>
+                        <Viewarea
+                            lowerLeft='2560 1600' upperRight='5120 3200'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <ProjectionViewModifier
+                                DEF='deepsixCT'
+                                surface='-0.32 0.05 -1,
+                                    0.32 0.05 -1,
+                                    0.32 0.45 -1,
+                                    -0.32 0.45 -1'
+                                    mono='TRUE'>
+                            </ProjectionViewModifier>
+                        </Viewarea>
+                        <Viewarea
+                            lowerLeft='5120 0' upperRight='7680 1600'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <ProjectionViewModifier
+                                DEF='deepsixRB'
+                                surface='0.37 -0.4 -0.99,
+                                    0.92 -0.4 -0.672,
+                                    0.92 0 -0.672,
+                                    0.37 0 -0.99'
+                                    mono='TRUE'>
+                            </ProjectionViewModifier>
+                        </Viewarea>
+                        <Viewarea
+                            lowerLeft='5120 1600' upperRight='7680 3200'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <ProjectionViewModifier
+                                DEF='deepsixRT'
+                                surface='0.37 0.05 -0.99,
+                                    0.92 0.05 -0.672,
+                                    0.92 0.45 -0.672,
+                                    0.37 0.45 -0.99'
+                                    mono='TRUE'>
                             </ProjectionViewModifier>
                         </Viewarea>
                     </LocalWindow>
@@ -689,6 +749,12 @@
             <Viewpoint position='0 0.3 1' description='origin'/>
         </Scene>
     </IFsweetViewPoint>
+
+    <IFdeepsixViewPoint>
+        <Scene>
+            <Viewpoint position='0 0.2 1.8' description='sweet'/>
+        </Scene>
+    </IFdeepsixViewPoint>
 
 
 
