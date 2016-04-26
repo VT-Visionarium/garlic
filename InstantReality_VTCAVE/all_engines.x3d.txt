@@ -533,6 +533,29 @@
 
 
 
+                <!-- DEEPSIX DISPLAY -->
+                <IFdeepsixDisplay>
+
+                    <LocalWindow position='0 0' size='2560 1600'
+                        fullScreen='FALSE' pipe=':0.10' border='FALSE'
+                        drawCursor='TRUE' drawToolBar='FALSE'>
+                        <Viewarea
+                            lowerLeft='0 0' upperRight='2560 1600'
+                            leftBuffer='TRUE' rightBuffer='FALSE'>
+                            <ProjectionViewModifier
+                                DEF='sixCenterBottom'
+                                surface='1.524 -1.524 -1.524,
+                                    1.524 -1.524 1.524,
+                                    1.524 0.381 1.524,
+                                    1.524 0.381 -1.524'
+                                mono='TRUE'>
+                            </ProjectionViewModifier>
+                        </Viewarea>
+                    </LocalWindow>
+
+                </IFdeepsixDisplay>
+                <!-- END DEEPSIX DISPLAY -->
+
 
                 <IFtwoDifferentX11Screens>
                     <LocalWindow pipe=':0.1' />
