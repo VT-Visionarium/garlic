@@ -57,6 +57,7 @@ apt-get -y install\
  sox\
  libsox-fmt-all\
  xmlstarlet\
+ consolekit\
  || exit $?
 
 # this will remove wayland
