@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# TODO: run in foreground or background?
+set -x
+startx &
+#startx
