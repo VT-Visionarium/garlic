@@ -1,7 +1,8 @@
 #!/bin/bash
 
+# TODO: This does not work. Rewrite using a PID file from startx  
 set -x
 # get DBUS_SESSION_BUS_ADDRESS
-source .cache/upstart/dbus-session
+source ${HOME}/.cache/upstart/dbus-session
 export DBUS_SESSION_BUS_ADDRESS
 xfce4-session-logout --logout --display=:0.0
