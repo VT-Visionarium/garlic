@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -x
+# get DBUS_SESSION_BUS_ADDRESS
+source .cache/upstart/dbus-session
+export DBUS_SESSION_BUS_ADDRESS
+xfce4-session-logout --logout --display=:0.0

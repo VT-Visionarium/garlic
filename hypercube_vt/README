@@ -40,9 +40,13 @@ apt-get purge light-locker xfce4-panel xfce4-power-manager
 
 apt-get autoremove
 
-Then a user can just run 'startx' and stop it to have a X session.
+Then a user can just run 'startx' to have a X session.
 
 startx
+
+Just stop startx with Crl-C or signal it to stop it.
+Or maybe a instead run './hy_stopx'
+
 
 # disable screen blanking through X11 one time by:
 xset s off
