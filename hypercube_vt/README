@@ -24,20 +24,48 @@ monitor.
 service lightdm stop
 mv /etc/init/lightdm.conf /etc/init/lightdm.conf.disabled
 
+doing a 'apt-get purge lightdm' is not what we want, that will
+cause another service to be installed to replace lightdm, yes
+ubuntu sucks.
+
+
 #edit /etc/X11/Xwrapper.config
 from:
 allowed_users=console
 to:
 allowed_users=anybody
 
+
+apt-get purge light-locker xfce4-panel xfce4-power-manager
+
+apt-get autoremove
+
 Then a user can just run 'startx' and stop it to have a X session.
 
-# disable screen blanking through X11
-xset s off
+startx
 
-killall xfce4-panel
-killall light-locker
-apt-get purge light-locker
-apt-get purge xfce4-panel
-apt-get autoremove
+# disable screen blanking through X11 one time by:
+xset s off
+# but it does not work because other things are happening.
+
+
+The next two things seem to do the trick:
+
+edit /etc/kbd/config
+change 3 lines to:
+BLANK_DPMS=off
+POWERDOWN_TIME=0
+BLANK_TIME=0
+
+
+
+edit /etc/X11/xorg.conf
+added lines to Section "ServerLayout"
+
+Option          "BlankTime"     "0"
+Option          "StandbyTime"   "0"
+Option          "SuspendTime"   "0"
+Option          "OffTime"       "0"
+
+
 
