@@ -35,6 +35,9 @@ hy_edge_blend_on hy_edge_blend_off: %:%.in
 install: build
 	mkdir -p $(BIN)
 	cp $(inst_files) $(BIN)
+	@echo
+	@echo "You may want to run: sudo encap"
+	@echo
 
 clean:
 	rm -f $(built_files)
