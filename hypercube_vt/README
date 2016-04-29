@@ -45,7 +45,14 @@ Then a user can just run 'startx' to have a X session.
 startx
 
 Just stop startx with Crl-C or signal it to stop it.
-Or maybe a instead run './hy_stopx'
+This method of stopping the X session works but only
+if a signal can propagate to the x-session-manager
+which seems to be thing thing that starts a proper X
+session shutdown, or X session logout.
+So we wrote to wrapper scripts hy_startx and hy_stopx
+that "do the right things" for starting and ending a
+user X session, as it is done via the windowing GUIs
+but without the GUIs.
 
 
 # disable screen blanking through X11 one time by:
