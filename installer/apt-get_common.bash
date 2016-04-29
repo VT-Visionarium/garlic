@@ -59,6 +59,8 @@ apt-get -y install\
  xmlstarlet\
  consolekit\
  re2c\
+ bison\
+ bison-doc\
  || exit $?
 
 # this will remove wayland
