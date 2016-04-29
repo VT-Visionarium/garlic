@@ -1,0 +1,21 @@
+Files:
+
+  install.bash
+
+      run to install PHP
+
+  index.html
+
+      a test file used by running
+
+          php -S localhost:8000
+
+      from this directory.  Then run something like:
+
+          firefox localhost:8000
+
+
+   php.ini
+
+       installed as the default php.ini configuration file.
+
