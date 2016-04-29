@@ -58,6 +58,7 @@ apt-get -y install\
  libsox-fmt-all\
  xmlstarlet\
  consolekit\
+ re2c\
  || exit $?
 
 # this will remove wayland
