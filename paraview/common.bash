@@ -32,7 +32,6 @@ function Install()
     # Could be a race condition in parallel make
     #make VERBOSE=1 -j$ncores || Fail
     make VERBOSE=1 || Fail
-    make -j3 install || Fail
-    PrintSuccess
+    make -j$ncores install || Fail
 }
 
