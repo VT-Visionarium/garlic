@@ -30,8 +30,8 @@ function PreInstall()
 function Install()
 {
     # Could be a race condition in parallel make
-    #make VERBOSE=1 -j$ncores || Fail
-    make VERBOSE=1 || Fail
+    make VERBOSE=1 -j$ncores || Fail
+    #make VERBOSE=1 || Fail
     make -j$ncores install || Fail
 }
 
