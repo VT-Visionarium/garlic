@@ -1,16 +1,11 @@
 #!/bin/bash
 
 set -x
+startx &
 
-# We run only one startx and we setup a PID file so that
-# we may signal it via hy_stopx
-
-pid_file=${HOME}/.hy_pidfile
-exec 3<> $pid_file || exit 1
-flock -x -n 3 || exit 1 # only one process at a time from here
-echo "$$" 1>&3
-# if this bash process is signaled it should pass on the
-# signal to the startx child process that we run next.
-startx
-rm -f $pid_file
-# now the next process may continue if it did not fail
+# Trial and error shows that signaling the startx process will
+# not alway stop the X session, but signaling x-session-manager
+# seems to be the correct thing to do.  So now we must find the
+# process id (PID) of the x-session-manager.  Then again why
+# bother looking for this PID here, just let killall do the work,
+# it's the same.

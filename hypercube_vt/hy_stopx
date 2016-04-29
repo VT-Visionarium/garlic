@@ -1,13 +1,5 @@
 #!/bin/bash
 
-pid_file=${HOME}/.hy_pidfile
-if [ ! -f $pid_file ] ; then
-    echo "PID file \"$pid_file\" not found"
-    exit 1
-fi
-
-pid="$(cat $pid_file)"
+# not much to it.  See notes in hy_startx.
 set -x
-kill -INT $pid
-# The hy_start script will clean up the pid file
-
+killall x-session-manager
