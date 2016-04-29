@@ -1,6 +1,16 @@
 #!/bin/bash
 
-# TODO: run in foreground or background?
 set -x
-startx &
-#startx
+
+# We run only one startx and we setup a PID file so that
+# we may signal it via hy_stopx
+
+pid_file=${HOME}/.hy_pidfile
+exec 6 > $pid_file || exit 1
+flock -x -n 6 || exit 1 # only one process at a time from here
+echo "$$" 1>&6
+# if this bash process is signaled it should pass on the
+# signal to the startx child process that we run next.
+startx
+rm -f $pid_file
+# now the next process may continue if it did not fail
