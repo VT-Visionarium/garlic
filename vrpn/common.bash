@@ -24,5 +24,4 @@ function Install()
 {
     make VERBOSE=1 -j$ncores || Fail
     make -j3 install || Fail
-    PrintSuccess
 }
