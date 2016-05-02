@@ -5,6 +5,7 @@ cd "$scriptdir" || exit $?
 scriptdir="$PWD" # now we have full path
 # this will source ../common.bash too
 source ../../common.bash
+
 # we make the install prefix name different from the git tag because the
 # paraview tags do not have the string "paraview" them
 PreInstall "v5.0.1" # git tag
@@ -90,7 +91,7 @@ Install
 
 file=ParaViewTutorialData.tar.gz
 url=http://www.paraview.org/Wiki/images/5/5d/$file
-tarfile="$srcdir/$file"
+tarfile="$topsrcdir/$file"
 if [ ! -f "$tarfile" ] ; then
     set -x
     wget $url -O "$tarfile" || Fail
