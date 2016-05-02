@@ -26,5 +26,6 @@ make -j3 install || Fail
 
 mkdir -p $prefix/share || Fail
 cp $scriptdir/php.ini $php_ini || Fail
+echo "php.ini" > $prefix/share/encap.exclude
 
 PrintSuccess

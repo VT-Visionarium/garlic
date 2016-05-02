@@ -1,0 +1,17 @@
+php_demorunner - This just installs a striped down version of PHP for
+                 demoRunner.  You may install this indirectly by
+                 installing demoRunner.
+
+
+# besides the GNU autotools we need re2c to build PHP:
+apt-get install re2c
+
+git clone https://github.com/php/php-src.git git
+
+
+TO INSTALL:
+
+1. run:
+
+     ./php-VERSION/install.bash
+
