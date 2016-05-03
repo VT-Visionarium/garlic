@@ -14,8 +14,3 @@ Files:
 
           firefox localhost:8000
 
-
-   php.ini
-
-       installed as the default php.ini configuration file.
-

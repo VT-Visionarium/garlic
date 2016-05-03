@@ -1,0 +1,9 @@
+; This is for the PHP script that runs the demos, demoRunner-server,
+; which runs the demos in the Virginia Tech HyperCube (CAVE) via a browser
+; by running PHP as a localhost server.
+;
+;
+include_path = "@WWW_ROOT@/private"
+;
+;
+

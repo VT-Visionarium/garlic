@@ -1,0 +1,54 @@
+The final form of this demoRunner is unclear, it may be merged into
+hyperCube, or it may have more general scope than just running demos
+in the Virginia Tech CAVE.
+
+This is a web server directory tree.  We make a minimal approach just
+segregating files by how they can be seen from the client end keeping
+redundancy small.  We don't have concern segregating files based on
+file type, so we can have CSS, php, and HTMl files in the same directory.
+The service is seem by the client as a tree of demos, with some cross
+linking across branches.
+
+This little HTTP service may or may not end up on the Internet so if you
+develop it keep that in mind, by making web security a thing that is a
+least future possibility.
+
+
+FILES:
+
+    GNUmakefile
+
+       A GNU makefile that installs the demoRunner HTTP server script
+       and other stuff, so that you have it in your PATH.
+
+
+
+    demoRunner-server
+
+       Runs the HTTP server for this demoRunner service.  Created from
+       demoRunner-server.in via make.
+
+
+
+    docRoot/
+
+       The public served files.  Files that can be accessed via a URL.
+
+
+
+    private/
+
+       Files that are not directly accessible by a URL.
+       
+           Examples:
+
+              1. A file included into a public file to compose a page.
+              2. A script/program that is executed by the server.
+              3. A service configuration file.
+
+
+
+    ~/.hy_demoRunner/
+
+       User specific state and configuration.  Maintained by the server.
+
