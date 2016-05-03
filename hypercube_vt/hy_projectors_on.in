@@ -1,7 +1,6 @@
 #!/usr/bin/ruby -w
 
 require File.dirname(__FILE__) + "/hy_projectors_common"
-require 'optparse'
 
 def usage()
 

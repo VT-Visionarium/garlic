@@ -1,0 +1,103 @@
+#!/bin/bash
+
+function usage()
+{
+    cat <<EOF
+
+  Usage: $0 [-m|--mono]
+
+  Run many programs needed to start a HyperCube session.
+
+  Runs the following 5 programs:
+       
+       hy_startx
+       hy_edgeBlend_on
+       hy_projectors_on [--mono]
+       hy_frameLock_on
+       hy_syncToVBlank_on
+
+  By default we turn on the projector for stereo display, not --mono.
+
+
+EOF
+
+    exit 1
+}
+
+function Run()
+{
+    if ! $* ; then
+        echo
+        echo "$* FAILED"
+        exit 1
+    fi
+}
+
+
+# default mono is off
+mono=
+
+
+while [ -n "$1" ] ; do
+    case $1 in
+        -h|--h*)
+            usage
+            ;;
+        -m|--mono|--m|-mono)
+            mono="--mono"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+    shift 1
+done
+
+
+Run hy_startx
+
+
+# TODO: need an error check here
+hy_projectors_on $mono &
+proj_pid=$!
+
+displaySave="$DISPLAY"
+
+# test that a particular X server is running
+# startx may have failed or not finished starting yet
+# so we test it here with xset
+display=":0.15"
+export DISPLAY=$display
+
+count=0
+while ! xset -q > /dev/null ; do
+    echo "Failed ($count seconds) to run a good X session yet."
+    let count=$count+1
+    if [ $count = 40 ] ; then
+        cat <<EOF
+ Failed ($count seconds) $count tries to connect to X server at DISPLAY=$DISPLAY
+
+EOF
+        exit 1
+    fi
+    sleep 1
+done
+
+echo "found a good X server at DISPLAY=$display"
+
+[ -n "$displaySave" ] && export DISPLAY="$displaySave"
+
+# TODO: We will not get an error check here until nvidia fixes
+# the return status value from the nvidia-settings program.
+
+# all 3 are nvidia driver scripts.
+Run hy_edgeBlend_on
+Run hy_frameLock_on
+Run hy_syncToVBlank_on
+
+# Hang this script until the projectors finish sending back replies.
+# It's likely they are on now but just not showing any light yet.
+wait $proj_pid
+
+echo "Started Okay"
+

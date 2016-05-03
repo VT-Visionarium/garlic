@@ -25,7 +25,7 @@ hy_projectors_off: hy_projectors_off.in
 	sed $^ -e 's/@on@/off/g' -e 's/@CMD@/POWR0/g' >> $@
 	chmod 755 $@
 
-hy_edge_blend_on hy_edge_blend_off: %:%.in
+hy_edgeBlend_on hy_edgeBlend_off: %:%.in
 	echo "#!/bin/bash" > $@
 	echo "# This is a generated file" >> $@
 	sed $^ -e 's!@BIN@!$(BIN)!g' >> $@

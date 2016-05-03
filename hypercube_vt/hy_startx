@@ -1,5 +1,24 @@
 #!/bin/bash
 
+function usage()
+{
+    cat <<EOF
+
+  Usage: $0 [-h|--help]
+
+  Run a xfce user desktop X session; just like logging in at a desktop
+  locker, but without looking at the desktop X11 screen.
+
+  This just runs 'startx'.  That's the correct way to start an X11 when
+  there is no locking login window manager.
+
+EOF
+    exit 1
+}
+
+[ -n "$1" ] && usage
+
+
 set -x
 startx &
 
@@ -8,4 +27,4 @@ startx &
 # seems to be the correct thing to do.  So now we must find the
 # process id (PID) of the x-session-manager.  Then again why
 # bother looking for this PID here, just let killall do the work,
-# it's the same.
+# it's the same. See hy_stopx

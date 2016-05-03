@@ -4,12 +4,12 @@ scriptdir="$(dirname ${BASH_SOURCE[0]})"
 cd "$scriptdir" || exit 1
 scriptdir="$PWD"
 
-if [ -f "$scriptdir/hy_edge_blend_common" ] ; then
+if [ -f "$scriptdir/hy_edgeBlend_common" ] ; then
     # running from the source directory
-    source "$scriptdir/hy_edge_blend_common"
+    source "$scriptdir/hy_edgeBlend_common"
 else
     # after it's installed in BIN
-    source "@BIN@/hy_edge_blend_common"
+    source "@BIN@/hy_edgeBlend_common"
 fi
 
 # blend_on DISPLAY GRAPHIC_NUM BOTTOM|TOP
