@@ -61,6 +61,7 @@ apt-get -y install\
  re2c\
  bison\
  bison-doc\
+ nfs-common\
  || exit $?
 
 # this will remove wayland
