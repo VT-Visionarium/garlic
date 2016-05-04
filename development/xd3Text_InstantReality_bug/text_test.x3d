@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<X3D>
+<Scene>
+<Background skyColor='1 1 1'/>
+<Viewpoint description='Text example' position='0 0 3'/>
+<Viewpoint description='Book view' position='0.89 -1.11 2.33'/>
+<Shape>
+<Text DEF='HelloText' string='"hello" "X3D!"'>
+<FontStyle DEF='CenteredFontStyle' justify='"MIDDLE" "MIDDLE"'/>
+</Text>
+<Appearance>
+<Material DEF='DefaultMaterial' diffuseColor='.2 .2 .2'/>
+</Appearance>
+</Shape>
+</Scene>
+</X3D> 

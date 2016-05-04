@@ -1,0 +1,6 @@
+Looking for a bug in InstantReality program sax.  It seems that it has a
+problem with X3D text nodes.
+
+We ran:
+
+    InstantPlayer-cave text_test.x3d
