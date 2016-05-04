@@ -1,0 +1,45 @@
+#!/bin/bash
+
+function usage()
+{
+    cat <<EOF
+
+  Usage: $0 [-h|--help]
+
+  Run programs needed to stop a HyperCube session.
+
+  Runs the following 2 programs:
+       
+       hy_stopx               turn off all user X sessions 
+       hy_projectors_off      turn off the projectors
+
+EOF
+
+    exit 1
+}
+
+function Run()
+{
+    if ! $* ; then
+        echo
+        echo "$* FAILED"
+        exit 1
+    fi
+}
+
+
+while [ -n "$1" ] ; do
+    case $1 in
+        -h|--h*|*)
+            usage
+            ;;
+    esac
+    shift 1
+done
+
+
+Run hy_stopx
+Run hy_projectors_off
+
+echo "Stopped Okay"
+

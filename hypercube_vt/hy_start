@@ -4,20 +4,20 @@ function usage()
 {
     cat <<EOF
 
-  Usage: $0 [-m|--mono]
+  Usage: $0 [-m|--mono]|[-s|--stereo]|[-h|--help]
 
   Run many programs needed to start a HyperCube session.
 
-  Runs the following 5 programs:
-       
-       hy_startx
-       hy_edgeBlend_on
-       hy_projectors_on [--mono]
-       hy_frameLock_on
-       hy_syncToVBlank_on
+  Runs the following 6 programs:
+
+    hy_stopx                   makes sure no user X sessions are running
+    hy_startx                  start a user login X session
+    hy_edgeBlend_on            turn on screen edge blending
+    hy_projectors_on [--mono]  turn on projects
+    hy_frameLock_on            turn on nvidia frame locking
+    hy_syncToVBlank_on         turn on nvidia sync to verticle refresh
 
   By default we turn on the projector for stereo display, not --mono.
-
 
 EOF
 
@@ -26,6 +26,7 @@ EOF
 
 function Run()
 {
+    echo "$*"
     if ! $* ; then
         echo
         echo "$* FAILED"
@@ -43,8 +44,11 @@ while [ -n "$1" ] ; do
         -h|--h*)
             usage
             ;;
-        -m|--mono|--m|-mono)
+        -m|-mono|--m|--mono)
             mono="--mono"
+            ;;
+        -s|-stereo|--s|--stereo)
+            mono=
             ;;
         *)
             usage
@@ -53,7 +57,8 @@ while [ -n "$1" ] ; do
     shift 1
 done
 
-
+# first kill any old user X sessions
+Run hy_stopx
 Run hy_startx
 
 

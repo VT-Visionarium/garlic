@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# not much to it.  See notes in hy_startx.
-set -x
-killall x-session-manager

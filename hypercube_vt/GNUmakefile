@@ -4,7 +4,10 @@ PREFIX := /usr/local/encap/hypercube_vt-0.1
 
 BIN = $(PREFIX)/bin
 
-built_files = $(patsubst %.in,%,$(wildcard hy_*.in))
+CFLAGS = -g
+
+cbinaries = $(patsubst %.c,%,$(wildcard *.c))
+built_files = $(patsubst %.in,%,$(wildcard hy_*.in)) $(cbinaries)
 
 inst_files = $(sort\
  $(filter-out %.in,$(wildcard hy_*) $(built_files))\
@@ -12,6 +15,11 @@ inst_files = $(sort\
 
 build: $(built_files)
 
+$(cbinaries): %: %.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) $< -c -o $@
 
 hy_projectors_on: hy_projectors_on.in
 	echo "#!/usr/bin/ruby -w" > $@
@@ -38,7 +46,14 @@ install: build
 	@echo
 	@echo "You may want to run: sudo encap"
 	@echo
+	@echo "You also need to run:"
+	@echo
+	@echo "  sudo chown root:root $(BIN)/hy_stopx"
+	@echo "  sudo chmod u+s $(BIN)/hy_stopx"
+	@echo
+	@echo "So that any user may stop an X session for other users."
+	@echo
 
 clean:
-	rm -f $(built_files)
+	rm -f $(built_files) *.o
 
