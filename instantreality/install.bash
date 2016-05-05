@@ -40,3 +40,6 @@ echo -e "Please read the notes in this script $0\n"
 
 echo -e "Run:\n\n  sudo gdebi \"$DEBSRC\"\n\nto install it"
 
+echo -e "\nOr something like that.  Also consider installing a license via something like:\n"
+
+echo -e "  sudo cp my_license.xml /opt/instantReality/bin/license.xml\n"
