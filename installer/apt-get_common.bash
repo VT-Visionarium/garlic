@@ -63,6 +63,8 @@ apt-get -y install\
  bison-doc\
  nfs-common\
  libxt-dev\
+ libqt4-dev\
+ mysql-utilities\
  || exit $?
 
 # this will remove wayland

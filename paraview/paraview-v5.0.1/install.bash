@@ -41,7 +41,7 @@ cmake ../src\
  -DMPIEXEC_NUMPROC_FLAG:STRING=-np\
  -DModule_vtkGUISupportQtOpenGL:BOOL=ON\
  -DModule_vtkIOGeoJSON:BOOL=ON\
- -DModule_vtkIOMySQL:BOOL=ON\
+ -DModule_vtkIOMySQL:BOOL=Off\
  -DModule_vtkPointCloud:BOOL=ON\
  -DModule_vtkWrappingPythonCore:BOOL=ON\
  -DPARAVIEW_AUTOLOAD_PLUGIN_VRPlugin:BOOL=ON\
