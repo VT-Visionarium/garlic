@@ -102,7 +102,7 @@ cd "$prefix" || Fail
 tar -xzvf "$tarfile" || Fail
 echo "ParaViewTutorialData" > "$prefix/encap.exclude" || Fail
 
-cp $topsrcdir/cave-mono.pvx $prefix
+cp $topsrcdir/cave-mono.pvx $prefix || Fail
 
 PrintSuccess
 
