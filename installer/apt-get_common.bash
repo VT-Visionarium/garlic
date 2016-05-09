@@ -62,6 +62,7 @@ apt-get -y install\
  bison\
  bison-doc\
  nfs-common\
+ libxt-dev\
  || exit $?
 
 # this will remove wayland
