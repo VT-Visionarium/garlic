@@ -45,9 +45,12 @@ cmake ../src\
 Install
 
 # VRPN is an installation pig with file name space pollution.
-encap_exclude_file="$(dirname $prefix)/$name"
+encap_exclude_file="$(dirname $prefix)/encap.exclude"
 if ! grep -q "$name" "$encap_exclude_file" ; then
     echo "$name" >> "$encap_exclude_file"
+fi
+if ! grep -q "$name" "$encap_exclude_file" ; then
+    Fail "file $encap_exclude_file does not exist"
 fi
 
 PrintSuccess

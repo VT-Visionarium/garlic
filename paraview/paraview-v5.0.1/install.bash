@@ -23,6 +23,8 @@ set -x
 # We tried with -DPARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON
 # but 'make install' is broken with that.
 
+VRPN_PREFIX=$(dirname $prefix)/vrpn-v07.33
+
 cmake ../src\
  -G"Unix Makefiles"\
  -DCMAKE_CXX_FLAGS:STRING="-Wall"\
@@ -83,6 +85,8 @@ cmake ../src\
  -DPARAVIEW_USE_ICE_T:BOOL=ON\
  -DPARAVIEW_USE_MPI:BOOL=ON\
  -DPARAVIEW_USE_VRPN:BOOL=ON\
+ -DVRPN_INCLUDE_DIR:DIR=$VRPN_PREFIX/include\
+ -DCMAKE_LIBRARY_PATH:PATH=$VRPN_PREFIX/lib\
  -DVTK_MPI_MAX_NUMPROCS:STRING=48\
  -DVTK_RENDERING_BACKEND:STRING=OpenGL\
  || Fail
