@@ -64,6 +64,8 @@ apt-get -y install\
  nfs-common\
  libxt-dev\
  libqt4-dev\
+ qt4-dev-tools\
+ qt4-doc\
  mysql-utilities\
  || exit $?
 
