@@ -1,0 +1,13 @@
+This was a C++ library dependency for OpenSG.
+
+
+For compiling and installing the C++ API
+COLLADA Document Object Model (DOM)
+
+We use a tarball but it's also available via svn:
+https://sourceforge.net/p/collada-dom/code/HEAD/tree/
+svn checkout svn://svn.code.sf.net/p/collada-dom/code/trunk collada-dom-svn
+
+
+We got the tar file via this URL:
+https://sourceforge.net/projects/collada-dom/files/latest/download

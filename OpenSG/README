@@ -1,0 +1,32 @@
+This seems to be a dead end.  The current git repo version
+git://git.code.sf.net/p/opensg/code git will not build on ubuntu 14.04 
+The InstantReality code looks to be using version 1.8 which was
+last released on 2007-07-04, so I'm not going to try to build that.
+
+
+We need to build and install collada-dom before this.
+We found no apt-get package for collada-dom so see collada-dom/
+where we install it from source.
+
+OpenSG also depends on some of the BOOST C++ libraries so we did a:
+apt-get install libboost-all-dev libboost-doc
+but found that it was not compatible in compiling OpenSG, giving a
+compiler error with a BOOST template.
+
+# This seems to be the code we want, but there are no git tags.
+git clone git://git.code.sf.net/p/opensg/code git
+
+
+# this from opensg.org (homepage) seems to be a dead fork of OpenSG
+git clone https://github.com/vossg/OpenSGDevMaster.git git
+
+
+Dependencies:
+
+   collada-dom -- see collada-dom/
+
+   Looks like the debian package available from ubuntu 14.04 is
+   not compatible with the current (2016-05-13) OpenSG.  So we'll
+   try building Boost from source in boost/.
+
+
