@@ -62,6 +62,10 @@ apt-get -y install\
  bison\
  bison-doc\
  nfs-common\
+ libbz2-dev\
+ python-dev\
+ libxml2-dev\
+ libxslt-dev\
  libxt-dev\
  libqt4-dev\
  qt4-dev-tools\

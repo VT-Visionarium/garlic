@@ -80,3 +80,11 @@ Option          "OffTime"       "0"
 
 
 
+
+FILES:
+
+    demos/
+
+        contain things related to hypercube demos which run something
+        that displays using the hypercube projectors.
+
