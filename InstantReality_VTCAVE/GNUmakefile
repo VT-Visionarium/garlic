@@ -75,13 +75,17 @@ bash_from_in_files = $(sort\
  $(patsubst %.in, %,\
  $(wildcard $(patsubst %, %.in, $(scripts)))))
 
-built := $(sort $(plugins) $(built_engines) $(test_bins) $(bash_from_in_files))
+c_bins := $(filter-out %_test, $(patsubst %.c, %,$(wildcard *.c)))
+
+built := $(sort $(plugins) $(built_engines) $(test_bins)\
+    $(bash_from_in_files) $(c_bins))
 
 # default target is build
 build: $(built)
 
 debug:
 	@echo " plugins=$(plugins) inst_plugins=$(inst_plugins)"
+
 
 $(bash_from_in_files): %: %.in
 	echo "#!/bin/bash" > $@
@@ -116,8 +120,8 @@ $(built_engines): engineFeaturesList.txt
 %.o: %.c
 	$(CC) $(CXXFLAGS) $($@_CPPFLAGS) -c $^ -o $@
 
-$(test_bins): %: %.o
-	$(CC) $(CXXFLAGS) $< -o $@ $($@_LDFLAGS)
+$(test_bins) $(c_bins): %: %.o
+	$(CC) $(CFLAGS) $< -o $@ $($@_LDFLAGS)
 
 
 # to un-install just 'rm -rf PREFIX'
@@ -147,7 +151,7 @@ endif
 # We clean up the CMake shit too, just in case.
 clean distclean cleaner:
 	rm -f *.o *.lo *.iio Makefile cmake_install.cmake $(built)\
- engineFeaturesList.txt install_manifest.txt
+ engineFeaturesList.txt install_manifest.txt $(c_bins)
 	rm -rf CMakeFiles/
 
 # See: more comments and still shorter than the corresponding
