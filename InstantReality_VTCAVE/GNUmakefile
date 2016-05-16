@@ -69,13 +69,23 @@ engines = $(sort\
  $(build_engines))
 inst_engines = $(sort $(filter-out %_test-engine.x3d, $(engines)))
 
-installed = $(sort $(models) $(inst_plugins) $(inst_engines) $(navs) $(scripts))
+c_bins := $(filter-out %_test, $(patsubst %.c, %,$(wildcard *.c)))
+
+# files installed in prefix/bin
+bins := $(sort $(scripts) $(c_bins))
+
+installed = $(sort\
+ $(models)\
+ $(inst_plugins)\
+ $(inst_engines)\
+ $(navs)\
+ $(scripts)\
+ $(c_bins))
 
 bash_from_in_files = $(sort\
  $(patsubst %.in, %,\
  $(wildcard $(patsubst %, %.in, $(scripts)))))
 
-c_bins := $(filter-out %_test, $(patsubst %.c, %,$(wildcard *.c)))
 
 built := $(sort $(plugins) $(built_engines) $(test_bins)\
     $(bash_from_in_files) $(c_bins))
@@ -142,9 +152,9 @@ ifneq ($(navs),)
 	install -d $(NAVS_DIR)
 	cp $(navs) $(NAVS_DIR)
 endif
-ifneq ($(scripts),)
+ifneq ($(bins),)
 	install -d $(BIN_DIR)
-	cp $(scripts) $(BIN_DIR)
+	cp $(bins) $(BIN_DIR)
 endif
 
 
