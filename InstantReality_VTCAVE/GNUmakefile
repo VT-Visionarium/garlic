@@ -57,9 +57,24 @@ test_bins = $(sort $(patsubst %.c, %, $(wildcard *_test.c)))
 multiScreenGTK_test_LDFLAGS = $(shell pkg-config pkg-config --libs gtk+-2.0)
 multiScreenGTK_test.o_CPPFLAGS = $(shell pkg-config pkg-config --cflags gtk+-2.0)
 
+nav_prefixes =  $(sort\
+ $(patsubst %-nav.wrl.in, %,\
+ $(wildcard *-nav.wrl.in)))
 
-# InstantReality navigations # this is 6 lines in CMake
-navs = $(sort $(filter-out %_test-nav.%, $(wildcard *-nav.wrl *-nav.x3d)))
+navwalk_from_in_files = $(patsubst %, %_walk-nav.wrl, $(nav_prefixes))
+navnone_from_in_files = $(patsubst %, %_none-nav.wrl, $(nav_prefixes))
+navfly_from_in_files = $(patsubst %, %_fly-nav.wrl, $(nav_prefixes))
+navfreefly_from_in_files = $(patsubst %, %_freefly-nav.wrl, $(nav_prefixes))
+navexamine_from_in_files = $(patsubst %, %_examine-nav.wrl, $(nav_prefixes))
+
+
+# InstantReality navigations
+navs = $(sort\
+ $(navwalk_from_in_files)\
+ $(navnone_from_in_files)\
+ $(navfly_from_in_files)\
+ $(navfreefly_from_in_files)\
+ $(navexamine_from_in_files))
 
 # installed InstantReality engines
 built_engines = $(sort\
@@ -87,14 +102,16 @@ bash_from_in_files = $(sort\
  $(wildcard $(patsubst %, %.in, $(scripts)))))
 
 
+
 built := $(sort $(plugins) $(built_engines) $(test_bins)\
-    $(bash_from_in_files) $(c_bins))
+    $(bash_from_in_files) $(c_bins) $(navs))
 
 # default target is build
 build: $(built)
 
 debug:
 	@echo " plugins=$(plugins) inst_plugins=$(inst_plugins)"
+	@echo " navwalk_from_in_files=$(navwalk_from_in_files)"
 
 
 $(bash_from_in_files): %: %.in
@@ -106,6 +123,27 @@ $(bash_from_in_files): %: %.in
  -e 's!@ENGINES_DIR@!$(ENGINES_DIR)!g'\
  -e 's!@PLUGINS_DIR@!$(PLUGINS_DIR)!g' >> $@
 	chmod 755 $@
+
+$(navwalk_from_in_files): %_walk-nav.wrl: %-nav.wrl.in
+	echo "#X3D V3.0 utf8" > $@
+	echo "# This is a generated file" >> $@
+	sed $^ -e 's/@nav@/walk/g' >> $@
+$(navfly_from_in_files): %_fly-nav.wrl: %-nav.wrl.in
+	echo "#X3D V3.0 utf8" > $@
+	echo "# This is a generated file" >> $@
+	sed $^ -e 's/@nav@/fly/g' >> $@
+$(navfreefly_from_in_files): %_freefly-nav.wrl: %-nav.wrl.in
+	echo "#X3D V3.0 utf8" > $@
+	echo "# This is a generated file" >> $@
+	sed $^ -e 's/@nav@/freefly/g' >> $@
+$(navexamine_from_in_files): %_examine-nav.wrl: %-nav.wrl.in
+	echo "#X3D V3.0 utf8" > $@
+	echo "# This is a generated file" >> $@
+	sed $^ -e 's/@nav@/examine/g' >> $@
+$(navnone_from_in_files): %_none-nav.wrl: %-nav.wrl.in
+	echo "#X3D V3.0 utf8" > $@
+	echo "# This is a generated file" >> $@
+	sed $^ -e 's/@nav@/none/g' >> $@
 
 
 # built engine rules

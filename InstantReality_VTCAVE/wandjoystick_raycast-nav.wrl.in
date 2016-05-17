@@ -20,7 +20,7 @@ DEF iowand IOSensor {
 }
 
 NavigationInfo {
-	type [ "walk" "any" ]
+	type [ "@nav@" "any" ]
 	interactionType "ray"
 	navigator [
 		DEF nav SteerNavigator {

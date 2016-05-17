@@ -38,6 +38,10 @@ default_head=with
 default_wand=raycast
 
 
+# InstantReality navigation mode
+# Maybe fly examine walk OR none
+default_nav_mode=fly
+
 
 # We where going to use the program 'InstantPlayer' but it did not support
 # more than one X11 screen at a time.  sax seem to be like InstantPlayer
@@ -86,6 +90,7 @@ cwd=
 report=
 run="$player"
 IR_args=
+nav_mode=$default_nav_mode
 
 
 function Usage()
@@ -109,6 +114,11 @@ function Usage()
     -cd             Change directory to the first model file's directory
     -head           Use head tracking
     -m|-mono        Use mono display or no stereo
+    -nav-examine    Start with InstantReality nav mode examine
+    -nav-fly        Start with InstantReality nav mode fly (the default)
+    -nav-freefly    Start with InstantReality nav mode freefly
+    -nav-none       Start with InstantReality nav mode none
+    -nav-walk       Start with InstantReality nav mode walk
     -no-head        Don't use the head tracker
     -no-wand        Don't use the tracked wand
     -no-tracking    Same as --no-wand --no-head
@@ -160,6 +170,7 @@ $progName DEFAULTS:
    $default_stereo stereo
    $default_head head tracking
    $default_wand wand
+   Starting with InstantReality navigation $default_nav_mode
 
 EOF
   exit 1
@@ -190,6 +201,21 @@ function ParseArgs()
                 ;;
             -m|--m|-mono|--mono)
                 stereo=without
+                ;;
+            -nav-none|--nav-none)
+                nav_mode=none
+                ;;
+            -nav-fly|--nav-fly)
+                nav_mode=fly
+                ;;
+            -nav-freefly|--nav-freefly)
+                nav_mode=freefly
+                ;;
+            -nav-walk|--nav-walk)
+                nav_mode=walk
+                ;;
+            -nav-examine|--nav-examine)
+                nav_mode=examine
                 ;;
             -head|--head)
                 head=with
@@ -237,7 +263,7 @@ function ComposeCommand()
     local engine
     local nav
 
-    if [ ! -f "$scriptdir/wandjoystick_raycast-nav.wrl" ] ||\
+    if [ ! -f "$scriptdir/wandjoystick_raycast-nav.wrl.in" ] ||\
         [ ! -f "$scriptdir/cave_stereo_head_engineer.bash" ] ; then
         # We are running from an installed script
         engine=" @ENGINES_DIR@/"
@@ -286,10 +312,10 @@ function ComposeCommand()
 
     case "$wand" in
         raycast)
-            nav="${nav}wandjoystick_raycast-nav.wrl"
+            nav="${nav}wandjoystick_raycast_${nav_mode}-nav.wrl"
             ;;
         simple)
-            nav="${nav}wandjoystick-nav.wrl"
+            nav="${nav}wandjoystick_${nav_mode}-nav.wrl"
             ;;
         without)
             nav=""
@@ -320,6 +346,7 @@ Running:
    $stereo stereo
    $head head tracking
    $wand wand
+   Starting with InstantReality navigation $nav_mode
 
    InstantReality (sax) options:${IR_args}
 
