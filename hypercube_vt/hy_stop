@@ -8,8 +8,9 @@ function usage()
 
   Run programs needed to stop a HyperCube session.
 
-  Runs the following 2 programs:
-       
+  Runs the following 3 programs:
+      
+       hy_kill_dtk-server     kill any dtk-server programs
        hy_stopx               turn off all user X sessions 
        hy_projectors_off      turn off the projectors
 
@@ -37,9 +38,8 @@ while [ -n "$1" ] ; do
     shift 1
 done
 
-
+Run hy_kill_dtk-server
 Run hy_stopx
 Run hy_projectors_off
 
 echo "$0 finished"
-
