@@ -33,3 +33,4 @@ blend_on :0.13 34 -b
 blend_on :0.14 36 -t
 blend_on :0.15 38 -t
 
+echo "$0 finished"

@@ -1,4 +1,7 @@
-# GNU makefile
+# This is a GNU makefile
+#
+# Butt-ugly make files are so fun!
+# But only if you're a make expert.
 
 PREFIX := /usr/local/encap/hypercube_vt-0.1
 
@@ -6,6 +9,7 @@ BIN = $(PREFIX)/bin
 
 CFLAGS = -g
 
+inst_scripts = hy_debuggingDemoRunner
 cbinaries = $(patsubst %.c,%,$(wildcard *.c))
 built_files = $(patsubst %.in,%,$(wildcard hy_*.in)) $(cbinaries)
 
@@ -48,10 +52,10 @@ install: build
 	@echo
 	@echo "You also need to run:"
 	@echo
-	@echo "  sudo chown root:root $(BIN)/hy_stopx"
-	@echo "  sudo chmod u+s $(BIN)/hy_stopx"
+	@echo "  sudo chown root:root $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server"
+	@echo "  sudo chmod u+s $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server"
 	@echo
-	@echo "So that any user may stop an X session for other users."
+	@echo "So that any user may stop an X session and dtk-server for other users."
 	@echo
 
 clean:

@@ -1,0 +1,96 @@
+#!/bin/bash
+
+#################################################
+#         CONFIGURATION
+#################################################
+
+# directory that has demos with run.bash files
+demoRoot=/NTFS/Shared/demos
+
+
+#################################################
+
+mono=
+runUsage=
+topPrograms=
+
+function usage()
+{
+    cat << EOF
+
+    Usage: $0 [-m|--mono]
+
+    Run a launcher GUI with buttons that run programs.
+    This does not control the programs that it runs.
+
+    This program looks in "$demoRoot" for files named
+    run.bash in addition to the programs:
+
+$topPrograms
+
+EOF
+
+    exit 1
+}
+
+dir=.
+who=$(whoami)
+tmpfile="$(mktemp --suffix=_${who}_hy_demo)"
+
+while [ -n "$1" ] ; do
+    case $1 in
+        -m|--m|-mono|--mono)
+            mono=" --mono"
+            ;;
+        *)
+            runUsage=yes
+            ;;
+    esac
+    shift 1
+done
+
+
+topPrograms="hy_start${mono}
+hy_stop
+dtk-server is900
+hy_kill_dtk-server"
+
+
+[ -n "$runUsage" ] && usage
+
+
+function getRunList()
+{
+    prev=
+    for i in * ; do
+        if [ "$i" = "*" ] ; then
+            continue
+        elif [ -x run.bash ] ; then
+            # bash sucks at recursion.  It does not
+            # make new variables for each recurse, even for
+            # local variables.
+            next="xfce4-terminal  -x $dir/run.bash${mono}"
+            if [ "$next" != "$prev" ] ; then
+                echo "$next" >> $tmpfile
+                prev="$next"
+            fi
+        elif [ -d "$i" ] ; then
+            # we want shorter relative paths in dir
+            dir=$dir/$i
+            cd $i || exit $?
+            getRunList
+            cd .. || exit $?
+            dir="$(dirname $dir)"
+        fi
+    done
+}
+
+echo "${topPrograms}" > $tmpfile
+
+cd $demoRoot || exit $?
+getRunList
+#cat $tmpfile
+cd $demoRoot || exit $?
+qs_demo_launcher --list $tmpfile --title "Debugging HyperCube Demos"
+rm $tmpfile
+

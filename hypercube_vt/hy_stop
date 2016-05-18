@@ -41,5 +41,5 @@ done
 Run hy_stopx
 Run hy_projectors_off
 
-echo "Stopped Okay"
+echo "$0 finished"
 

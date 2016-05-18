@@ -169,3 +169,5 @@ else # mono
     send('TDSE0')
 
 end
+
+echo "$0 finished"

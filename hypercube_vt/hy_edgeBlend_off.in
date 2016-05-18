@@ -34,3 +34,4 @@ blend_off :0.13 34
 blend_off :0.14 36
 blend_off :0.15 38
 
+echo "$0 finished"

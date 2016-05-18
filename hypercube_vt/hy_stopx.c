@@ -56,6 +56,8 @@ int main(int argc, char **argv)
     // TODO: See if there was a process and check
     // for failure if there was.
 
+    printf("%s finished\n", argv[0]);
+
     return 0; // success
 }
 

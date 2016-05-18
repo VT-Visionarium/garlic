@@ -15,3 +15,5 @@ set -x
 export DISPLAY=:0.0
 
 nvidia-settings --load-config-only --assign="SyncToVBlank=0"
+
+echo "$0 finished"

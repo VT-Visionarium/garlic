@@ -104,5 +104,6 @@ Run hy_syncToVBlank_on
 # It's likely they are on now but just not showing any light yet.
 wait $proj_pid
 
-echo "Started Okay"
+echo "$0 Started Okay, so it seems."
+echo "$0 finished"
 
