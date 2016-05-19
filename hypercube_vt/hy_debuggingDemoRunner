@@ -10,6 +10,7 @@ demoRoot=/NTFS/Shared/demos
 
 #################################################
 
+# by default mono is unset.
 mono=
 runUsage=
 topPrograms=
@@ -53,6 +54,8 @@ done
 topPrograms="hy_start${mono}
 hy_stop
 dtk-server is900
+hy_projectors_on${mono}
+hy_projectors_off${mono}
 hy_kill_dtk-server"
 
 
