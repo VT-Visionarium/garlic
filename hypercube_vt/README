@@ -13,9 +13,15 @@ All the programs that are installed from this project have the prefix hy_
 This project is only good for the VT CAVE, so it need not follow the
 garlic standard install methods.
 
-To install run:
+To install on the VT hyperCube machine run:
 
     make install
+
+
+There is one program you can install on other machines run:
+
+   make install_pushSshKeys
+
 
 
 Notes on starting X session from an ssh session on cube, because it has no

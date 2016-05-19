@@ -1,0 +1,108 @@
+#!/bin/bash
+
+##########################################################
+#             CONFIGURATION
+##########################################################
+
+hy_host=cube
+
+
+
+##########################################################
+
+
+
+function usage()
+{
+    cat << EOF || exit $?
+
+  Usage: $0 [-h|--help]
+
+    Generate ssh public/private rsa key pair (if needed) and put
+    the public key on the hyperCube machine ${hy_host}, so that
+    you may ssh to ${hy_host} without a password.
+
+
+  References:
+
+    This follows something like what you see at:
+    
+        http://www.linuxproblem.org/art_9.html
+
+    Or google search:
+    
+        ssh without password
+
+EOF
+
+    exit 1
+}
+
+
+[ -n "$1" ] && usage
+
+
+function checkLocalKeys()
+{
+    if [ ! -f "${HOME}/.ssh/id_rsa" ] ; then
+        echo
+        echo "generating ssh keys ..."
+        echo -e "\n\n\n\n\n\n\n\n" | ssh-keygen -t rsa || exit $?
+    else
+        echo
+        echo "Your local ssh keys exist in ${HOME}/.ssh/id_rsa, which is fine."
+    fi
+
+    if [ ! -f "${HOME}/.ssh/id_rsa" ] ; then
+        echo
+        echo "failed to generate ssh keys"
+        echo
+        exit 1
+    fi
+}
+
+function success()
+{
+    set +x
+    echo "$0 was successful"
+    exit 0
+}
+
+
+function checkWorksAlready()
+{
+    set +x
+    if ssh -o 'StrictHostKeyChecking no' -o\
+        'PreferredAuthentications=publickey' $1\
+        echo -e "\\\\nLooks like you can ssh to $1 without password already\\\\n" ; then
+        success
+    fi
+}
+        
+
+function rmHostFromKnown()
+{
+    if ! ssh-keygen -R $1 ; then
+        echo "failed to remove host $1 from .ssh/known_hosts"
+        echo "but that maybe because you do not know them yet"
+        echo
+    fi
+}
+
+function pushPublicKeyToHyHost()
+{
+    set -x
+    cat ${HOME}/.ssh/id_rsa.pub | ssh -o 'StrictHostKeyChecking no' $1\
+ 'mkdir -p ${HOME}/.ssh && cat >> ${HOME}/.ssh/authorized_keys'\
+ || exit $?
+    set +x
+
+}
+
+
+checkLocalKeys
+checkWorksAlready ${hy_host}
+rmHostFromKnown ${hy_host}
+pushPublicKeyToHyHost ${hy_host}
+success
+

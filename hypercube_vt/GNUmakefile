@@ -19,6 +19,10 @@ inst_files = $(sort\
 
 build: $(built_files)
 
+install_pushSshKeys:
+	mkdir -p $(BIN)
+	cp hy_pushSshKeysToHyperCube $(BIN)/
+
 $(cbinaries): %: %.o
 	$(CC) $(CFLAGS) $^ -o $@
 
