@@ -2,25 +2,26 @@
 
 require File.dirname(__FILE__) + "/hy_projectors_common"
 
+$prog = File.basename($0)
+ 
 def usage()
 
-    prog = File.basename($0)
     nprojs = $projectorIPs.length
     puts <<EOF
 
-  Usage: #{prog} [-m|--mono][PROJ_WALL ...]|[-h|--help]
+  Usage: #{$prog} [-m|--mono][PROJ_WALL ...]|[-h|--help]
 
    Turn @on@ projectors via the ethernet TCP/IP interface.
 
 
    Examples:
 
-          #{prog}
+          #{$prog}
 
    will turn @on@ all #{nprojs.to_s} hypercube projectors,
 
 
-          #{prog} LT FB
+          #{$prog} LT FB
 
    will turn @on@ the left top (LT) and floor bottom (FB) projectors.
 
@@ -170,4 +171,4 @@ else # mono
 
 end
 
-puts "$0 finished"
+puts "#{$prog} finished"
