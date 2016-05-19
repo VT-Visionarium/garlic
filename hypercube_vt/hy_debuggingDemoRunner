@@ -19,13 +19,20 @@ function usage()
 {
     cat << EOF
 
-    Usage: $0 [-m|--mono]
+    Usage: $0 [-m|--mono] 
 
-    Run a launcher GUI with buttons that run programs.
-    This does not control the programs that it runs.
+  Run a launcher GUI with buttons that run hyperCube programs.  This
+  does not control the programs that it runs, which is a better case if
+  you need to control what you are doing.  You may need to wait for some
+  programs to finish running before starting other programs.  With great
+  power comes responsibility.  This program has no smarts to determine
+  then running a particlular program can be successful.  You must be
+  knowledgeable about the program interdependency.  If you need a higher
+  level demo runner interface try running hy_demoRunner (under
+  development).
 
-    This program looks in "$demoRoot" for files named
-    run.bash in addition to the programs:
+  This program looks in "$demoRoot" for files named
+  run.bash in addition to the programs:
 
 $topPrograms
 
@@ -56,7 +63,15 @@ hy_stop
 dtk-server is900
 hy_projectors_on${mono}
 hy_projectors_off${mono}
-hy_kill_dtk-server"
+hy_kill_dtk-server
+hy_edgeBlend_on
+hy_frameLock_on
+hy_startx
+hy_stopx
+hy_syncToVBlank_on
+hy_testGrid_off
+hy_testGrid_on
+"
 
 
 [ -n "$runUsage" ] && usage
