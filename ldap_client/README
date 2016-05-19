@@ -9,11 +9,36 @@ It can't be just one script because you may need to reboot or run tests at
 some points in the process.  The root_install_?.bash scripts are
 interactive.
 
+
+NOTE: We tried the pam-auth-update bullshit but that failed. If you would
+like pain then try it.  We got things to work by editing /etc files by hand
+via the root_install_?.bash scripts. It's a fucking mess ... You would need
+to make your own GNU/Linux distro to clean it up.  That's because the UNIX
+/etc/ system is a fucking mess, all interdependent configuration files with
+no proof of consistency, except by just running the system; i.e. it runs,
+therefore it is consistent.
+
+
 On Xbuntu 10.04
 Look at them and then run: sudo ./root_install_0.bash  and then sudo
 ./root_install_1.bash and so on.
 
+
 --------------------------------------------------------------------------
+# notes for added local groups to users be they ldap or local users
+# had to do this after other pam/ldap stuff was done
+
+#add 2 lines to /etc/pam.d/common-auth
+# added by lance
+auth    required    pam_group.so use_first_pass
+
+
+cp group.conf /etc/security/group.conf 
+service nscd restart
+
+--------------------------------------------------------------------------
+
+
 Here's some messy notes, from when we first got LDAP client auth working:
 
 

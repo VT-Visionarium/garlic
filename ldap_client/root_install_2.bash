@@ -69,10 +69,11 @@ EOF
 vim /etc/ssh/sshd_config || exit $?
 
 
-set +x
-Prompt "NEXT with add/check with vim  pam_mkhomedir.so to /etc/pam.d/common-session"
+######################## edit /etc/pam.d/common-session ##########################
 
-set -x
+set +x
+Prompt "NEXT with add/check with vim pam_mkhomediri.so (bottom) to /etc/pam.d/common-session"
+
 cat << EOF >> /etc/pam.d/common-session || exit $?
 
 # lance added next line $date
@@ -81,12 +82,50 @@ EOF
 
 vim /etc/pam.d/common-session || exit $?
 
+set +x
+echo "/etc/pam.d/common-session has been changed"
+echo
+
+######################## edit /etc/pam.d/common-auth ##########################
+
+set +x
+Prompt "NEXT with add/check with vim adding pam_group.so to /etc/pam.d/common-auth"
+
+set -x
+tmp=$(mktemp --suffix=ldap_client_pam_common_) || exit $?
+cat << EOF > $tmp || exit $?
+# next line added by lance on $date
+auth    required    pam_group.so use_first_pass
+
+EOF
+cat /etc/pam.d/common-auth >> $tmp
+vim $tmp || exit $?
+
+Prompt "SAVE this edit as /etc/pam.d/common-auth"
+set -x
+mv $tmp /etc/pam.d/common-auth
+chmod 644 /etc/pam.d/common-auth
+
+####################### change /etc/security/group.conf" ######################
+
+set +x
+Prompt "replace /etc/security/group.conf"
+set -x
+cp group.conf /etc/security/group.conf || exit $?
+chmod 644 /etc/security/group.conf || exit $?
+
+
+######################## edit /etc/login.defs ##########################
 
 set +x
 Prompt "NEXT we vim edit /etc/login.defs to change the default UMASK to 022"
 
 set -x
 vim +152 /etc/login.defs || exit $?
+
+
+
+
 
 set +x
 Prompt "NEXT this script will Restart ssh, nscd, and nslcd"
