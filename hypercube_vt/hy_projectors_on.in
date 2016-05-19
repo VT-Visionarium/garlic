@@ -170,4 +170,4 @@ else # mono
 
 end
 
-echo "$0 finished"
+puts "$0 finished"
