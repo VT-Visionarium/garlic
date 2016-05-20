@@ -1,25 +1,35 @@
-#!/bin/bash
+#!/usr/bin/env ruby
+
+require 'find'
 
 #################################################
 #         CONFIGURATION
 #################################################
 
 # directory that has demos with run.bash files
-demoRoot=/NTFS/Shared/demos
+$demoRoot = '/NTFS/Shared/demos'
+
+# demos to run are named:
+$runDemoName = 'run.bash'
 
 
 #################################################
 
+# env overrides.  At least to test this.
+$demoRoot = ENV['DEMO_ROOT'] if ENV['DEMO_ROOT']
+$runDemoName = ENV['RUN_DEMO_NAME'] if ENV['RUN_DEMO_NAME']
+
+
 # by default mono is unset.
-mono=
-runUsage=
-topPrograms=
+$mono = ''
+$runUsage = false
+$programs = ''
 
-function usage()
-{
-    cat << EOF
+def usage()
 
-    Usage: $0 [-m|--mono] 
+    print <<-EOF
+
+    Usage: #{$0} [-m|--mono]
 
   Run a launcher GUI with buttons that run hyperCube programs.  This
   does not control the programs that it runs, which is a better case if
@@ -31,38 +41,34 @@ function usage()
   level demo runner interface try running hy_demoRunner (under
   development).
 
-  This program looks in "$demoRoot" for files named
-  run.bash in addition to the programs:
+  This program looks in "#{$demoRoot}" for files named
+  #{$runDemoName} in addition to the programs:
 
-$topPrograms
+#{$programs}
 
 EOF
 
     exit 1
-}
-
-dir=.
-who=$(whoami)
-tmpfile="$(mktemp --suffix=_${who}_hy_demo)"
-
-while [ -n "$1" ] ; do
-    case $1 in
-        -m|--m|-mono|--mono)
-            mono=" --mono"
-            ;;
-        *)
-            runUsage=yes
-            ;;
-    esac
-    shift 1
-done
+end
 
 
-topPrograms="hy_start${mono}
+
+ARGV.each do |arg|
+    case arg
+        when '-m','--m','-mono','--mono'
+            then $mono = ' --mono'
+        else
+            $runUsage = true
+    end
+end
+
+
+
+$programs = "hy_start#{$mono}
 hy_stop
 dtk-server is900
-hy_projectors_on${mono}
-hy_projectors_off${mono}
+hy_projectors_on#{$mono}
+hy_projectors_off#{$mono}
 hy_kill_dtk-server
 hy_edgeBlend_on
 hy_frameLock_on
@@ -73,42 +79,26 @@ hy_testGrid_off
 hy_testGrid_on
 "
 
+usage if $runUsage
 
-[ -n "$runUsage" ] && usage
 
+def getRunList()
 
-function getRunList()
-{
-    prev=
-    for i in * ; do
-        if [ "$i" = "*" ] ; then
-            continue
-        elif [ -x run.bash ] ; then
-            # bash sucks at recursion.  It does not
-            # make new variables for each recurse, even for
-            # local variables.
-            next="xfce4-terminal  -x $dir/run.bash${mono}"
-            if [ "$next" != "$prev" ] ; then
-                echo "$next" >> $tmpfile
-                prev="$next"
-            fi
-        elif [ -d "$i" ] ; then
-            # we want shorter relative paths in dir
-            dir=$dir/$i
-            cd $i || exit $?
-            getRunList
-            cd .. || exit $?
-            dir="$(dirname $dir)"
-        fi
-    done
-}
+    Find.find('.') do |path|
+        $programs += path + "\n" if File.basename(path) == $runDemoName
+    end
+    $programs.gsub!(/^\.\//, '')
+end
 
-echo "${topPrograms}" > $tmpfile
+Dir.chdir $demoRoot
 
-cd $demoRoot || exit $?
 getRunList
-#cat $tmpfile
-cd $demoRoot || exit $?
-qs_demo_launcher --list $tmpfile --title "Debugging HyperCube Demos"
-rm $tmpfile
 
+$cmd = 'qs_demo_launcher --list - --title "Debugging HyperCube Demos"'
+
+io = IO.popen($cmd, 'w')
+io.write $programs
+# close will wait for the child to exit
+io.close
+
+puts $0 + ' exiting'
