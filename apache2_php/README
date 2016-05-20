@@ -1,2 +1,5 @@
 This is to keep notes on how apache and php are installed
 be they installed from apt-get or built from source.
+
+We used the method to install apache2 with PHP shown in
+apt-get/ on metagrid2 (20 May 2016) and anvil (around Apr 2016).
