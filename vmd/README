@@ -1,0 +1,37 @@
+
+   VMD (Visual Molecular Dynamics)
+
+Downloading VMD is a pain in the ass, the download is
+interactive and requires a web browser from a page near
+URL:  http://www.ks.uiuc.edu/Research/vmd/
+
+Given it's not free (as in speech) I don't expect that
+we can install it with apt-get (or yum).
+
+
+
+
+DEPENDENCIES:
+  
+  apt-get install libnetcdf-dev netcdf-bin netcdf-doc tcl-dev tk-dev tcl-doc tk-doc flex-old csh rlwrap
+
+
+FILES:
+
+    vmd-1.9.2/
+
+       Contains install.bash for good installation of vmd
+
+
+
+    vmd-1.9.2-SHARED/
+
+       was used to debug the VMD build process.  We found a
+       BUG and proved it with this.
+
+  
+
+    vmd-1.9.2.src.tar.gz
+
+         vmd source gotten from http://www.ks.uiuc.edu/Research/vmd/
+

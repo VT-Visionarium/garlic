@@ -71,6 +71,7 @@ apt-get -y install\
  qt4-dev-tools\
  qt4-doc\
  mysql-utilities\
+ gnome-terminal\
  || exit $?
 
 # this will remove wayland
