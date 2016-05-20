@@ -12,10 +12,11 @@ cscriptdir="$PWD" # now we have full path
 unset cscriptdir
 
 
+# Usage: Install [TAG]
 function Install()
 {
     GitCreateClone https://github.com/lanceman2/quickscope.git
-    GitToBuildDir
+    GitToBuildDir $1
     # We are now in the newly created build dir
     ./bootstrap --force || Fail
     CFLAGS="-g -Werror -Wall"\
