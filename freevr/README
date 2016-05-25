@@ -1,0 +1,8 @@
+
+wget http://www.freevr.org/Downloads/freevr_0.6f.tar.gz
+
+apt-get install freeglut-dev libsdl2-dev
+
+youtube video of Bill Sherman showing VMD running in a 
+CAVE-like display system:
+https://youtu.be/A-pOM-RNZ0w

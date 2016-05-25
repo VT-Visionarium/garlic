@@ -1,0 +1,35 @@
+29c29
+< .IGNORE:
+---
+> #.IGNORE:
+40,41c40,41
+< LINUX_EXTRA = -L/usr/X11R6/lib -ldl -export-dynamic
+< LINUX_EXTRA = -L/usr/X11R6/lib64 -ldl -export-dynamic
+---
+> #LINUX_EXTRA = -L/usr/X11R6/lib -ldl -export-dynamic
+> LINUX_EXTRA = -L/usr/X11R6/lib64
+75c75
+< FREEVRDIR = /usr/local/freevr-0.6b/src
+---
+> FREEVRDIR = /usr/local/encap/freevr_0.6f/lib
+77c77
+< FVR_LIBS = $(LINUX_EXTRA) -L$(FREEVRDIR)/. -lfreevr_64 -lGL -lX11 -lXi -lm
+---
+> FVR_LIBS = $(LINUX_EXTRA) -L$(FREEVRDIR)/. -lfreevr_64 -lGL -lX11 -lXi -lm -ldl
+161c161
+< 	$(CC) $(CFLAGS) $(GLUT_FLAGS) $(LDFLAGS) -o $@ ex0_glut.c $(GEOM_OBJS) $(GLX_LIBS)
+---
+> 	$(CC) $(CFLAGS) $(GLUT_FLAGS) $(LDFLAGS) -o $@ ex0_glut.c $(GEOM_OBJS) $(GLX_LIBS) -L$(GLUT_DIR)/lib -lglut
+301c301
+< 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ ex21_flashlight.c $(GEOM_OBJS_WRS) $(SOCK_OBJS) $(VR_LIBS)
+---
+> 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ ex21_flashlight.c $(GEOM_OBJS_WRS) $(SOCK_OBJS) $(VR_LIBS) -L$(GLUT_DIR)/lib -lglut
+376,379d375
+< ######
+< # Clean up non-essential files
+< clean:
+< 	rm -f core *.o $(DIFFS)
+383c379
+< purge:
+---
+> clean:
