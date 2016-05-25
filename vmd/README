@@ -12,6 +12,9 @@ we can install it with apt-get (or yum).
 
 
 DEPENDENCIES:
+
+  ../freevr/
+
   
   apt-get install libnetcdf-dev netcdf-bin netcdf-doc tcl-dev tk-dev tcl-doc tk-doc flex-old csh rlwrap libfltk1.3-dev libjpeg-dev
 
@@ -34,4 +37,10 @@ FILES:
     vmd-1.9.2.src.tar.gz
 
          vmd source gotten from http://www.ks.uiuc.edu/Research/vmd/
+
+
+
+Running VMD in CAVE:
+   vmd -dispdev freevr
+
 
