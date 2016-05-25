@@ -13,7 +13,9 @@ we can install it with apt-get (or yum).
 
 DEPENDENCIES:
   
-  apt-get install libnetcdf-dev netcdf-bin netcdf-doc tcl-dev tk-dev tcl-doc tk-doc flex-old csh rlwrap libfltk1.3-dev libjpeg-dev
+  apt-get install libnetcdf-dev netcdf-bin netcdf-doc tcl-dev tk-dev\
+ tcl-doc tk-doc flex-old csh rlwrap libfltk1.3-dev libjpeg-dev\
+ libfltk1.3-dev fltk1.3-doc
 
 
 FILES:
