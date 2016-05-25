@@ -43,6 +43,11 @@ FILES:
 
 
 Running VMD in CAVE:
-   vmd -dispdev freevr
+
+   make a file called .freevrrc that has something like what is in
+   /usr/local/src/freevr/hy_VT_freevrrc
+   
+     export FREEVRHOME=/directory_where_freevrrc_file_is
+     vmd -dispdev freevr
 
 
