@@ -168,11 +168,15 @@ simple.o: simple.c
 fvconfig: $(FREEVR_LIB) fvconfig.o
 	$(CC) $(CFLAGS) -o $@ fvconfig.o $(APP_LIBS)
 
-install: build
-	mkdir -p $(PREFIX)/bin $(PREFIX)/include $(PREFIX)/lib
+mkprefix:
+	mkdir -p $(PREFIX)/bin $(PREFIX)/include $(PREFIX)/lib $(PREFIX)/etc
+
+
+install: build mkprefix
 	cp travel $(PREFIX)/bin/freevr_test
 	cp $(FREEVR_LIB) $(PREFIX)/lib
 	cp vr_*.h freevr.h $(PREFIX)/include
+	cp ../hy_VT_freevrrc $(PREFIX)/etc
 
 
 clean:
