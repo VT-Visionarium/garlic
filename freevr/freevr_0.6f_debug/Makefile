@@ -7,6 +7,7 @@ CFLAGS = -g -DWIN_GLX -DSHM_DUMMY -DSHM_SVR4MMAP -DSEM_SYSVIPC -DHOST='$(UNAME)'
 GLX_FREEVR_LIB = libfreevr_64.so
 FREEVR_LIB = $(GLX_FREEVR_LIB)
 APP_FLAGS = -DFREEVR
+drawing.o_CFLAGS = $(APP_FLAGS)
 APP_LIBS = -L. -lfreevr_64 $(LINUX_GLX64_LIBS) -lm -ldl
 
 PREFIX = /usr/local/encap/freevr_0.6f_lance_debug
@@ -143,20 +144,16 @@ FREEVR_DOC = README_dist contrib coverage todo \
 # rules for making example VR programs
 # =======================================================
 
-travel: $(FREEVR_LIB) travel.o drawing.c
-	$(CC) $(CFLAGS) -c $(APP_FLAGS) drawing.c
+travel: $(FREEVR_LIB) travel.o drawing.o
 	$(CC) $(CFLAGS) -o $@ travel.o drawing.o $(APP_LIBS)
 
-static: $(FREEVR_LIB) static.o drawing.c
-	$(CC) $(CFLAGS) -c $(APP_FLAGS) drawing.c
+static: $(FREEVR_LIB) static.o drawing.o
 	$(CC) $(CFLAGS) -o $@ static.o drawing.o $(APP_LIBS)
 
-inputs: $(FREEVR_LIB) valtest.o drawing.c
-	$(CC) $(CFLAGS) -c $(APP_FLAGS) drawing.c
+inputs: $(FREEVR_LIB) valtest.o drawing.o
 	$(CC) $(CFLAGS) -o $@ valtest.o drawing.o $(APP_LIBS)
 
-configurator: $(FREEVR_LIB) configurator.o drawing.c
-	$(CC) $(CFLAGS) -c $(APP_FLAGS) drawing.c
+configurator: $(FREEVR_LIB) configurator.o drawing.o
 	$(CC) $(CFLAGS) -o $@ configurator.o drawing.o $(APP_LIBS)
 
 ## NOTE: -lGLU must NOT be used with Cygwin (odd, but that's the way it is)
@@ -184,5 +181,5 @@ clean:
 
 
 .c.o:
-	$(CC) -fPIC $(CFLAGS) -c $<
+	$(CC) -fPIC $(CFLAGS) $($@_CFLAGS) -c $< -o $@
 
