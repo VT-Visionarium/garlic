@@ -8,7 +8,7 @@ GLX_FREEVR_LIB = libfreevr_64.so
 FREEVR_LIB = $(GLX_FREEVR_LIB)
 APP_FLAGS = -DFREEVR
 drawing.o_CFLAGS = $(APP_FLAGS)
-APP_LIBS = -L. -lfreevr_64 $(LINUX_GLX64_LIBS) -lm -ldl
+APP_LIBS = -L. -lfreevr_64 $(LINUX_GLX64_LIBS) -ldl -lm
 
 PREFIX = /usr/local/encap/freevr_0.6f_debug
 
@@ -98,8 +98,9 @@ FREEVR_GLX_HEAD = \
 
 FREEVR_GLX_OBJ = $(FREEVR_SRC:.c=.o) $(FREEVR_GLX_SRC:.c=.o)
 
+# We seem to need the extra -lm
 $(GLX_FREEVR_LIB): $(FREEVR_GLX_OBJ)
-	$(CC) -shared $(CFLAGS) -o $(GLX_FREEVR_LIB) $(FREEVR_GLX_OBJ)
+	$(CC) -shared $(CFLAGS) -o $(GLX_FREEVR_LIB) $(FREEVR_GLX_OBJ) -lm
 
 
 #
