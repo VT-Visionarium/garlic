@@ -10,7 +10,7 @@ APP_FLAGS = -DFREEVR
 drawing.o_CFLAGS = $(APP_FLAGS)
 APP_LIBS = -L. -lfreevr_64 $(LINUX_GLX64_LIBS) -lm -ldl
 
-PREFIX = /usr/local/encap/freevr_0.6f_lance_debug
+PREFIX = /usr/local/encap/freevr_0.6f_debug
 
 VERSION_TAG = "freevr_0.6f"
 VERSION_CVSTAG = "freevr_0-6f"
@@ -170,7 +170,7 @@ fvconfig: $(FREEVR_LIB) fvconfig.o
 
 install: build
 	mkdir -p $(PREFIX)/bin $(PREFIX)/include $(PREFIX)/lib
-	cp travel $(PREFIX)/bin
+	cp travel $(PREFIX)/bin/freevr_test
 	cp $(FREEVR_LIB) $(PREFIX)/lib
 	cp vr_*.h freevr.h $(PREFIX)/include
 
