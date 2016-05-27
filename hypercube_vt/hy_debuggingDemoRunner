@@ -85,9 +85,10 @@ usage if $runUsage
 def getRunList()
 
     Find.find('.') do |path|
-        $programs += path + "\n" if File.basename(path) == $runDemoName
+        path.gsub!(/^\.\//, '')
+        $programs += 'xfce4-terminal -x ' +
+            path + "\n" if File.basename(path) == $runDemoName
     end
-    $programs.gsub!(/^\.\//, '')
 end
 
 Dir.chdir $demoRoot

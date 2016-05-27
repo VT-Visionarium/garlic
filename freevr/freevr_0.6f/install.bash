@@ -45,14 +45,17 @@ cd $name/src || Fail
 tab="$(echo -en '\t')"
 
 cat << EOF >> Makefile || Fail
+# added by lance
 install:
-${tab}mkdir -p $prefix/lib $prefix/include
+${tab}mkdir -p $prefix/lib $prefix/include $prefix/bin $prefix/etc
 ${tab}cp libfr*.a freevr.h vr_*.h $prefix/lib
 ${tab}cp freevr.h vr_*.h $prefix/include
+${tab}cp travel $prefix/bin/freevr_test
+${tab}cp $topsrcdir/hy_VT_freevrrc $prefix/etc
 
 EOF
 
-make linux2.6-glx-64 || Fail
+make -j$ncores linux2.6-glx-64 || Fail
 make install || Fail
 
 
@@ -68,5 +71,7 @@ mv Makefile Makefile.org || Fail
 patch Makefile.org\
  -i $scriptdir/tutorial_Makefile.patch\
  -o Makefile || Fail
+
+echo "tutorial" > $prefix/encap.exclude
 
 PrintSuccess
