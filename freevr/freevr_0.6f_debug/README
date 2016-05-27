@@ -1,0 +1,10 @@
+This is Lance trying to debug this code.  I copied Bill's code to start
+with. It now makes shared object library which makes it much easier/faster
+to debug large programs (like VMD) that use the freeVR library since with
+a shared library I do not have to rebuild the large program every time I
+make a minor edit to the FreeVR library code.  Also added an install make
+target.  This is not portable code, just for Xubuntu 14.04, GNU/Linux.
+Lots of the rest of this file content is now invalid.  I expect to find
+many race conditions in this code, given that the that apps linked with it
+tend to fail intermittently.
+

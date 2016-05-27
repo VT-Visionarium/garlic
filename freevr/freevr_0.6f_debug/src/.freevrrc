@@ -1,0 +1,298 @@
+#
+####################################################################
+
+echo "Test freevrrc file";
+
+#########
+# A couple of brief notes about the format of the FreeVR configuration file:
+#
+# The components of configuration is made up of some major object
+#   definitions: system, process, window, input device and inputmap.
+#   (Inputmap is not yet implemented as a configurable object.)
+#
+# Names of objects are not exclusive.  That is, there can be a window
+#   named "default", and also a process named "default" and things will
+#   work fine.
+#
+# Order of this file doesn't matter for the most part.  Objects can
+#   refer to other objects that appear before or after them in the
+#   file.  Order does matter when an object or paramter of the same
+#   name is repeated.  In this case the latter setting will overwrite
+#   the earlier one.
+#
+# Further information is available in the FreeVR Administrator's Guide
+#   available in the accompanying documentation.
+#
+
+	############################################
+	############# Variable settings ############ 
+	############################################
+
+#########
+# This variable is used for setting the sync-group number for the
+#   visual rendering processes.
+setenv	VISSYNC	= 1;
+setenv	VISSYNC	= off;	# By changing this to "off", no synchronization will take place.  As there seems to be a bug in the Linux/FreeVR barrier code, we'll leave it off for now.
+
+#########
+# This variable is used for setting the default size of the window on
+#   each screen of the CAVE.
+setenv	WINDOW_GEOM = "geometry=1024x768+0+0;";
+
+#########
+# These variables are used in the config file, and primarily
+#   serve to make the config file a little easier to read.
+#   See the usage of "printcolor" in process object definitions.
+#
+#   NOTE: red (31) is not used because FreeVR uses red to
+#   indicate important text -- usually an error, and black (30)
+#   and white (37) are not used because one is usually the
+#   background color, and the other is used for the standard
+#   foreground color, which is what would be output by
+#   default.
+setenv	ANSI_GREEN =	32;
+setenv	ANSI_YELLOW =	33;
+setenv	ANSI_BLUE =	34;
+setenv	ANSI_MAGENTA =	35;
+setenv	ANSI_CYAN =	36;
+
+#########
+# This variable is for getting the correct DSO to match the version and
+#   architecture of the library against which the application was compiled.
+#   NOTE: most FreeVR installations will not make use of the DSO methodology
+#   to provide for input device handling, and in these cases, these lines
+#   can be safely ignored.
+setenv FREEVR_DSO_PATH = $freevrhomedir"/"$version"/dsos/"$arch;
+
+
+	##########################################
+	############# GLOBAL settings ############ 
+	##########################################
+
+#########
+# The default debug level is set to 5 in vr_config.h.  This provides
+#   minimal feedback of typically important information.  The debug
+#   level can be set to 0 (for no output), or any positive integer.
+#   In general the higher the number, the more output you'll get.
+#   (Look in vr_debug.h for some hints).
+set DebugLevel = 100;		# Set debuglevel to 0 for almost no output
+
+#########
+#setDefault VisrenMode = dualfb;			# dual-framebuffer stereo
+setDefault VisrenMode = mono;			
+
+setDefault LockCPU = "on";			# Not yet implemented
+setDefault LockCommand = "mplock %p";		# Not yet implemented
+
+#########
+# Here are four system choices.  The last uncommented one will be active.
+#   If all are commented, then the "simulator" system will be used.
+usesystem "cave-system";
+
+
+	##############################################
+	############# SYSTEM definitions ############# 
+	##############################################
+
+#########
+#  This system is for running in normal CAVE mode with IS900 tracking
+system "cave-system" = {
+	malleable = 1;
+	procs = "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10";
+
+	execuponerror = "xmessage -bg red 'There is a problem in the configuration.  Error #E.'";
+	exituponerror = 255;		# Exit when encountering any error. (0xFF)
+}
+
+	##########################################################
+	############# INPUT (dev & proc) definitions ############# 
+	##########################################################
+
+
+
+	##############################################
+	############# WINDOW definitions ############# 
+	##############################################
+
+###################
+### CAVE windows
+
+window "r1" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.0;";
+	args += "geometry=100x100+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 3.75, 5,    -5, 3.75, -5,    -5, 10, 5;
+        visrenmode = "left";
+}
+
+window "r2" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.0;";
+	args += "geometry=100x100+100+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 3.75, 5,    -5, 3.75, -5,    -5, 10, 5;
+        visrenmode = "left";
+}
+
+window "r3" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.0;";
+	args += "geometry=100x100+200+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 5,    -5, 0, -5,    -5, 6.25, 5;
+        visrenmode = "left";
+}
+
+window "r4" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.0;";
+	args += "geometry=100x100+300+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 5,    -5, 0, -5,    -5, 6.25, 5;
+        visrenmode = "left";
+}
+
+window "r5" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.0;";
+	args += "geometry=100x100+400+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 5,    -5, 0, -5,    -5, 6.25, 5;
+        visrenmode = "left";
+}
+
+window "r6" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.0;";
+	args += "geometry=100x100+500+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 5,    -5, 0, -5,    -5, 6.25, 5;
+        visrenmode = "left";
+}
+
+window "r7" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.0;";
+	args += "geometry=100x100+600+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 5,    -5, 0, -5,    -5, 6.25, 5;
+        visrenmode = "left";
+}
+
+window "r8" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.0;";
+	args += "geometry=100x100+700+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 5,    -5, 0, -5,    -5, 6.25, 5;
+        visrenmode = "left";
+}
+
+window "r9" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.0;";
+	args += "geometry=100x100+800+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 5,    -5, 0, -5,    -5, 6.25, 5;
+        visrenmode = "left";
+}
+
+window "r10" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.0;";
+	args += "geometry=100x100+900+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 5,    -5, 0, -5,    -5, 6.25, 5;
+        visrenmode = "left";
+}
+
+
+
+	###################################################
+	############# VISREN proc definitions ############# 
+	###################################################
+
+###########################################
+### CAVE visual rendering processes
+
+process "r1" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "r1";
+	printcolor = $ANSI_GREEN;
+}
+
+process "r2" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "r2";
+	printcolor = $ANSI_YELLOW;
+}
+
+process "r3" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "r3";
+	printcolor = $ANSI_CYAN;
+}
+
+process "r4" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "r4";
+	printcolor = $ANSI_MAGENTA;
+}
+
+process "r5" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "r5";
+	printcolor = $ANSI_GREEN;
+}
+
+process "r6" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "r6";
+	printcolor = $ANSI_YELLOW;
+}
+
+process "r7" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "r7";
+	printcolor = $ANSI_CYAN;
+}
+
+process "r8" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "r8";
+	printcolor = $ANSI_MAGENTA;
+}
+
+process "r9" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "r9";
+	printcolor = $ANSI_CYAN;
+}
+
+process "r10" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "r10";
+	printcolor = $ANSI_MAGENTA;
+}
+
