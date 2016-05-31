@@ -1,26 +1,32 @@
 #!/bin/bash
 
-##########################################################
-#             CONFIGURATION
-##########################################################
-
-hy_host=cube
 
 
+if [ -n "$default_host" ] ; then
+    OPTIONS="OPTIONS
 
-##########################################################
+       HOST   $default_host is the default host
+"
+else
+    OPTIONS="OPTIONS
 
+       HOST   HOST is the remote host to setup access to
+"
+fi
 
 
 function usage()
 {
     cat << EOF || exit $?
 
-  Usage: $0 [-h|--help]
+  Usage: $0 [HOST]|[-h|--help]
 
     Generate ssh public/private rsa key pair (if needed) and put
-    the public key on the hyperCube machine ${hy_host}, so that
-    you may ssh to ${hy_host} without a password.
+    the public key on the machine at HOST, so that you may ssh to
+    HOST from the current machine without a password.
+
+
+        ${OPTIONS}
 
 
   References:
@@ -38,8 +44,22 @@ EOF
     exit 1
 }
 
+host=
 
-[ -n "$1" ] && usage
+while [ -n "$1" ] ; do
+    case $1 in
+        -h|--help|--h|-help|-?|--?)
+            usage
+            ;;
+        *)
+            host="$1"
+            ;;
+    esac
+    shift 1
+done
+
+[ -z "$host" ] && host="$default_host"
+[ -n "$host" ] || usage
 
 
 function checkLocalKeys()
@@ -71,7 +91,7 @@ function success()
 
 function checkWorksAlready()
 {
-    set +x
+    set -x
     if ssh -o 'StrictHostKeyChecking no' -o\
         'PreferredAuthentications=publickey' $1\
         echo -e "\\\\nLooks like you can ssh to $1 without password already\\\\n" ; then
@@ -101,8 +121,8 @@ function pushPublicKeyToHyHost()
 
 
 checkLocalKeys
-checkWorksAlready ${hy_host}
-rmHostFromKnown ${hy_host}
-pushPublicKeyToHyHost ${hy_host}
+checkWorksAlready ${host}
+rmHostFromKnown ${host}
+pushPublicKeyToHyHost ${host}
 success
 

@@ -9,7 +9,7 @@ BIN = $(PREFIX)/bin
 
 CFLAGS = -g
 
-inst_scripts = hy_debuggingDemoRunner
+inst_scripts = hy_debuggingDemoRunner hy_pushSshKeysToHyperCube
 cbinaries = $(patsubst %.c,%,$(wildcard *.c))
 built_files = $(patsubst %.in,%,$(wildcard hy_*.in)) $(cbinaries)
 
@@ -19,9 +19,12 @@ inst_files = $(sort\
 
 build: $(built_files)
 
-install_pushSshKeys:
-	mkdir -p $(BIN)
-	cp hy_pushSshKeysToHyperCube $(BIN)/
+
+hy_pushSshKeysToHyperCube: hy_pushSshKeysToHyperCube.in
+	echo "#!/bin/bash" > $@
+	echo "# This is a generated file" >> $@
+	cat $^ ../garlicGeneralPrograms/gar_pushSshKeys >> $@
+	chmod 755 $@
 
 $(cbinaries): %: %.o
 	$(CC) $(CFLAGS) $^ -o $@
