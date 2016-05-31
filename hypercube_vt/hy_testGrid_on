@@ -2,66 +2,75 @@
 # For the most part this was written by Paul Rajilich
 # of visbox.com, file: RUN_BLEND_ALL_GRID
 
+cscriptdir="$(dirname $(readlink ${BASH_SOURCE[0]}))" || exit $?
+cd "$cscriptdir" || exit $?
+cscriptdir="$PWD"
+blend="$cscriptdir/nv-control-blend-visbox"
+unset cscriptdir
+
 # LTL
 export DISPLAY=:0.0
-./nv-control-blend-visbox 2 -b 640 -c -s 80
+$blend 2 -b 640 -c -s 80
 
 # LTR
 export DISPLAY=:0.1
-./nv-control-blend-visbox 4 -b 640 -c -s 80
+$blend 4 -b 640 -c -s 80
 
 # LBL
 export DISPLAY=:0.2
-./nv-control-blend-visbox 6 -t 640 -c -s 80
+$blend 6 -t 640 -c -s 80
 
 # LBR
 export DISPLAY=:0.3
-./nv-control-blend-visbox 8 -t 640 -c -s 80
+$blend 8 -t 640 -c -s 80
 
 # CTL
 export DISPLAY=:0.4
-./nv-control-blend-visbox 12 -b 640 -c -s 80
+$blend 12 -b 640 -c -s 80
 
 # CTR
 export DISPLAY=:0.5
-./nv-control-blend-visbox 14 -b 640 -c -s 80
+$blend 14 -b 640 -c -s 80
 
 # CBL
 export DISPLAY=:0.6
-./nv-control-blend-visbox 16 -t 640 -c -s 80
+$blend 16 -t 640 -c -s 80
 
 # CBR
 export DISPLAY=:0.7
-./nv-control-blend-visbox 18 -t 640 -c -s 80
+$blend 18 -t 640 -c -s 80
 
 # RTL
 export DISPLAY=:0.8
-./nv-control-blend-visbox 22 -b 640 -c -s 80
+$blend 22 -b 640 -c -s 80
 
 # RTR
 export DISPLAY=:0.9
-./nv-control-blend-visbox 24 -b 640 -c -s 80
+$blend 24 -b 640 -c -s 80
 
 # RBL
 export DISPLAY=:0.10
-./nv-control-blend-visbox 26 -t 640 -c -s 80
+$blend 26 -t 640 -c -s 80
 
 # RBR
 export DISPLAY=:0.11
-./nv-control-blend-visbox 28 -t 640 -c -s 80
+$blend 28 -t 640 -c -s 80
 
 # FTL
 export DISPLAY=:0.12
-./nv-control-blend-visbox 32 -b 640 -c -s 80
+$blend 32 -b 640 -c -s 80
 
 # FTR
 export DISPLAY=:0.13
-./nv-control-blend-visbox 34 -b 640 -c -s 80
+$blend 34 -b 640 -c -s 80
 
 # FBL
 export DISPLAY=:0.14
-./nv-control-blend-visbox 36 -t 640 -c -s 80
+$blend 36 -t 640 -c -s 80
 
 # FBR
 export DISPLAY=:0.15
-./nv-control-blend-visbox 38 -t 640 -c -s 80
+$blend 38 -t 640 -c -s 80
+
+set +x
+echo "finished running $0"
