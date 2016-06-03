@@ -1,0 +1,103 @@
+#!/bin/bash
+
+
+function usage()
+{
+    local proj
+    proj=$(basename $0)
+    cat << EOF
+  Usage: ${proj} PID | -cmd CMD [PID ...] [-cmd CMD ...]
+
+    Run gdb for each process and all child processes in terminals.
+    
+    OPTIONS
+
+  PID    PID is a process ID like 1245
+
+  CMD    get PIDs from the command name CMD
+
+
+EOF
+    exit 1
+}
+
+pid=
+
+function addPID()
+{
+    local add
+    add="$(ps -C $1 | grep -v PID | awk '{print $1}')"
+    if [ -n "$pid" ] ; then
+        pid="$pid $add"
+    else
+        pid="$add"
+    fi
+}
+
+count=0
+
+args="$*"
+
+while [ -n "$1" ] ; do
+    case "$1" in
+        -cmd|--cmd)
+            shift 1
+            if [ -n "$1" ] ; then
+                addPID $1
+            fi
+            ;;
+        *)
+            if [ -n "$pid" ] ; then
+                pid="$pid $1"
+            else
+                pid="$1"
+            fi
+            ;;
+    esac
+    shift 1
+done
+
+[ -z "$args" ] && usage
+
+if [ -z "$pid" ] ; then
+    echo -e "\nNo pid found from arguments \"$args\"\n\n"
+    usage
+fi
+
+# append all child processes
+ppid="$pid"
+while [ -n "$ppid" ] ; do
+    added=
+    for i in $ppid ; do
+        add="$(ps --ppid $i | grep -v PID | awk '{print $1}')"
+        if [ -n "$add" ] ; then
+            pid="$pid $add"
+            if [ -n "$added" ] ; then
+                added="$added $add"
+            else
+                added="$add"
+            fi
+        fi
+    done
+    ppid="$added"
+done
+
+for i in $pid ; do
+    let count=$count+1
+done
+
+echo "pids[$count] = $pid"
+
+delta=$(( 1600 / $count ))
+
+echo "delta= $delta"
+
+top=0
+
+for i in $pid ; do
+    run="xfce4-terminal --geometry=102x16-0+$top -x gdb --pid=$i --eval-command=where"
+    echo "$run"
+    # $run
+    let top=$top+$delta
+done
+
