@@ -64,10 +64,11 @@ done
 
 function checkLocalKeys()
 {
+    set -x 
     if [ ! -f "${HOME}/.ssh/id_rsa" ] ; then
         echo
         echo "generating ssh keys ..."
-        echo -e "\n\n\n\n\n\n\n\n" | ssh-keygen -t rsa || exit $?
+        echo -e "\n\n\n\n\n\n\n\n" | ssh-keygen -t rsa -N '' || exit $?
     else
         echo
         echo "Your local ssh keys exist in ${HOME}/.ssh/id_rsa, which is fine."
