@@ -1,33 +1,30 @@
 #!/bin/bash
 
 
+prog="$(basename $0)"
 
-if [ -n "$default_host" ] ; then
-    OPTIONS="OPTIONS
 
-       HOST   $default_host is the default host
-"
-else
-    OPTIONS="OPTIONS
+# gnome-keyring BUG:
+# gnome-keyring was trying to handle all SSH key usage, preventing
+# the keys from working.
+# see: https://chrisjean.com/ubuntu-ssh-fix-for-agent-admitted-failure-to-sign-using-the-key/
+# Setting evn: SSH_AUTH_SOCK=0 can stop ssh from using the gnome-keyring
 
-       HOST   HOST is the remote host to setup access to
-"
-fi
 
 
 function usage()
 {
     cat << EOF || exit $?
 
-  Usage: $0 [HOST]|[-h|--help]
+  Usage: $prog TO_HOST [FROM_HOST]
 
     Generate ssh public/private rsa key pair (if needed) and put
-    the public key on the machine at HOST, so that you may ssh to
-    HOST from the current machine without a password.
+    the public key on the machine at TO_HOST, so that you may ssh to
+    TO_HOST from the current machine FROM_HOST without a password.
 
-
-        ${OPTIONS}
-
+    If FROM_HOST is not given the output of 'hostname -s' will be
+    used as the host name we ssh from.
+    
 
   References:
 
@@ -39,27 +36,41 @@ function usage()
     
         ssh without password
 
+  BUGS:
+
+    The gnome-keyring can interfer with ssh in general.  You can
+    disable the gnome-keyring by setting environment variable
+    SSH_AUTH_SOCK=0, so for example in a bash shell run:
+
+        unset SSH_AUTH_SOCK
+
+
 EOF
 
     exit 1
 }
 
-host=
+tohost=
+fromhost="$(hostname -s)" || exit 1
+
+who="$(whoami)"
+
+[ -z "$1" ] && usage
+[ -n "$3" ] && usage
+
+tohost="$1"
+
+[ -z "$2" ] || fromhost="$3"
 
 while [ -n "$1" ] ; do
-    case $1 in
-        -h|--help|--h|-help|-?|--?)
+    case "$1" in
+        -*)
             usage
-            ;;
-        *)
-            host="$1"
             ;;
     esac
     shift 1
 done
 
-[ -z "$host" ] && host="$default_host"
-[ -n "$host" ] || usage
 
 
 function checkLocalKeys()
@@ -68,7 +79,8 @@ function checkLocalKeys()
     if [ ! -f "${HOME}/.ssh/id_rsa" ] ; then
         echo
         echo "generating ssh keys ..."
-        echo -e "\n\n\n\n\n\n\n\n" | ssh-keygen -t rsa -N '' || exit $?
+        echo -e "\n\n\n\n\n\n\n\n" |\
+            ssh-keygen -t rsa -N '' || exit $?
     else
         echo
         echo "Your local ssh keys exist in ${HOME}/.ssh/id_rsa, which is fine."
@@ -114,16 +126,16 @@ function pushPublicKeyToHyHost()
 {
     set -x
     cat ${HOME}/.ssh/id_rsa.pub | ssh -o 'StrictHostKeyChecking no' $1\
- 'mkdir -p ${HOME}/.ssh && cat >> ${HOME}/.ssh/authorized_keys'\
+ 'mkdir -p ${HOME}/.ssh && cat >> ${HOME}/.ssh/authorized_keys && chmod 600 ${HOME}/.ssh/authorized_keys'\
  || exit $?
     set +x
 
 }
 
 
-checkLocalKeys
-checkWorksAlready ${host}
-rmHostFromKnown ${host}
-pushPublicKeyToHyHost ${host}
+checkLocalKeys "${fromhost}"
+checkWorksAlready ${tohost}
+rmHostFromKnown ${tohost}
+pushPublicKeyToHyHost ${tohost}
 success
 
