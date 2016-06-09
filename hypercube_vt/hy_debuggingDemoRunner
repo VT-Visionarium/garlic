@@ -95,7 +95,7 @@ Dir.chdir $demoRoot
 
 getRunList
 
-$cmd = 'qs_demo_launcher --list - --title "Debugging HyperCube Demos"'
+$cmd = '__GL_YIELD=USLEEP qs_demo_launcher --list - --title "Debugging HyperCube Demos"'
 
 io = IO.popen($cmd, 'w')
 io.write $programs
