@@ -127,9 +127,13 @@ function GitCreateClone()
         url="$(git config --get remote.origin.url)"
         [ "$url" = "$1" ] || \
             Fail "git cloned repo is not from $1 it's from $url"
-        cd "$cwd" || Fail
 
         echo -e "\ngit clone of \"$1\" \"$gitdir\" was found.\n"
+        echo -e "pulling latest changes from $url\n"
+        set -x
+        git pull --recurse-submodules || Fail
+        cd "$cwd" || Fail
+        set +x
     fi
 }
 
