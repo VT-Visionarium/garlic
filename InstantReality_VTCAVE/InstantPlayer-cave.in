@@ -51,6 +51,9 @@ player=/opt/instantReality/bin/sax
 InstantPlayer=/opt/instantReality/bin/InstantPlayer
 
 
+export __GL_YIELD=USLEEP
+
+
 ######################################################################
 #                 END CONFIGURATION
 ######################################################################
