@@ -88,7 +88,7 @@ alias ll="ls -thlF$col"
 alias lla="ls -athlF$col"
 unset col
 alias b='cd ..;pwd'
-alias gittagbydate='git log --date-order --tags --simplify-by-decoration --pretty="format:%ai %d"'
+alias gittagbydate='git log --date-order --tags --simplify-by-decoration --pretty="format:%ai %d %H"'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
