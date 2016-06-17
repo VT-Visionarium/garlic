@@ -98,6 +98,8 @@ FREEVR_GLX_HEAD = \
 
 FREEVR_GLX_OBJ = $(FREEVR_SRC:.c=.o) $(FREEVR_GLX_SRC:.c=.o)
 
+travel.o drawing.o $(FREEVR_GLX_OBJ): lance_debug.h
+
 # We seem to need the extra -lm
 $(GLX_FREEVR_LIB): $(FREEVR_GLX_OBJ)
 	$(CC) -shared $(CFLAGS) -o $(GLX_FREEVR_LIB) $(FREEVR_GLX_OBJ) -lm
