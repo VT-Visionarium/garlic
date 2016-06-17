@@ -1,3 +1,14 @@
+#!/bin/bash
+
+# This we learned by trial and error is how we run Unity
+# after we install it via gdebi
+# See /usr/local/src/Unity (if you're lucky) for details.
+
+cd /opt/Unity/Editor || exit 1
+exec ./Unity || exit 1
+
+# Bash Never gets here
+
 See release news at URL:
 http://forum.unity3d.com/threads/unity-on-linux-release-notes-and-known-issues.350256/
 
@@ -6,9 +17,4 @@ wget http://download.unity3d.com/download_unity/linux/unity-editor-5.4.0b18+2016
 
 #As root:
 gdebi unity-editor-5.4.0b18+20160524_amd64.deb
-
-
-# run not as root
-
-./post_install.bash
 
