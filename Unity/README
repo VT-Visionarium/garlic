@@ -1,3 +1,7 @@
+README for installing Unity on Ubuntu (xubuntu 14.04)
+
+This was in /usr/local/src/Unity/
+
 See release news at URL:
 http://forum.unity3d.com/threads/unity-on-linux-release-notes-and-known-issues.350256/
 
@@ -8,7 +12,6 @@ wget http://download.unity3d.com/download_unity/linux/unity-editor-5.4.0b18+2016
 gdebi unity-editor-5.4.0b18+20160524_amd64.deb
 
 
-# run not as root
-
+# run not as root (in /usr/local/src/Unity)
 ./post_install.bash
 
