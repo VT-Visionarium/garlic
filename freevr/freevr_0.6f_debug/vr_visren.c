@@ -71,6 +71,8 @@ TODO:
 #include <GL/gl.h>		/* for the definition of GL_NONE */
 #endif
 
+#include "lance_debug.h"
+
 #include "vr_config.h"		/* needed for getting default values (eg. near_clip) */
 #include "vr_visren.h"
 #include "vr_entity.h"
@@ -1089,6 +1091,8 @@ void vrVisrenInitProc(vrProcessInfo *myproc_info)
 
 	renderinfo = visren_aux->renderinfo;
 	renderinfo->persp = (vrPerspData *)vrShmemAlloc(sizeof(vrPerspData));
+
+
 	renderinfo->context = myproc_info->context;
 	renderinfo->window = NULL;	/* this will be set before renderinfo gets passed to a CB */
 	renderinfo->eye = NULL;		/* the init and frame callbacks are not done on a per-eye basis */

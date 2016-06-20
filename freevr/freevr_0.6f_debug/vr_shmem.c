@@ -29,6 +29,7 @@ TODO:
 
 *************************************************************************/
 
+#include "lance_debug.h"
 
 /*****************************************************************/
 /* Some options to how the shared memory code should be compiled */
@@ -321,6 +322,7 @@ long vrShmemInit(size_t bytes)
 #  else
         /* non-SGI mmap doesn't let us grow the mapped region on the fly */
         shmem_addr = mmap(0, request_size, PROT_READ | PROT_WRITE, MAP_SHARED, shmem_fd, 0);
+        // lance it gets here...
 #  endif
 
 	/* TODO: we can probably close(shmem_fd) here -- since the memory mapping has been done. */
@@ -600,6 +602,7 @@ void *vrShmemAlloc(size_t bytes)
 #ifdef VRTRACKMEM
 	if (mem) {
 #  if USE_SHMEM && !defined(SHM_PF_ARENA)
+
 		*total_bytes_overall += amallocblksize(mem, arena);
 		total_bytes_this_proc += amallocblksize(mem, arena);
 #  else
@@ -1044,6 +1047,8 @@ void **vrShmemPtrArray(int count,...)
 #if defined(VRTRACKMEM) || 0 /* since vrShmemAlloc() is used above, this would be redundant */
 	if (mem) {
 #  if USE_SHMEM && !defined(SHM_PF_ARENA)
+
+
 		*total_bytes_overall += amallocblksize(mem, arena);
 		total_bytes_this_proc += amallocblksize(mem, arena);
 #  else

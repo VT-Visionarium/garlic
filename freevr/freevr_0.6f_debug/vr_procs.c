@@ -13,6 +13,8 @@
  * With the intent to provide an open-source license to be named later.
  * ====================================================================== */
 
+#include "lance_debug.h"
+
 #include "vr_procs.h"		/* NOTE: Sukru includes vr_shmem.h instead */
 #include "vr_objects.h"
 #include "vr_config.h"
@@ -592,7 +594,10 @@ printf("hey, about to do Performer visren open callback (%#p)\n", window->Open);
 #  ifdef GFX_PERFORMER
 	if (proc_info->type == VRPROC_VISREN)
 		childpid = 0;
-	else	childpid = fork();
+	else 
+        {
+            childpid = fork();
+        }
 #  else
 	childpid = fork();
 #  endif
@@ -1117,7 +1122,7 @@ void vrSetSignalHandler(void (*func)(int))
 #if 0
 	signal(SIGINT, func);
 #else
-	signal(SIGINT, SIG_IGN);	/* we want the main process to catch this and then stop the other procs. */
+	//signal(SIGINT, SIG_IGN);	/* we want the main process to catch this and then stop the other procs. */
 #endif
 	signal(SIGHUP, func);
 	signal(SIGBUS, func);

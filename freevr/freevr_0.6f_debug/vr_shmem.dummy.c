@@ -77,6 +77,7 @@ void *amalloc(size_t size, struct arena *arena)
         sa = ((size+(ALIGNSZ-1)) & ~(ALIGNSZ-1)); /* align to next boundary */
 	if(arena->avail + sa > arena->room) {
 		fprintf(stderr, RED_TEXT "Not enough room to amalloc(%d)!\n" NORM_TEXT, size);
+                ASSERT(0);
 		return NULL;
 	}
 #if 0

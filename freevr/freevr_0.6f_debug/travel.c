@@ -12,6 +12,7 @@
  * Copyright 2010, Bill Sherman & Friends, All rights reserved.
  * With the intent to provide an open-source license to be named later.
  * ====================================================================== */
+#include "lance_debug.h"
 #include <stdio.h>
 #include <signal.h>
 #include <sys/types.h>
@@ -40,7 +41,7 @@ int main(int argc, char* argv[])
 
 	/* TODO: do I want to ignore interrupts for all of this?  or */
 	/*   just during vrStart()?                                  */
-	signal(SIGINT, SIG_IGN);
+	//signal(SIGINT, SIG_IGN);
 
 	vrShmemInit(30 * 1024 * 1024);
 	vrConfigure(&argc, argv, NULL);
