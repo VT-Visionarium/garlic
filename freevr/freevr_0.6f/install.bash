@@ -51,7 +51,7 @@ ${tab}mkdir -p $prefix/lib $prefix/include $prefix/bin $prefix/etc
 ${tab}cp libfr*.a freevr.h vr_*.h $prefix/lib
 ${tab}cp freevr.h vr_*.h $prefix/include
 ${tab}cp travel $prefix/bin/freevr_test
-${tab}cp $topsrcdir/hy_VT_freevrrc $prefix/etc
+${tab}cp $topsrcdir/hy_VT_freevrrc $topsrcdir/rc_viscube_c4t2_dualhead_all_4procs  $prefix/etc
 
 EOF
 

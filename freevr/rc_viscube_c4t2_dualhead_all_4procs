@@ -1,0 +1,450 @@
+#
+# rc file for running a VisCube C4-T2 CAVE with FreeVR
+#
+####################################################################
+
+echo "CAVE freevrrc file";
+
+#########
+# A couple of brief notes about the format of the FreeVR configuration file:
+#
+# The components of configuration is made up of some major object
+#   definitions: system, process, window, input device and inputmap.
+#   (Inputmap is not yet implemented as a configurable object.)
+#
+# Names of objects are not exclusive.  That is, there can be a window
+#   named "default", and also a process named "default" and things will
+#   work fine.
+#
+# Order of this file doesn't matter for the most part.  Objects can
+#   refer to other objects that appear before or after them in the
+#   file.  Order does matter when an object or paramter of the same
+#   name is repeated.  In this case the latter setting will overwrite
+#   the earlier one.
+#
+# Further information is available in the FreeVR Administrator's Guide
+#   available in the accompanying documentation.
+#
+
+	############################################
+	############# Variable settings ############ 
+	############################################
+
+#########
+# This variable is used for setting the sync-group number for the
+#   visual rendering processes.
+setenv	VISSYNC	= 1;
+setenv	VISSYNC	= off;	# By changing this to "off", no synchronization will take place.  As there seems to be a bug in the Linux/FreeVR barrier code, we'll leave it off for now.
+
+#########
+# This variable is used for setting the default size of the window on
+#   each screen of the CAVE.
+setenv	WINDOW_GEOM = "geometry=1024x768+0+0;";
+
+#########
+# These variables are used in the config file, and primarily
+#   serve to make the config file a little easier to read.
+#   See the usage of "printcolor" in process object definitions.
+#
+#   NOTE: red (31) is not used because FreeVR uses red to
+#   indicate important text -- usually an error, and black (30)
+#   and white (37) are not used because one is usually the
+#   background color, and the other is used for the standard
+#   foreground color, which is what would be output by
+#   default.
+setenv	ANSI_GREEN =	32;
+setenv	ANSI_YELLOW =	33;
+setenv	ANSI_BLUE =	34;
+setenv	ANSI_MAGENTA =	35;
+setenv	ANSI_CYAN =	36;
+
+#########
+# This variable is for getting the correct DSO to match the version and
+#   architecture of the library against which the application was compiled.
+#   NOTE: most FreeVR installations will not make use of the DSO methodology
+#   to provide for input device handling, and in these cases, these lines
+#   can be safely ignored.
+setenv FREEVR_DSO_PATH = $freevrhomedir"/"$version"/dsos/"$arch;
+
+
+	##########################################
+	############# GLOBAL settings ############ 
+	##########################################
+
+#########
+# The default debug level is set to 5 in vr_config.h.  This provides
+#   minimal feedback of typically important information.  The debug
+#   level can be set to 0 (for no output), or any positive integer.
+#   In general the higher the number, the more output you'll get.
+#   (Look in vr_debug.h for some hints).
+#set DebugLevel = 0;		# Set debuglevel to 0 for almost no output
+
+#########
+#setDefault VisrenMode = dualfb;			# dual-framebuffer stereo
+setDefault VisrenMode = mono;			
+
+setDefault LockCPU = "on";			# Not yet implemented
+setDefault LockCommand = "mplock %p";		# Not yet implemented
+setDefault UnLockCommand = "mpunlock %p";	# Not yet implemented
+
+
+	##########################################
+	############# SYSTEM choices ############# 
+	##########################################
+
+#########
+# Here are four system choices.  The last uncommented one will be active.
+#   If all are commented, then the "simulator" system will be used.
+usesystem "cave-system";
+
+
+	##############################################
+	############# SYSTEM definitions ############# 
+	##############################################
+
+#########
+#  This system is for running in normal CAVE mode with IS900 tracking
+system "cave-system" = {
+	malleable = 1;
+	procs = "cave-visren-L", "cave-visren-C", "cave-visren-R", "cave-visren-F";
+#	procs += "cave-track";
+	procs += "cave-is900track";
+	inputmap = "default";
+
+	execuponerror = "xmessage -bg red 'There is a problem in the configuration.  Error #E.'";
+	exituponerror = 255;		# Exit when encountering any error. (0xFF)
+}
+
+	##########################################################
+	############# INPUT (dev & proc) definitions ############# 
+	##########################################################
+
+
+# A simple X-windows input device for the very basics -- all other inputs
+#   would come from the "real" input devices.
+inputdevice "xwin-vr" = {
+	type = "xwindows";
+#	args = "window = front-cave;";
+	args = "window = cave-LTL;";
+
+	input "2switch[ESC]" = "2switch(keyboard:key[Escape])";
+
+	control "print_struct" = "2switch(keyboard:key[print])";
+	control "system_pause_toggle" = "2switch(keyboard:key[pause])";
+}
+
+
+###############################
+## Define an AR-tracking "dtrack" Input Device
+inputdevice "dtrack-input" = {
+        type = "dtrack";
+
+        #args = "host = localhost; port = 8555;";
+        args = "host = 192.168.0.3; port = 5000;";
+
+        input "button-1" = "2switch(fs2[0, 0])";
+        input "button-2" = "2switch(fs2[0, 1])";
+        input "button-3" = "2switch(fs2[0, 2])";
+        input "button-4" = "2switch(fs2[0, 3])";
+#        input "button-5" = "2switch(fs2[0, 4])";
+#        input "button-6" = "2switch(fs2[0, 5])";
+
+        input "joy-left-X" = "valuator(fs2[0, 0])";
+        input "joy-left-Y" = "valuator(fs2[0, -1])";
+
+        #### Define the position-trackers
+        t2rw_translate = 0.00, 0.00, 0.00;      # set the identity
+        #t2rw_rotate *= 1.0, 0.0, 0.0, 90.0;    # (t2rw_rotate affects direction of translation of sensor)
+        #t2rw_rotate *= 0.0, 1.0, 0.0, 180.0;   # (t2rw_rotate affects direction of translation of sensor)
+        #t2rw_rotate *= 0.0, 0.0, 1.0,  90.0;   # (t2rw_rotate affects direction of translation of sensor)
+        #t2rw_translate *= 0.00, 4.666, 0.00;   # move the origin down 4.666 feet
+
+        #r2e_translate = 0.0, 0.0, 0.0;         # set the identity
+        #r2e_rotate *= 1.0, 0.0, 0.0, 180.0;
+        r2e_transform =  1.0,  0.0,  0.0, 0.0,  # set the identity (the long way)
+                         0.0,  1.0,  0.0, 0.0,
+                         0.0,  0.0,  1.0, 0.0,
+                         0.0,  0.0,  0.0, 1.0;
+        #r2e_rotate *= 1.0, 0.0, 0.0, 180.0;
+
+        input "head" = "6sensor(6body[0])";
+        input "flightstick-2" = "6sensor(fs2[0, r2e])";
+
+#        r2e_rotate *= 1.0, 0.0, 0.0,  90.0;                     # add an addition 90 deg rotation about X for the wand
+ #       input "flightstick-1" = "6sensor(fs2[1, r2e])";
+}
+
+process "cave-track" = {
+	type = input;
+#	objects = "xwin-vr", "dtrack-input";
+	objects = "xwin-vr";
+	printcolor = $ANSI_MAGENTA;
+}
+
+##########################
+## Define an Intersense IS-900 position tracker input device
+inputdevice "is900-device" = {
+	type = "is900";					# The "is900" type is a subset (expansion) of the type "fastrak"
+	args = "baud = 115200; port = /dev/ttyS0;";
+	args += "scale = .08333333333333;";		# convert from inches to feet
+	args += "hemisphere = fore;";
+
+	#### Here is an example of how to set the beacon parameters
+	#args += "command = MCC\nMCF1, 0.9144,-0.6096, 0.0000, 0.00, 0.00, 1.00,5001\nMCF2, 0.0000,-0.6096, 0.0000, 0.00, 0.00, 1.00,5002\nMCF3,-0.9144,-0.6096, 0.0000, 0.00, 0.00, 1.00,5003\nMCF4,-0.6096, 0.0000, 0.0000, 0.00, 0.00, 1.00,5004\nMCF5, 0.0000, 0.0000, 0.0000, 0.00, 0.00, 1.00,5005\nMCF6, 0.6096, 0.0000, 0.0000, 0.00, 0.00, 1.00,5006\nMCF7, 0.9144, 0.6096, 0.0000, 0.00, 0.00, 1.00,5007\nMCF8, 0.0000, 0.6096, 0.0000, 0.00, 0.00, 1.00,5008\nMCF9,-0.9144, 0.6096, 0.0000, 0.00, 0.00, 1.00,5009\nMCe\n;";
+	#args += "command = U";
+
+	#### Define the inputs
+	t2rw_translate = 0.00, 0.00, 0.00;	# set the identity
+	t2rw_rotate *= 1.0, 0.0, 0.0, -90.0;	# (t2rw_rotate affects direction of translation of sensor)
+	t2rw_rotate *= 0.0, 0.0, 1.0,  90.0;	# (t2rw_rotate affects direction of translation of sensor)
+	#t2rw_translate *= 0.00, 8.00, -5.00;
+        # PAUL!! VT Z coords from tracker off by about a foot!
+        # moved coordinate system in tracker (isdemo constellation tool)
+	#t2rw_translate *= 0.00, 0.00, 1.00;
+
+	r2e_translate = 0.0, 0.0, 0.0;		# set the identity
+	r2e_rotate *= 1.0, 0.0, 0.0,  90.0;	# Do a couple of rotations
+	r2e_rotate *= 0.0, 1.0, 0.0,  90.0;
+
+#	input "6sensor[head]" = "6sensor(2, r2e)";
+#	input "6sensor[wand]" = "6sensor(1, r2e)";
+	input "6sensor[head]" = "6sensor(1, r2e)";
+	input "6sensor[wand]" = "6sensor(2, r2e)";
+
+	input "2switch[yellow]" = "2switch(2, Y)";	# yellow is button #1
+	input "2switch[trigger]" = "2switch(2, T)";	# trigger is button #2
+	input "2switch[green]" = "2switch(2, G)";	# green is button #3
+	input "2switch[red]" = "2switch(2, R)";		# red is button #4
+	input "2switch[blue]" = "2switch(2, B)";	# blue is button #5
+	input "2switch[joystick]" = "2switch(2, J)";	# joystick is button #6
+
+	input "valuator[x]" = "valuator(2, X)";
+	input "valuator[y]" = "valuator(2, Y)";
+
+	#### Define the controls
+}
+
+process "cave-is900track" = {
+	type = input;
+	objects = "xwin-vr", "is900-device";
+	printcolor = $ANSI_MAGENTA;
+}
+
+
+	##############################################
+	############# WINDOW definitions ############# 
+	##############################################
+
+###################
+### CAVE windows
+
+window "cave-LTL" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.0;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 3.75, 5,    -5, 3.75, -5,    -5, 10, 5;
+        visrenmode = "left";
+}
+
+window "cave-LTR" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.1;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 3.75, 5,    -5, 3.75, -5,    -5, 10, 5;
+        visrenmode = "right";
+}
+
+window "cave-LBL" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.2;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 5,    -5, 0, -5,    -5, 6.25, 5;
+        visrenmode = "left";
+}
+
+window "cave-LBR" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.3;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 5,    -5, 0, -5,    -5, 6.25, 5;
+        visrenmode = "right";
+}
+
+window "cave-CTL" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.4;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 3.75, -5,    5, 3.75, -5,    -5, 10, -5;
+        visrenmode = "left";
+}
+
+window "cave-CTR" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.5;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 3.75, -5,    5, 3.75, -5,    -5, 10, -5;
+        visrenmode = "right";
+}
+
+window "cave-CBL" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.6;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, -5,    5, 0, -5,    -5, 6.25, -5;
+        visrenmode = "left";
+}
+
+window "cave-CBR" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.7;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, -5,    5, 0, -5,    -5, 6.25, -5;
+        visrenmode = "right";
+}
+
+window "cave-RTL" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.8;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = 5, 3.75, -5,    5, 3.75, 5,    5, 10, -5;
+        visrenmode = "left";
+}
+
+window "cave-RTR" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.9;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = 5, 3.75, -5,    5, 3.75, 5,    5, 10, -5;
+        visrenmode = "right";
+}
+
+window "cave-RBL" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.10;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = 5, 0, -5,    5, 0, 5,    5, 6.25, -5;
+        visrenmode = "left";
+}
+
+window "cave-RBR" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.11;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = 5, 0, -5,    5, 0, 5,    5, 6.25, -5;
+        visrenmode = "right";
+}
+
+window "cave-FTL" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.12;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 1.25,    5, 0, 1.25,    -5, 0, -5;
+        visrenmode = "left";
+}
+
+window "cave-FTR" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.13;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 1.25,    5, 0, 1.25,    -5, 0, -5;
+        visrenmode = "right";
+}
+
+window "cave-FBL" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.14;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 5,    5, 0, 5,    -5, 0, -1.25;
+        visrenmode = "left";
+}
+
+window "cave-FBR" = {
+	mount = "fixed";
+	GraphicsType = "glx";
+	args = "display=:0.15;";
+	args += "geometry=2560x1600+0+0;";
+	args += "decoration=none";
+	rw2w_coords = -5, 0, 5,    5, 0, 5,    -5, 0, -1.25;
+        visrenmode = "right";
+}
+
+
+	###################################################
+	############# VISREN proc definitions ############# 
+	###################################################
+
+###########################################
+### CAVE visual rendering processes
+
+process "cave-visren-L" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "cave-LTL", "cave-LTR", "cave-LBL", "cave-LBR";
+	printcolor = $ANSI_BLUE;
+}
+
+process "cave-visren-C" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "cave-CTL", "cave-CTR", "cave-CBL", "cave-CBR";
+	printcolor = $ANSI_BLUE;
+}
+
+process "cave-visren-R" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "cave-RTL", "cave-RTR", "cave-RBL", "cave-RBR";
+	printcolor = $ANSI_BLUE;
+}
+
+process "cave-visren-F" = {
+	type = visren;
+	sync = $VISSYNC;
+	objects = "cave-FTL", "cave-FTR", "cave-FBL", "cave-FBR";
+	printcolor = $ANSI_BLUE;
+}
+
+
+	######################################################
+	############# OTHER settings and options ############# 
+	######################################################
+
+# NOTE: some of these settings might be options one would include in a
+#   personal .freevrrc config file, or one local to the application
+#   during development
+
+# The following line (when uncommented) will add the default "telnet" process
+#   to whichever system is currently selected -- note that a local .freevrrc
+#   file might change the selected system from what it is presently.
+#system $system += { procs += "default-telnet"; }
+
