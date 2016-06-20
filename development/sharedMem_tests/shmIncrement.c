@@ -46,12 +46,14 @@ static void _vassert(const char *x, const char *file, const char *func,
 static long *shm = NULL; // using "volatile long *shm" does not help
                          // make the call *shm += INC atomic.
 
-#define TEST_RUNS    2000
-#define NUM_CHILD      2 // 1 should pass every time, >1 should fail
+#define TEST_RUNS    2000 // Times to run the test.
+#define NUM_CHILD      5 // 1 should pass every time, >1 should fail
                          // try NUM_CHILD 1 for sanity check
-#define INC            64
-#define INC_PER_CHILD  10000
-#define INIT_VAL       0
+                         // number of forked children per test run.
+#define INC            64 // added to long in shared memory
+#define INC_PER_CHILD  1000 // Number of loops per child
+#define INIT_VAL       0    // initial value for shared memory long
+
 #define EXPECTED_TOTAL (INIT_VAL + (NUM_CHILD*INC*INC_PER_CHILD))
 
 
@@ -115,9 +117,9 @@ static int run(int num)
         numForks--;
     }
 
-    printf("run %d/%d   EXPECTED_TOTAL=%ld  ",
-        TEST_RUNS - num + 1, TEST_RUNS, (long int) EXPECTED_TOTAL);
-    printf("NUN_FORKS=%d\n", NUM_CHILD);
+    printf("run %d/%d   %d forked children with %d   *shm += %d calls\n",
+        TEST_RUNS - num + 1, TEST_RUNS,
+        NUM_CHILD, INC_PER_CHILD, INC);
 
     VASSERT(numForks == 0,
             "wait() did not succeed %d times for the %d children\n",
@@ -126,7 +128,7 @@ static int run(int num)
     // This is where we test to see if the  *shm += INC;
     // code above acted like it was atomic.  Note: sometimes
     // this assertion passes and other times not.
-    VASSERT(*shm == EXPECTED_TOTAL, "expected count %ld != %ld\n",
+    VASSERT(*shm == EXPECTED_TOTAL, "\nexpected count %ld != %ld\n",
             *shm,  EXPECTED_TOTAL);
 
     // We passed the assertion above so we got lucky this time.
