@@ -67,6 +67,10 @@ static int child(void)
         // This is a very bad thing to do.
         // This is not an atomic operation across processes,
         // and we prove that by running this code.
+        // Note: We cannot do any more testing of the values
+        // in shared memory here, because we need this to be
+        // something that looks like it would be an atomic
+        // operation preformed to the shared memory.
         *shm += INC;
 
     //printf("child exiting\n");
@@ -111,7 +115,7 @@ static int run(int num)
         numForks--;
     }
 
-    printf("run %d/%d   EXPECTED_TOTAL=%ld\n",
+    printf("run %d/%d   EXPECTED_TOTAL=%ld  ",
         TEST_RUNS - num + 1, TEST_RUNS, (long int) EXPECTED_TOTAL);
     printf("NUN_FORKS=%d\n", NUM_CHILD);
 
@@ -119,9 +123,13 @@ static int run(int num)
             "wait() did not succeed %d times for the %d children\n",
             NUM_CHILD, NUM_CHILD);
 
+    // This is where we test to see if the  *shm += INC;
+    // code above acted like it was atomic.  Note: sometimes
+    // this assertion passes and other times not.
     VASSERT(*shm == EXPECTED_TOTAL, "expected count %ld != %ld\n",
             *shm,  EXPECTED_TOTAL);
 
+    // We passed the assertion above so we got lucky this time.
     printf("parent finishing with SUCCESS\n\n");
     return 0;
 }
