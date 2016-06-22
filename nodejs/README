@@ -1,0 +1,6 @@
+nodejs is impressive.  It built from git repo source on the first try and
+required no configuration beyond setting PREFIX.
+
+Got the source with:
+git clone https://github.com/nodejs/node.git git
+
