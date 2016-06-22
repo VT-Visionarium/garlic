@@ -87,7 +87,7 @@ def getRunList()
     Find.find('.') do |path|
         path.gsub!(/^\.\//, '')
         $programs += 'xfce4-terminal -x ' +
-            path + "\n" if File.basename(path) == $runDemoName
+            path + $mono + "\n" if File.basename(path) == $runDemoName
     end
 end
 
