@@ -57,7 +57,6 @@ var http = require('http'),
     defaultPage = '';
 
 
-
 function usage() {
     var prog = path.basename(__filename);
     console.log(
@@ -211,7 +210,7 @@ function config() {
     {
         try {
             serverFiles[filenames[i]] =
-                fs.readFileSync(etcDir + '/' + filenames[i]);
+                fs.readFileSync(path.join(etcDir, filenames[i]));
         }
         catch(err) {
             console.log("Error: " + err + "\n\n");
@@ -285,6 +284,9 @@ wss.on('connection', function(socket) {
 
                 console.log('will kill pid ' + child.pid);
                 child.kill('SIGINT');
+                child.kill('SIGTERM');
+
+                //process.kill(obj.pid, 'SIGINT');
             }
             catch(err) {
                 console.log('signaling ' + child.pid + ' failed');
@@ -305,7 +307,7 @@ wss.on('connection', function(socket) {
             }
         } else {
 
-            console('ERROR: Got bad WebSocket message: ' + message);
+            console.log('ERROR: Got bad WebSocket message: ' + message);
         }
     });
 });
@@ -350,10 +352,10 @@ var server = http.createServer(function(request, response) {
         console.log('server running: ' + fpath);
         //////////// async version //////////
         try {
-            var child = child_process.exec(fpath, 
+            var child = child_process.spawn(fpath, 
                 {
                     cwd: path.dirname(fpath),
-                    detached: true,
+                    detached: false,
                     stdio: [0,1,2]
                 }
             );
@@ -404,6 +406,23 @@ var server = http.createServer(function(request, response) {
             });
 
         }
+    } else if(parse.query == 'etc') {
+        /////////////////////////////////////
+        ////////// Files from etc/   ////////
+        /////////////////////////////////////
+        fpath = path.join(etcDir, parse.pathname);
+
+        fs.readFile(fpath, "binary", function(err, file) {
+            if(err) {        
+                response.writeHead(500, {"Content-Type": "text/plain"});
+                response.write("err=" +  err + "\n");
+                response.end();
+            } else {
+                response.writeHead(200, { 'Content-Type': 'text/html' });
+                response.write(file, "binary");
+                response.end();
+            }
+        });
 
     } else if(stats && stats.isDirectory()) {
         /////////////////////////////////////
@@ -414,7 +433,7 @@ var server = http.createServer(function(request, response) {
         response.end();
     } else if(stats) {
         /////////////////////////////////////
-        //////////// Sent a file ////////////
+        //////////// Sent a file in demo ////////////
         /////////////////////////////////////
         fs.readFile(fpath, "binary", function(err, file) {
             if(err) {        
@@ -437,6 +456,5 @@ var server = http.createServer(function(request, response) {
     }
 }).listen(httpPort, 'localhost');
 
-console.log("Static file server running at\n  => http://localhost:" +
-        httpPort + "\n");
+console.log("demoRunner service at  => http://localhost:" + httpPort);
 

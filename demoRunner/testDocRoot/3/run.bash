@@ -1,5 +1,13 @@
 #!/bin/bash
 
-echo "$0 running"
-xlogo
-echo "$0 exiting"
+function term()
+{
+    echo "Caught signal SIGINT"
+    set -x
+    kill -TERM $childPid
+}
+
+trap term SIGINT SIGTERM
+xlogo &
+childPid=$!
+wait $childPid
