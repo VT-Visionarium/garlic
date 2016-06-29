@@ -1,5 +1,0 @@
-<?php
-
-    require 'launch.php'
-
-?>
