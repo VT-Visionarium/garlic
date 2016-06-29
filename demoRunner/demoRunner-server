@@ -1,99 +1,442 @@
-#!/usr/bin/env node
+#!/usr/local/bin/node
 
-var http = require("http"),
-    url = require("url"),
-    path = require("path"),
-    fs = require("fs"),
-    port = process.argv[2] || 8888;
+var http = require('http'),
+    child_process = require('child_process'),
+    url = require('url'),
+    path = require('path'),
+    fs = require('fs'),
+    util = require('util'),
+    ws = require('ws').Server,
+    httpPort = 8080,
+    // We use a separate port for the web sockets
+    // so that the code has less chance of braking.
+    wsPort = 8888,
+
+//////////////////////////////////////////////////////////////////////
+//         Supporting Files
+//////////////////////////////////////////////////////////////////////
+
+    // User configuration/setting dir
+    userDir = process.env.HOME + '/.gar_demorunner',
+
+    // Files in etc/ used to compose pages served
+    serverFiles = {
+        'head.htm': '', // Top of the page.
+        'foot.htm': ''  // Bottom of the page.
+    },
+
+    // Filename of Demo Runner Scripts to link.
+    runnerScriptFilenames = [
+        'run.bash',
+        'runDemo'
+    ],
+
+    // Filename of Demo Description Files
+    ///////////////////////////////////////
+    
+    // For HTML fragment.  If found will not use
+    // txtDescFilename or imgDescFilename
+    htmDescFilename = 'description.htm',
+
+    // For simple text
+    txtDescFilename = 'description.txt',
+
+    // For small images we match this regrex
+    imgDescFilename = /^demoDesc.*\.(png|jpg|JPG)/,
+
+    // For large (Preview) images we match this regrex
+    imgPreviewFilename = /^demoPreview.*\.(png|jpg|JPG)/,
+
+
+//////////////////////////////////////////////////////////////////////
+
+    scriptDir = path.dirname(fs.realpathSync(__filename)),
+    cwdOrg = process.cwd(),
+    filenames = [],
+    etcDir = '',
+    defaultPage = '';
+
+
 
 function usage() {
     var prog = path.basename(__filename);
     console.log(
-"   Usage: " + prog + " DOC_ROOT\n" +
+"   Usage: " + prog + " [DOC_ROOT]\n" +
 "\n" +
-"  Run a " + prog + " HTTP server using DOC_ROOT as the path\n" +
-"  to the top document directory.\n"
+"  Run a " + prog + " HTTP server and WebSocket server.\n" +
+"\n" +
+"  The default DOC_ROOT is the current working directory.\n"
     );
     process.exit(1);
 }
 
-var docRoot;
-var cwdOrg = process.cwd();
+var tagCount = 0;
 
-for(var i=2; i < process.argv.length; ++i) {
-    var str = process.argv[i];
-    switch(str) {
-        case '-h':
-        case '--h':
-        case '-help':
-        case '--help':
-            usage();
-            break;
-        default:
-            fs.access(str, fs.X_OK | fs.R_OK,  err => {
-                if (!err) {
-                    console.log('Cannot access file ' + str + "\n\n");
+function addDemosFromDirectoryToDefaultPage(dir, relDir) {
+    
+    for(var i=0; i<runnerScriptFilenames.length; ++i)
+    {
+        var scriptPath = path.join(dir, runnerScriptFilenames[i]);
+        var scriptURI = path.join(relDir, runnerScriptFilenames[i]);
+
+        try {
+            var stats = fs.lstatSync(scriptPath);
+        }
+        catch (e) {
+            stats = false;
+        }
+        if(!stats) continue;
+        
+        defaultPage += "<div class=box>\n" +
+"  <span class=state>Not run yet.</span>\n" +
+"  <div class=head>\n" +
+"    <div onclick=\"launch(this)\" id=" + tagCount++ +
+" class=launch title='run: " +
+    scriptURI + "'\n" +
+"      data-run='" + scriptURI + "'>\n";
+
+        var f = path.join(dir, txtDescFilename);
+
+        try {
+            stats =
+                "      <p>\n" +
+                fs.readFileSync(f).toString().replace(/\n\n/g,
+                "\n" +
+                "      </p>\n" +
+                "      <p>\n") +
+                "      </p>\n";
+
+        }
+        catch (e) {
+            stats = false;
+        }
+        if(stats)
+        {
+            // add images that are found
+            // TODO: ADD IMAGES
+        }
+        if(!stats)
+        {
+            f = path.join(dir, htmDescFilename);
+            try {
+                stats = fs.readFileSync(f).toString();
+            }
+            catch (e) {
+                stats = false;
+            }
+        }
+        if(!stats)
+        {
+            stats =
+                "      <p>Run " + scriptURI +
+                "      <\p>\n" +
+                "      <p>You can add a description to this program by creating the\n" +
+                "      plain text file " +  path.join(dir, txtDescFilename) + "\n" +
+                "      or the HTML fragment file " + path.join(dir, htmDescFilename) +
+                "      </p>\n";
+        }
+
+        defaultPage += stats +
+"    </div>\n" +
+"  </div>\n" +
+"</div>\n\n";
+        break;
+    }
+    
+    // Now find directories in this directory
+    try {
+        var dirs = fs.readdirSync(dir);
+    }
+    catch(e) {
+        // not able to open as a directory
+        dirs = [];
+    }
+    for(var i=0; i<dirs.length;++i)
+        addDemosFromDirectoryToDefaultPage(
+                path.join(dir, dirs[i]),
+                path.join(relDir, dirs[i]));
+}
+
+function config() {
+
+    for(var i=2; i < process.argv.length; ++i) {
+        var str = process.argv[i];
+        switch(str) {
+            case '-h':
+            case '--h':
+            case '-help':
+            case '--help':
+                usage();
+                break;
+            default:
+                if(str.match(/^-/))
                     usage();
+                try {
+                    process.chdir(str);
+                }
+                catch(err) {
+                    console.log('Cannot cd to ' + str + "\n\n");
+                    usage();
+                }
+                break;
+        }
+    };
+
+    var etcDirs = [ scriptDir + '/../etc' , scriptDir + '/etc' ];
+    var filenames = Object.keys(serverFiles);
+
+
+    // Find etcDir with is the directory where files
+    // that this service needs are located.
+    for(var i = 0; i < etcDirs.length; ++i) {
+        // This is total bullshit, i.e. it should be one line.
+        etcDir = etcDirs[i];
+        headFile = path.join(etcDir, serverFiles[filenames[i]]);
+        try {
+                fs.accessSync(headFile, fs.R_OK)
+        }
+        catch(err) {
+            etcDir = '';
+        }
+        if(etcDir != '') break;
+    }
+    if(etcDir == '') {
+        console.log(
+            'Cannot find supporting files in directories: ' +
+            etcDirs + "\n\n");
+        usage();
+    }
+
+    for(var i=0; i < filenames.length; ++i)
+    {
+        try {
+            serverFiles[filenames[i]] =
+                fs.readFileSync(etcDir + '/' + filenames[i]);
+        }
+        catch(err) {
+            console.log("Error: " + err + "\n\n");
+            usage();
+        }
+    }
+    var d = false;
+    try {
+        d = fs.statSync(userDir);
+    } catch(err) {
+            fs.mkdirSync(userDir, (err, userDir) => {
+                if(err)
+                {
+                    console.log("Failed to make directory: " +
+                        userDir + "\n" + err + "\n\n");
+                    process.exit(1);   
+                }
+        });
+        console.log("Made directory: " + userDir);
+    } 
+    if(d && !d.isDirectory()) {
+        console.log(userDir + " is not a directory.\n");
+        process.exit(1);
+    }
+
+    defaultPage = serverFiles['head.htm'] +
+        "\n<!-- This was a generated file.\n  END head.htm -->\n\n";
+
+    // recurse through directories in the demos directory
+    var dir = process.cwd();
+
+    addDemosFromDirectoryToDefaultPage(dir, '/');
+
+    defaultPage += "\n<!-- BEGIN foot.htm -->\n" +
+        serverFiles['foot.htm'];
+
+    // Report
+    console.log('Document root is ' + process.cwd());
+    console.log('HTTP server Port is ' + httpPort);
+    console.log('WebSocket Port is ' + wsPort);
+}
+
+
+
+config();
+
+
+function spewObject(obj, pre) {
+    console.log(pre + '= ' + JSON.stringify(obj));
+}
+
+var children = {};
+
+var wss = new ws({port: 8888, host: 'localhost'});
+
+wss.on('connection', function(socket) {
+
+    console.log('got WebSocket connection');
+
+    //if(socket.address().address != '127.0.0.1') return;
+
+    socket.on('message', function(message) {
+        console.log('received: %s', message);
+        var obj = JSON.parse(message);
+        console.log('got message: { state: "' + obj.state +
+                '", pid: "' + obj.pid + '", id: "' + obj.id + '"}');
+
+        if(obj.state == 'kill' && children[ obj.pid ]) {
+            var child = children[ obj.pid ];
+            try {
+
+                console.log('will kill pid ' + child.pid);
+                child.kill('SIGINT');
+            }
+            catch(err) {
+                console.log('signaling ' + child.pid + ' failed');
+            }
+        } else if(obj.state == 'running' && children[ obj.pid ]) {
+            if(children[ obj.pid ]) {
+                // Create new child object
+                children[ obj.pid ].Socket = this;
+                // we have state for example: 
+                //    { state: 'running', pid: '1234', id: '5' }
+                children[ obj.pid ].State = obj;
+            } else {
+                // The process is no longer running
+                obj.state = 'kill';
+                // Tell the browser that the process is no longer
+                // running and to go to launch mode for this demo.
+                this.send(JSON.stringify(obj));
+            }
+        } else {
+
+            console('ERROR: Got bad WebSocket message: ' + message);
+        }
+    });
+});
+
+
+
+var server = http.createServer(function(request, response) {
+
+    //spewObject(request, 'request');
+    //spewObject(response, 'response');
+    console.log('remoteAddress' + '= ' +
+        request.connection.remoteAddress);
+
+    // For now, no remote access to this server.
+    if(request.connection.remoteAddress != '127.0.0.1')
+    {
+        response.end();
+        return;
+    }
+
+
+    var parse =  url.parse(request.url);
+
+    console.log("parse.path=" + parse.path);
+    console.log("parse.query=" + parse.query);
+
+    var fpath = path.join(process.cwd(), parse.pathname);
+
+    try {
+        var stats = fs.lstatSync(fpath);
+    }
+    catch (e) {
+        stats = false;
+    }
+
+
+
+    if(stats && parse.query == 'run') {
+        /////////////////////////////////////
+        //////////// Run fpath //////////////
+        /////////////////////////////////////
+        console.log('server running: ' + fpath);
+        //////////// async version //////////
+        try {
+            var child = child_process.exec(fpath, 
+                {
+                    cwd: path.dirname(fpath),
+                    detached: true,
+                    stdio: [0,1,2]
+                }
+            );
+        }
+        catch(err) {
+
+            console.log('Failed to start child process: ' + err);
+            
+            response.writeHead(200, {"Content-Type": "text/plain"});
+            response.write(JSON.stringify({ state: 'failed', pid: '0' }));
+            response.end();
+            child = false;
+        }
+
+        if(child)
+        {
+            console.log('         ' +
+                    fpath + " is running  child.pid=", child.pid);
+
+            children[ child.pid.toString() ] = child;
+            
+            response.writeHead(200, {"Content-Type": "text/plain"});
+            response.write(JSON.stringify( { state: 'running',
+                                    pid: child.pid.toString() }));
+            response.end();
+
+            child.on('close', (code) => {
+                if (code !== 0) {
+                    console.log(fpath +
+                            ' exited with status code=' +
+                            code);
+                }
+                var pid = child.pid.toString();
+
+                console.log('child with pid=' + pid + ' exited');
+                console.log('children[' + pid + ']=' + children[pid]);
+                if(children[ pid ]) {
+                    var socket = children[ pid ].Socket;
+                    var state = children[ pid ].State;
+                    if(socket)
+                    {
+                        state.state = 'dead';
+                        console.log('sending: ' + JSON.stringify(state));
+                        socket.send(JSON.stringify(state));
+                    }
+                    delete children[ pid ];
                 }
             });
 
-            try {
-                process.chdir(str);
-            }
-            catch(err) {
-                console.log('Cannot cd to ' + str + "\n\n");
-                usage();
-            }
-            break;
-    }
-};
+        }
 
-console.log("Exiting\n");
-process.exit(1);
-
-
-// Started with: https://gist.github.com/ryanflorence/701407
-
-
-http.createServer(function(request, response)
-{
-
-  var uri = url.parse(request.url).pathname
-    , filename = path.join(process.cwd(), uri);
-
-  var contentTypesByExtension = {
-    '.html': "text/html",
-    '.css':  "text/css",
-    '.js':   "text/javascript"
-  };
-
-  fs.exists(filename, function(exists) {
-    if(!exists) {
-      response.writeHead(404, {"Content-Type": "text/plain"});
-      response.write("404 Not Found\n");
-      response.end();
-      return;
-    }
-
-    if (fs.statSync(filename).isDirectory()) filename += '/index.html';
-
-    fs.readFile(filename, "binary", function(err, file) {
-      if(err) {        
-        response.writeHead(500, {"Content-Type": "text/plain"});
-        response.write(err + "\n");
+    } else if(stats && stats.isDirectory()) {
+        /////////////////////////////////////
+        ////////// Send default page ////////
+        /////////////////////////////////////
+        response.writeHead(200, { 'Content-Type': 'text/html' });
+        response.write(defaultPage, "binary");
         response.end();
-        return;
-      }
+    } else if(stats) {
+        /////////////////////////////////////
+        //////////// Sent a file ////////////
+        /////////////////////////////////////
+        fs.readFile(fpath, "binary", function(err, file) {
+            if(err) {        
+                response.writeHead(500, {"Content-Type": "text/plain"});
+                response.write("err=" +  err + "\n");
+                response.end();
+            } else {
+                response.writeHead(200, { 'Content-Type': 'text/html' });
+                response.write(file, "binary");
+                response.end();
+            }
+        });
+    } else {
+        /////////////////////////////////////
+        /////////// file not found //////////
+        /////////////////////////////////////
+        response.writeHead(404, {"Content-Type": "text/plain"});
+        response.write("404 Not Found\n");
+        response.end();
+    }
+}).listen(httpPort, 'localhost');
 
-      var headers = {};
-      var contentType = contentTypesByExtension[path.extname(filename)];
-      if (contentType) headers["Content-Type"] = contentType;
-      response.writeHead(200, headers);
-      response.write(file, "binary");
-      response.end();
-    });
-  });
-}).listen(parseInt(port, 10));
-
-console.log("Static file server running at\n  => http://localhost:" + port + "/\nCTRL + C to shutdown");
+console.log("Static file server running at\n  => http://localhost:" +
+        httpPort + "\n");
 

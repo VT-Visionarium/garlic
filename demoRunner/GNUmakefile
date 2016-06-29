@@ -1,9 +1,9 @@
 # This is a GNU makefile
 
 
-# You can override PREFIX and WWW_ROOT by running like so:
+# You can override PREFIX and DOC_ROOT by running like so:
 # 
-#    make PREFIX=/my/prefix WWW_ROOT=/my/www_root install
+#    make PREFIX=/my/prefix DOC_ROOT=/my/www_root install
 #
 # Note: you must set these variables to the same values every
 # time you run make or you will get bad results.
@@ -14,46 +14,37 @@
 #  CONFIGURATION
 ####################################################
 # This following can be overridden of changed here
+# via running: make install PREFIX=/my/prefix
 PREFIX := /usr/local/encap/demoRunner-0.0
-WWW_ROOT := /usr/local/src/demoRunner
-USER_CONFIG_DIR := .hy_demoRunner
 ####################################################
 
 
 # Stuff we install in BIN
-bins = demoRunner-server php.ini
+private_files = \
+ $(wildcard etc/*.htm etc/*.js etc/*.css)\
 
 BIN = $(PREFIX)/bin
+ETC = $(PREFIX)/etc
 
-build: $(bins)
+# We npm install a copy of ws for development
+build:
+	npm install ws
 
-install: build
-	mkdir -p $(BIN)
-	cp $(bins) $(BIN)
-	echo "php.ini" > $(BIN)/encap.exclude
-
-# We make an intermediate sed file which we add a head to.
-%.sed: %.in GNUmakefile
-	sed $< \
- -e 's!@PREFIX@!$(PREFIX)!g'\
- -e 's!@WWW_ROOT@!$(WWW_ROOT)!g'\
- -e 's!@USER_CONFIG_DIR@!$(USER_CONFIG_DIR)!g'\
- > $@
+mkdirs:
+	rm -rf $(ETC) $(BIN) && mkdir -p $(ETC) $(BIN)
 
 
-# add the header
-php.ini: %: %.sed
-	echo "; This is a generated file" > $@
-	cat $< >> $@
-
-# add the header
-demoRunner-server: %: %.sed
-	echo "#!/bin/bash" > $@
-	echo "# This is a generated file" >> $@
-	cat $< >> $@
-	chmod 755 $@
+# The current version of socket.io seems to be broken when used
+# with firefox and chromium-browser.  So we are trying nodejs 'ws'
+# WebSockets.
+install: build mkdirs
+	cp  -r $(private_files) $(ETC)/
+	cp demoRunner-server $(BIN)/
+	cd $(BIN)/ && npm install ws
+	echo "etc" > $(PREFIX)/encap.exclude
+	echo "node_modules" > $(BIN)/encap.exclude
 
 
 clean:
-	rm -f demoRunner-server php.ini *.sed
+	rm -rf node_modules
 

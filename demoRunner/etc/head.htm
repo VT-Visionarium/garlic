@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <meta charset="UTF-8"> 
+    <title>Demos</title>
+
+    <style>
+
+body {
+    background-color:#92A5E0;
+}
+div.box {
+    background-color:#8AA1F3;
+    border: 2px solid #6B85E5;
+    padding: 0px;
+    margin: 4px;
+    border-radius: 0px;
+    float:left;
+}
+div.head {
+    overflow: auto;
+    height: auto;
+    max-height: 300px;
+    width: auto;
+    max-width: 300px;
+}
+span.state {
+    font-size: 80%;
+    color: #6E7796;
+}
+
+div.launch, div.postlaunch, div.running {
+    padding: 3px;
+}
+div.running {
+    cursor: not-allowed;
+}
+div.launch {
+    cursor: pointer;
+}
+div.running {
+    background-color:#80959F;
+}
+div.launch {
+    background-color:#8AA1F3;
+}
+div.launch:hover {
+    background-color:#AED4FF;
+}
+div.launch:active {
+    background-color:#A8B7ED;
+}
+div.postlaunch {
+    background-color:#6AA1F3;
+}
+
+h1.demo {color:#56669F}
+    
+    </style>
+
+    <script>
+
+function ASSERT(val, msg)
+{
+    if(!val)
+    {
+        if(msg)
+            alert(msg);
+        else
+            alert("JavaScript failed");
+        throw '';
+    }
+}
+
+
+function launchChangeText(tag, text)
+{
+    var p = tag.parentNode;
+    while(p && p.className != 'box')
+        p = p.parentNode;
+
+    ASSERT(p, 'JavaScript Error: parentNode with class box not found');
+
+    // find span node child with class state
+    var state;
+    for(state = p.firstChild; state && state.className != 'state'; state =
+            state.nextSibling);
+
+    ASSERT(state, 'JavaScript Error: state span node not found');
+
+    // remove all children
+    while(state.firstChild)
+        state.removeChild(state.firstChild);
+    // add text
+    state.appendChild(document.createTextNode(text));
+}
+
+function setTagToLaunch(tag)
+{
+    tag.className = 'launch';
+    tag.title = 'run: ' + tag.getAttribute('data-run');
+    tag.onclick = launch;
+    launchChangeText(tag, "Ran " + tag.ClickCount + ' times');
+}
+
+var socket = new WebSocket('ws://localhost:8888/');
+socket.onmessage = function(event) {
+    //alert('Client received the message ' + event.data);
+
+    var state = JSON.parse(event.data);
+    var tag = document.getElementById(state.id);
+    // The only message sent from the server is program exited
+    // for this div tag.
+    setTagToLaunch(tag);
+};
+
+function setTagToRunning(tag)
+{
+    tag.className = 'running';
+    tag.title = 'kill: ' + tag.getAttribute('data-run');
+    launchChangeText(tag, "Running (" +
+        tag.ClickCount + ') pid: ' +
+        tag.State.pid);
+
+    tag.State.id = tag.id;
+    // We send the server the id and pid and state
+    // The server needed the id so that they can tell 
+    // us if the process exits.
+    alert('calling send(' + JSON.stringify(tag.State) + ")");
+    socket.send(JSON.stringify(tag.State));
+
+    tag.onclick = function() {
+        this.State.state = 'kill';
+        socket.send(JSON.stringify(this.State));
+        setTagToLaunch(this)
+    };
+}
+
+function setTagToPostLaunch(tag)
+{
+    if(tag.ClickCount)
+        ++(tag.ClickCount);
+    else
+        tag.ClickCount = 1;
+
+    tag.className = 'postlaunch';
+    tag.title = 'starting: ' + tag.getAttribute('data-run');
+    tag.onclick = null;
+    launchChangeText(tag, "Starting (" + tag.ClickCount + ')');
+}
+
+function launch(t)
+{
+    if(arguments.length > 0 && t.nodeName)
+        var tag = t;
+    else
+        var tag = this;
+
+    var xhttp = new XMLHttpRequest();
+
+    if(!xhttp)
+        alert("Can't contant server");
+
+    setTagToPostLaunch(tag);
+
+    xhttp.onreadystatechange = function() {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+           
+            //alert("message='" + xhttp.response + "'");
+
+            var tag = this.Tag;
+            tag.State = JSON.parse(xhttp.response);
+
+            if(tag.State.state != 'running')
+            {
+                setTagToLaunch(tag);
+                return;
+            }
+
+            setTagToRunning(tag);
+
+        } else {
+            //alert("got reply: xhttp.readyState=" + xhttp.readyState + "\nxhttp.status =" + xhttp.status);
+        }
+    };
+
+    xhttp.Tag = tag;
+    // Send the request via HTTP
+    xhttp.open('GET', tag.getAttribute('data-run') + '?run', true);
+    xhttp.send();
+
+    // The 3 Run/Tag States are: runnable/launch, sent/waiting/postlaunch, running
+}
+    </script>
+
+</head>
+<body>
+
+<h1>HyperCube Demo Runner</h1>
+

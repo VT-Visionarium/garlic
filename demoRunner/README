@@ -5,7 +5,7 @@ in the Virginia Tech CAVE.
 This is a web server directory tree.  We make a minimal approach just
 segregating files by how they can be seen from the client end keeping
 redundancy small.  We don't have concern segregating files based on
-file type, so we can have CSS, php, and HTMl files in the same directory.
+file type, so we can have CSS, php, and HTML files in the same directory.
 The service is seem by the client as a tree of demos, with some cross
 linking across branches.
 
@@ -33,18 +33,6 @@ FILES:
     docRoot/
 
        The public served files.  Files that can be accessed via a URL.
-
-
-
-    private/
-
-       Files that are not directly accessible by a URL.
-       
-           Examples:
-
-              1. A file included into a public file to compose a page.
-              2. A script/program that is executed by the server.
-              3. A service configuration file.
 
 
 
