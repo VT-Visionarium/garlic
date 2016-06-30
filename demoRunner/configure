@@ -1,0 +1,78 @@
+#!/bin/bash
+
+
+##########################################
+#      configure
+##########################################
+
+pack=demoRunner
+default_prefix=/usr/local/$pack-x
+
+##########################################
+
+scriptdir="$(dirname $0)" || exit $?
+cd "$scriptdir" || exit $?
+scriptdir="$PWD"
+
+
+function usage()
+{
+    local prog="$(basename $0)"
+
+    cat << EOF
+
+  Usage: $prog [--prefix PREFIX]
+
+  Configure the $pack package installation.
+  
+              OPTIONS
+
+  --prefix PREFIX        set the installation directory prefix
+
+                         the default PREFIX is $default_prefix
+
+
+  
+    For example in bash run:
+
+     ./configure --prefix=/usr/local/$pack-x-x && make && make install
+
+
+EOF
+    exit 1
+
+}
+
+prefix=$default_prefix
+
+while [ -n "$1" ] ; do
+    case "$1" in
+        -*prefix)
+            shift 1
+            prefix="$1"
+            ;;
+        --prefix=*|-prefix=*)
+            prefix="${1#*-prefix=}"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+    shift 1
+done
+
+echo "PREFIX=$prefix"
+
+cat << EOF > config
+# This is a generated file
+
+PREFIX = $prefix
+EOF
+
+cat << EOF
+
+  Now try running:
+
+      make
+
+EOF

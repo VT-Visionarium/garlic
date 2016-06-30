@@ -9,6 +9,13 @@
 body {
     background-color:#92A5E0;
 }
+body.warning {
+    background-color:#DDA1DC;
+}
+h3.warning {
+    color: #C72B2B;
+    background-color:#D585D3;
+}
 div.box {
     background-color:#8AA1F3;
     border: 2px solid #6B85E5;
@@ -125,6 +132,21 @@ socket.onclose = function(event) {
     alert('The server at URL: ' + socketUrl +
             ' just closed the WebSocket connection; ' +
          'so you may need to restart the server.');
+    for(var i=0; i<10000; ++i)
+    {
+        var tag;
+        if(tag = document.getElementById(i.toString()))
+            tag.onclick = null;
+        else
+            break;
+    }
+    var body = document.getElementsByTagName("BODY")[0];
+    var h = document.createElement("H3");
+    h.className = 'warning';
+    body.className = 'warning';
+    body.insertBefore(h, body.firstChild);
+    h.appendChild(document.createTextNode("Server at " +
+                window.location.href + " has disconnected"));
 }
 
 

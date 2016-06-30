@@ -1,3 +1,3 @@
 #!/bin/bash
 
-exec xlogo
+exec xlogo -geometry 367x262-200+100  -fg pink

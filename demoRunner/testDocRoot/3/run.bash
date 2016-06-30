@@ -8,6 +8,6 @@ function term()
 }
 
 trap term SIGINT SIGTERM
-xlogo &
+xlogo -geometry 272x163-0+88 -bg yellow -fg black &
 childPid=$!
 wait $childPid
