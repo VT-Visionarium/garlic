@@ -1,0 +1,45 @@
+#!/bin/bash
+
+root=/NTFS/Share/demos
+
+if [ ! -d $root ] ; then
+    root=/usr/local/src/demoRunner/testDocRoot
+fi
+
+function stopServer()
+{
+    if [ -n "$server" ] ; then
+        kill $server
+    fi
+}
+
+function runFirefox()
+{
+    set -x
+    firefox http://localhost:8080/ &
+    set +x
+    browser=$!
+    disown $browser
+    fg %1
+}
+
+trap runFirefox SIGUSR1
+
+demoRunner-server $root\
+ --title Demos\
+ --exit-on-last\
+ --kill-children\
+ --heading 'HyperCube Demos'\
+ --signal 'SIGUSR1' $$ &
+
+server=$!
+
+
+wait $server
+
+trap stopServer SIGINT SIGTERM
+
+while kill -CONT $server 2> /dev/null ; do
+    wait $server
+done
+

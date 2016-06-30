@@ -9,7 +9,6 @@ BIN = $(PREFIX)/bin
 
 CFLAGS = -g
 
-inst_scripts = hy_debuggingDemoRunner
 cbinaries = $(patsubst %.c,%,$(wildcard *.c))
 built_files = $(patsubst %.in,%,$(wildcard hy_*.in)) $(cbinaries)
 
