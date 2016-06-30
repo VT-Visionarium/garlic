@@ -12,6 +12,7 @@ var
 
 
 
+
 //////////////////////////////////////////////////////////////////////
 
     http = require('http'),
@@ -27,6 +28,9 @@ var
     wsPort = 8888,
     heading = '',
     title = '',
+    signal = [],
+    exitOnLast = false,
+    killChildren = false,
 
 //////////////////////////////////////////////////////////////////////
 //         Supporting Files
@@ -75,8 +79,12 @@ var
 
 function usage() {
     var prog = path.basename(__filename);
+
+    // Heredoc should be part of javascript!
+
     console.log(
-"   Usage: " + prog + " [DOC_ROOT] [--title TITLE] [--heading HEADING]\n" +
+"   Usage: " + prog + " [DOC_ROOT] [--title TITLE] " +
+"[--heading HEADING] [--exit-on-last] [--kill-children]\n" +
 "\n" +
 "  Run a " + prog + " HTTP server and WebSocket server.\n" +
 "\n" +
@@ -84,8 +92,12 @@ function usage() {
 "\n" +
 "                  OPTIONS\n" +
 "\n" +
+"     --exit-on-last       have server exit after last connection closes\n" +
 "     --heading HEADING    set <h1> page heading text to HEADING\n" +
 "                          the default HEADING is \"" + defaultHeading + "\n" +
+"     --kill-children      kill all launched children on exiting the server\n" +
+"     --signal SIG PID     signal the process with PID with signal SIG just after the\n" +
+"                          listening sockets are open.  Example:  --signal SIGUSR1 2354 \n" +
 "     --title TITLE        set the page title text to TITLE\n" +
 "                          the default title is \"" + defaultTitle + "\n" +
 "\n"
@@ -236,12 +248,31 @@ function config() {
                 else
                     usage();
                 break;
+            case '-signal':
+            case '--signal':
+                if(++i < process.argv.length)
+                    signal[0] = process.argv[i];
+                else
+                    usage();
+                if(++i < process.argv.length)
+                    signal[1] = process.argv[i];
+                else
+                    usage();
+                break;
             case '-title':
             case '--title':
                 if(++i < process.argv.length)
                     title = process.argv[i];
                 else
                     usage();
+                break;
+            case '--exit-on-last':
+            case '-exit-on-last':
+                exitOnLast = true;
+                break;
+            case '--kill-children':
+            case '-kill-children':
+                killChildren = true;
                 break;
             default:
                 if(/^-(-|)heading=/.test( process.argv[i])) {
@@ -363,7 +394,8 @@ function spewObject(obj, pre) {
     console.log(pre + '= ' + JSON.stringify(obj));
 }
 
-var children = {};
+var children = {},
+    socketCount = 0;
 
 var wss = new ws({port: 8888, host: 'localhost'});
 
@@ -380,6 +412,7 @@ function handleMessageLaunch(socket, obj)
         var child = children[ obj.pid ];
         try {
             console.log('will kill pid ' + child.pid);
+            // child close event will delete it from children{}
             child.kill('SIGINT');
             child.kill('SIGTERM');
             //process.kill(obj.pid, 'SIGINT');
@@ -391,6 +424,7 @@ function handleMessageLaunch(socket, obj)
         if(children[ obj.pid ]) {
             // Create new child object
             children[ obj.pid ].Socket = socket;
+            socket.Children[ obj.pid ] = children[ obj.pid ];
             // we have state for example: 
             //    { state: 'running', pid: '1234', id: '5' }
             children[ obj.pid ].State = obj;
@@ -406,14 +440,31 @@ function handleMessageLaunch(socket, obj)
     }
 }
 
+function exit() {
+   
+    if(killChildren)
+        for(var key in children) {
+            var child = children[key];
+            // child close event will delete it from children{}
+            child.kill('SIGINT');
+            child.kill('SIGTERM');
+        }
+
+    process.exit();
+}
+
 wss.on('connection', function(socket) {
 
-    console.log('got WebSocket connection');
+    ++socketCount;
+    console.log('got WebSocket connection (' +
+            socketCount + ")" );
+
+    socket.Children = {};
 
     //if(socket.address().address != '127.0.0.1') return;
 
     socket.on('message', function(message) {
-        
+ 
         console.log('WebSocket received: ' + message);
 
         var obj = JSON.parse(message);
@@ -421,13 +472,27 @@ wss.on('connection', function(socket) {
         if(obj.type == 'launch')
             handleMessageLaunch(this, obj);
         else if(obj.type == 'quit')
-            process.exit();
+            exit();
     });
+    socket.on('close', function() {
+        --socketCount;
+        console.log('Web Socket connection closed');
+        if(socketCount == 0 && exitOnLast) {
+            console.log('no more Web Socket connections: exiting');
+            exit();
+        }
+        if(killChildren)
+            for(var pid in this.Children) {
+                var child = this.Children[pid];
+                child.kill('SIGINT');
+                child.kill('SIGTERM');
+            }
+    });
+
 });
 
 
 var server = http.createServer(function(request, response) {
-
 
     function getContentType(file) {
 
@@ -526,8 +591,13 @@ var server = http.createServer(function(request, response) {
                     if(socket)
                     {
                         state.state = 'dead';
-                        console.log('sending: ' + JSON.stringify(state));
-                        socket.send(JSON.stringify(state));
+                        try {
+                            console.log('sending: ' + JSON.stringify(state));
+                            socket.send(JSON.stringify(state));
+                            delete socket.Children[ pid ];
+                        } catch(e){
+                            /* The socket may have been closed already */
+                        }
                     }
                     delete children[ pid ];
                 }
@@ -593,4 +663,13 @@ var server = http.createServer(function(request, response) {
 }).listen(httpPort, 'localhost');
 
 console.log("demoRunner service at  => http://localhost:" + httpPort);
+
+if(signal.length >= 1)
+{
+    try {
+    process.kill(signal[1], signal[0]);
+    } catch (err) {
+        console.log('signaling ' );
+    }
+}
 
