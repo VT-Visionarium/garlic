@@ -2,7 +2,7 @@
 <html lang=en>
 <head>
     <meta charset="UTF-8"> 
-    <title>Demos</title>
+    <title>@TITLE@</title>
 
     <style>
 
@@ -12,7 +12,13 @@ body {
 body.warning {
     background-color:#DDA1DC;
 }
-h3.warning {
+p.genericdesc {
+    font-size: 60%;
+}
+p.genericprog {
+    font-size: 90%;
+}
+p.warning {
     color: #C72B2B;
     background-color:#D585D3;
 }
@@ -35,7 +41,46 @@ span.state {
     font-size: 80%;
     color: #6E7796;
 }
-
+img.icon {
+    float: left;
+    padding-right: 4px;
+    padding-left: 4px;
+    padding-bottom: 2px;
+}
+div.quit, div.postquit {
+    width: 80px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 10px;
+    border-color: #8F7291;
+    border-style: solid;
+    border-width: 2px;
+    background-color:#CD7CD2;
+    padding:0px;
+    margin:10px;
+}
+div.quit {
+     cursor: pointer;
+}
+div.quit:hover {
+     background-color:#D7ACDA;
+}
+div.quit:active {
+     background-color:#89578C;
+}
+span.quit {
+    display: inline-block;
+    vertical-align: middle;
+}
+div.running:hover {
+    background-color:#A0C5D7;
+}
+div.running:active {
+    color:#401111;
+    background-color:#ED2FFD;
+}
 div.launch, div.postlaunch, div.running {
     padding: 3px;
 }
@@ -47,7 +92,7 @@ div.launch {
     cursor: pointer;
 }
 div.running:hover {
-    background-color:#B291AC;
+    background-color:#A7B4BB;
 }
 div.running:active {
     background-color:#AE409A;
@@ -57,7 +102,7 @@ div.launch {
     background-color:#8AA1F3;
 }
 div.launch:hover {
-    background-color:#AED4FF;
+    background-color:#9BA9DD;
 }
 div.launch:active {
     background-color:#A8B7ED;
@@ -72,6 +117,8 @@ h1.demo {color:#56669F}
 
     <script>
 
+var socket = false;
+
 function ASSERT(val, msg)
 {
     if(!val)
@@ -83,7 +130,6 @@ function ASSERT(val, msg)
         throw '';
     }
 }
-
 
 function launchChangeText(tag, text)
 {
@@ -115,40 +161,41 @@ function setTagToLaunch(tag)
     launchChangeText(tag, "Ran " + tag.ClickCount + ' times');
 }
 
-var socketUrl = 'ws://localhost:8888/'
+function main()
+{
+    var socketUrl =
+        window.location.href.replace(/^http(s|)/, 'ws').
+        replace(/8080/, '8888');
+    socket = new WebSocket(socketUrl);
+    socket.onmessage = function(event) {
+        //alert('Client received the message ' + event.data);
 
-var socket = new WebSocket(socketUrl);
-socket.onmessage = function(event) {
-    //alert('Client received the message ' + event.data);
+        var state = JSON.parse(event.data);
+        var tag = document.getElementById(state.id);
+        // The only message sent from the server is program exited
+        // for this div tag.
+        setTagToLaunch(tag);
+    };
+    socket.onclose = function(event) {
 
-    var state = JSON.parse(event.data);
-    var tag = document.getElementById(state.id);
-    // The only message sent from the server is program exited
-    // for this div tag.
-    setTagToLaunch(tag);
-};
-socket.onclose = function(event) {
-
-    alert('The server at URL: ' + socketUrl +
-            ' just closed the WebSocket connection; ' +
-         'so you may need to restart the server.');
-    for(var i=0; i<10000; ++i)
-    {
-        var tag;
-        if(tag = document.getElementById(i.toString()))
-            tag.onclick = null;
-        else
-            break;
+        for(var i=0; i<10000; ++i)
+        {
+            var tag;
+            if(tag = document.getElementById(i.toString()))
+                tag.onclick = null;
+            else
+                break;
+        }
+        var body = document.getElementsByTagName("BODY")[0];
+        var p = document.createElement("P");
+        p.className = 'warning';
+        body.className = 'warning';
+        body.insertBefore(p, body.firstChild);
+        p.appendChild(document.createTextNode("Server at " +
+                socketUrl + " has disconnected.  You may need to" +
+                " restart the server at: " + window.location.href));
     }
-    var body = document.getElementsByTagName("BODY")[0];
-    var h = document.createElement("H3");
-    h.className = 'warning';
-    body.className = 'warning';
-    body.insertBefore(h, body.firstChild);
-    h.appendChild(document.createTextNode("Server at " +
-                window.location.href + " has disconnected"));
 }
-
 
 function setTagToRunning(tag)
 {
@@ -159,6 +206,7 @@ function setTagToRunning(tag)
         tag.State.pid);
 
     tag.State.id = tag.id;
+    tag.State.type = 'launch';
     // We send the server the id and pid and state
     // The server needed the id so that they can tell 
     // us if the process exits.
@@ -169,8 +217,15 @@ function setTagToRunning(tag)
     tag.onclick = function() {
         this.State.state = 'kill';
         socket.send(JSON.stringify(this.State));
-        setTagToLaunch(this)
+        setTagToLaunch(this);
     };
+}
+
+function quit(tag)
+{
+    socket.send(JSON.stringify({ type: 'quit' }));
+    tag.onclick = null;
+    tag.className = 'postquit';
 }
 
 function setTagToPostLaunch(tag)
@@ -232,7 +287,11 @@ function launch(t)
     </script>
 
 </head>
-<body>
+<body onload='main()'>
 
-<h1>HyperCube Demo Runner</h1>
+<div onclick='quit(this)' class=quit>
+    <span class=quit>Quit</span>
+</div>
+
+<h1>@HEADING@</h1>
 

@@ -1,6 +1,20 @@
 #!/usr/local/bin/node
 
-var http = require('http'),
+//////////////////////////////////////////////////////////////////////
+//         App option defaults
+//////////////////////////////////////////////////////////////////////
+
+var 
+
+    defaultTitle = 'Demos',
+
+    defaultHeading = 'Demos',
+
+
+
+//////////////////////////////////////////////////////////////////////
+
+    http = require('http'),
     child_process = require('child_process'),
     url = require('url'),
     path = require('path'),
@@ -11,6 +25,8 @@ var http = require('http'),
     // We use a separate port for the web sockets
     // so that the code has less chance of braking.
     wsPort = 8888,
+    heading = '',
+    title = '',
 
 //////////////////////////////////////////////////////////////////////
 //         Supporting Files
@@ -35,17 +51,17 @@ var http = require('http'),
     ///////////////////////////////////////
     
     // For HTML fragment.  If found will not use
-    // txtDescFilename or imgDescFilename
+    // txtDescFilename
     htmDescFilename = 'description.htm',
 
     // For simple text
     txtDescFilename = 'description.txt',
 
     // For small images we match this regrex
-    imgDescFilename = /^demoDesc.*\.(png|jpg|JPG)/,
+    imgIconFilename = /^demoIcon.*\.(png|jpg|JPG)/,
 
     // For large (Preview) images we match this regrex
-    imgPreviewFilename = /^demoPreview.*\.(png|jpg|JPG)/,
+    imgPreviewFilename = /^demoPreview.*\.(png|jpg|JPG)$/,
 
 
 //////////////////////////////////////////////////////////////////////
@@ -60,16 +76,28 @@ var http = require('http'),
 function usage() {
     var prog = path.basename(__filename);
     console.log(
-"   Usage: " + prog + " [DOC_ROOT]\n" +
+"   Usage: " + prog + " [DOC_ROOT] [--title TITLE] [--heading HEADING]\n" +
 "\n" +
 "  Run a " + prog + " HTTP server and WebSocket server.\n" +
 "\n" +
-"  The default DOC_ROOT is the current working directory.\n"
+"  The default DOC_ROOT is the current working directory.\n" +
+"\n" +
+"                  OPTIONS\n" +
+"\n" +
+"     --heading HEADING    set <h1> page heading text to HEADING\n" +
+"                          the default HEADING is \"" + defaultHeading + "\n" +
+"     --title TITLE        set the page title text to TITLE\n" +
+"                          the default title is \"" + defaultTitle + "\n" +
+"\n"
     );
     process.exit(1);
 }
 
 var tagCount = 0;
+var launcherFooter =
+    "    </div>\n" +
+    "  </div>\n" +
+    "</div>\n\n";
 
 function addDemosFromDirectoryToDefaultPage(dir, relDir) {
     
@@ -85,7 +113,12 @@ function addDemosFromDirectoryToDefaultPage(dir, relDir) {
             stats = false;
         }
         if(!stats) continue;
-        
+
+        console.log('found demo script path=' + scriptPath);
+
+
+        // We have script.
+
         defaultPage += "<div class=box>\n" +
 "  <span class=state>Not run yet.</span>\n" +
 "  <div class=head>\n" +
@@ -93,52 +126,73 @@ function addDemosFromDirectoryToDefaultPage(dir, relDir) {
 " class=launch title='run: " +
     scriptURI + "'\n" +
 "      data-run='" + scriptURI + "'>\n";
-
-        var f = path.join(dir, txtDescFilename);
-
+            
+        var f = path.join(dir, htmDescFilename);
+        var text;
         try {
-            stats =
+            // TODO: fix relative URLs in this test
+            text = fs.readFileSync(f).toString();
+            defaultPage += text + launcherFooter;
+            // We have enough HTML for the launcher
+            break;
+        }
+        catch (e) {
+            text = false;
+        }
+
+        var images = [];
+    
+        try {
+            // Find any images and add <img> tags to launcher <div>
+            var filenames = fs.readdirSync(dir);
+        }
+        catch(err) {
+            console.log('fs.readdirSync("' + dir + '") failed: ' + err);
+            process.exit(1);
+        }
+        for(var i=0; i<filenames.length; ++i) {
+            //console.log('checking img filename=' + filenames[i]);
+            if(imgIconFilename.test(filenames[i])) {
+                console.log('found img filename=' + filenames[i]);
+                images.push(path.join(relDir, filenames[i]));
+            }
+        }
+
+        f = path.join(dir, txtDescFilename);
+        try {
+            text = '';
+            // Put images at the top with given text
+            for(var i=0; i<images.length; ++i)
+                text += "      <img class=icon src='" + images + "'>\n";
+            text +=
                 "      <p>\n" +
                 fs.readFileSync(f).toString().replace(/\n\n/g,
                 "\n" +
                 "      </p>\n" +
                 "      <p>\n") +
                 "      </p>\n";
-
         }
         catch (e) {
-            stats = false;
-        }
-        if(stats)
-        {
-            // add images that are found
-            // TODO: ADD IMAGES
-        }
-        if(!stats)
-        {
-            f = path.join(dir, htmDescFilename);
-            try {
-                stats = fs.readFileSync(f).toString();
-            }
-            catch (e) {
-                stats = false;
-            }
-        }
-        if(!stats)
-        {
-            stats =
-                "      <p>Run " + scriptURI +
-                "      <\p>\n" +
-                "      <p>You can add a description to this program by creating the\n" +
-                "      plain text file " +  path.join(dir, txtDescFilename) + "\n" +
-                "      or the HTML fragment file " + path.join(dir, htmDescFilename) +
-                "      </p>\n";
+            text = false;
         }
 
-        defaultPage += stats +
-"    </div>\n" +
-"  </div>\n" +
-"</div>\n\n";
+        if(!text) {
+            text = '';
+            // Put images at the top but with generic text
+            for(var i=0; i<images.length; ++i)
+                text += "      <img class=icon src='" + images + "'>\n";
+            text +=
+                "      <p class=genericprog>Run " + scriptURI +
+                "      <\p>\n" +
+                "      <p class=genericdesc>You can add a description to this " +
+                "program by creating the\n" +
+                "      plain text file " +  path.join(dir, txtDescFilename) + "\n" +
+                "      or the HTML fragment file " + path.join(dir, htmDescFilename) +
+                "\n    </p>\n";
+        }
+
+        defaultPage += text + launcherFooter;
+        // We how have a script to launch for this directory
         break;
     }
     
@@ -155,6 +209,14 @@ function addDemosFromDirectoryToDefaultPage(dir, relDir) {
                 path.join(dir, dirs[i]),
                 path.join(relDir, dirs[i]));
 }
+    
+function escapeHTML(s) { 
+    return s.replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/@/g, '');
+}
 
 function config() {
 
@@ -167,7 +229,29 @@ function config() {
             case '--help':
                 usage();
                 break;
+            case '-heading':
+            case '--heading':
+                if(++i < process.argv.length)
+                    heading = process.argv[i];
+                else
+                    usage();
+                break;
+            case '-title':
+            case '--title':
+                if(++i < process.argv.length)
+                    title = process.argv[i];
+                else
+                    usage();
+                break;
             default:
+                if(/^-(-|)heading=/.test( process.argv[i])) {
+                    heading = process.argv[i].replace(/^-(-|)heading=/,'');
+                    break;
+                }
+                if(/^-(-|)title=/.test( process.argv[i])) {
+                    title = process.argv[i].replace(/^-(-|)title=/,'');
+                    break;
+                }
                 if(str.match(/^-/))
                     usage();
                 try {
@@ -180,6 +264,21 @@ function config() {
                 break;
         }
     };
+    if(title.length < 1) {
+        console.log('WTF ------------------------------');
+        if(heading.length >= 1)
+            title =  heading;
+        else
+            title = defaultTitle;
+    }
+    if(heading.length < 1) {
+        if(title.length >= 1)
+            heading = title;
+        else
+            heading = defaultHeading;
+    }
+    heading = escapeHTML(heading);
+    title = escapeHTML(title);
 
     var etcDirs = [ scriptDir + '/../etc' , scriptDir + '/etc' ];
     var filenames = Object.keys(serverFiles);
@@ -236,7 +335,9 @@ function config() {
         process.exit(1);
     }
 
-    defaultPage = serverFiles['head.htm'] +
+    defaultPage = serverFiles['head.htm'].toString().
+        replace('@HEADING@', heading).
+        replace('@TITLE@', title) +
         "\n<!-- This was a generated file.\n  END head.htm -->\n\n";
 
     // recurse through directories in the demos directory
@@ -266,6 +367,45 @@ var children = {};
 
 var wss = new ws({port: 8888, host: 'localhost'});
 
+function handleMessageLaunch(socket, obj)
+{
+
+    console.log('Got JSON message: {' +
+            'type: "' + obj.type +
+            ', state: "' + obj.state +
+            '", pid: "' + obj.pid +
+            '", id: "' + obj.id + '"}');
+
+    if(obj.state == 'kill' && children[ obj.pid ]) {
+        var child = children[ obj.pid ];
+        try {
+            console.log('will kill pid ' + child.pid);
+            child.kill('SIGINT');
+            child.kill('SIGTERM');
+            //process.kill(obj.pid, 'SIGINT');
+        }
+        catch(err) {
+            console.log('signaling ' + child.pid + ' failed');
+        }
+    } else if(obj.state == 'running' && children[ obj.pid ]) {
+        if(children[ obj.pid ]) {
+            // Create new child object
+            children[ obj.pid ].Socket = socket;
+            // we have state for example: 
+            //    { state: 'running', pid: '1234', id: '5' }
+            children[ obj.pid ].State = obj;
+        } else {
+            // The process is no longer running
+            obj.state = 'kill';
+            // Tell the browser that the process is no longer
+            // running and to go to launch mode for this demo.
+            socket.send(JSON.stringify(obj));
+        }
+    } else {
+         console.log('ERROR: Got bad WebSocket message: ' + message);
+    }
+}
+
 wss.on('connection', function(socket) {
 
     console.log('got WebSocket connection');
@@ -273,48 +413,36 @@ wss.on('connection', function(socket) {
     //if(socket.address().address != '127.0.0.1') return;
 
     socket.on('message', function(message) {
-        console.log('received: %s', message);
+        
+        console.log('WebSocket received: ' + message);
+
         var obj = JSON.parse(message);
-        console.log('got message: { state: "' + obj.state +
-                '", pid: "' + obj.pid + '", id: "' + obj.id + '"}');
 
-        if(obj.state == 'kill' && children[ obj.pid ]) {
-            var child = children[ obj.pid ];
-            try {
-
-                console.log('will kill pid ' + child.pid);
-                child.kill('SIGINT');
-                child.kill('SIGTERM');
-
-                //process.kill(obj.pid, 'SIGINT');
-            }
-            catch(err) {
-                console.log('signaling ' + child.pid + ' failed');
-            }
-        } else if(obj.state == 'running' && children[ obj.pid ]) {
-            if(children[ obj.pid ]) {
-                // Create new child object
-                children[ obj.pid ].Socket = this;
-                // we have state for example: 
-                //    { state: 'running', pid: '1234', id: '5' }
-                children[ obj.pid ].State = obj;
-            } else {
-                // The process is no longer running
-                obj.state = 'kill';
-                // Tell the browser that the process is no longer
-                // running and to go to launch mode for this demo.
-                this.send(JSON.stringify(obj));
-            }
-        } else {
-
-            console.log('ERROR: Got bad WebSocket message: ' + message);
-        }
+        if(obj.type == 'launch')
+            handleMessageLaunch(this, obj);
+        else if(obj.type == 'quit')
+            process.exit();
     });
 });
 
 
-
 var server = http.createServer(function(request, response) {
+
+
+    function getContentType(file) {
+
+        var suffix = {
+            "text/plain": /\.txt$/,
+            "image/png": /\.png$/,
+            "image/jpeg": /\.(jpg|JPG|jpeg|JPEG)$/,
+            "text/html": /\.html$/,
+        };
+        for (var type in suffix) {
+            if(suffix[type].test(file))
+                return type;
+        }
+        return "text/plain";
+    }
 
     //spewObject(request, 'request');
     //spewObject(response, 'response');
@@ -413,13 +541,17 @@ var server = http.createServer(function(request, response) {
         fpath = path.join(etcDir, parse.pathname);
 
         fs.readFile(fpath, "binary", function(err, file) {
-            if(err) {        
+            if(err) {
                 response.writeHead(500, {"Content-Type": "text/plain"});
                 response.write("err=" +  err + "\n");
                 response.end();
                 console.log(fpath + ' not found ' + err);
             } else {
-                response.writeHead(200, { 'Content-Type': 'text/html' });
+
+                // TODO: find the file mime type from the filename
+                // to fix this writeHead():
+
+                response.writeHead(200, { 'Content-Type': getContentType(fpath) });
                 response.write(file, "binary");
                 response.end();
                 console.log('sent file: ' + fpath);
@@ -435,7 +567,7 @@ var server = http.createServer(function(request, response) {
         response.end();
     } else if(stats) {
         /////////////////////////////////////
-        //////////// Sent a file in demo ////////////
+        //////////// Sent a file ////////////
         /////////////////////////////////////
         fs.readFile(fpath, "binary", function(err, file) {
             if(err) {        
@@ -444,7 +576,7 @@ var server = http.createServer(function(request, response) {
                 response.end();
                 console.log(fpath + ' not found ' + err);
             } else {
-                response.writeHead(200, { 'Content-Type': 'text/html' });
+                response.writeHead(200, { 'Content-Type': getContentType(fpath) });
                 response.write(file, "binary");
                 response.end();
                 console.log('sent file: ' + fpath);
