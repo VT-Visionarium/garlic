@@ -161,12 +161,33 @@ function setTagToLaunch(tag)
     launchChangeText(tag, "Ran " + tag.ClickCount + ' times');
 }
 
+function quit()
+{
+    for(var i=0; i<10000; ++i)
+    {
+        var tag;
+        if(tag = document.getElementById(i.toString()))
+            tag.onclick = null;
+        else
+            break;
+    }
+    var body = document.getElementsByTagName("BODY")[0];
+    var p = document.createElement("P");
+    p.className = 'warning';
+    body.className = 'warning';
+    body.insertBefore(p, body.firstChild);
+    p.appendChild(document.createTextNode("Server at " +
+            socket.Url + " has disconnected."));
+    socket = false;
+}
+
 function main()
 {
     var socketUrl =
         window.location.href.replace(/^http(s|)/, 'ws').
         replace(/8080/, '8888');
     socket = new WebSocket(socketUrl);
+    socket.Url = socketUrl;
     socket.onmessage = function(event) {
         //alert('Client received the message ' + event.data);
 
@@ -177,23 +198,7 @@ function main()
         setTagToLaunch(tag);
     };
     socket.onclose = function(event) {
-
-        for(var i=0; i<10000; ++i)
-        {
-            var tag;
-            if(tag = document.getElementById(i.toString()))
-                tag.onclick = null;
-            else
-                break;
-        }
-        var body = document.getElementsByTagName("BODY")[0];
-        var p = document.createElement("P");
-        p.className = 'warning';
-        body.className = 'warning';
-        body.insertBefore(p, body.firstChild);
-        p.appendChild(document.createTextNode("Server at " +
-                socketUrl + " has disconnected.  You may need to" +
-                " restart the server at: " + window.location.href));
+        quit();
     }
 }
 
@@ -221,9 +226,12 @@ function setTagToRunning(tag)
     };
 }
 
-function quit(tag)
+function quitClick(tag)
 {
-    socket.send(JSON.stringify({ type: 'quit' }));
+    // We tell the server to quit and on the sock close
+    // event we really quit.
+    if(socket)
+        socket.send(JSON.stringify({ type: 'quit' }));
     tag.onclick = null;
     tag.className = 'postquit';
 }
@@ -289,7 +297,7 @@ function launch(t)
 </head>
 <body onload='main()'>
 
-<div onclick='quit(this)' class=quit>
+<div onclick='quitClick(this)' class=quit>
     <span class=quit>Quit</span>
 </div>
 
