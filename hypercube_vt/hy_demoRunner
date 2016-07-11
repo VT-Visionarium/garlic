@@ -1,15 +1,52 @@
 #!/bin/bash -x
 
-ssh cube\
- demoRunner-server /usr/local/src/demoRunner/testDocRoot\
- --remote 
+root=/NTFS/Shared/demos
+
+
+function catch()
+{
+    if [ -n "$server" ] ; then
+        echo "killing server pid $server"
+        kill $server
+        server=
+    fi
+}
+
+function runServer()
+{
+    ssh cube -X\
+ demoRunner-server $root\
+ --remote '::ffff:128.173.49.149'\
  --title Demos\
  --exit-on-last\
  --kill-children\
- --heading 'HyperCube Demos'\
- --signal 'SIGUSR1' $$ &
+ --heading \"HyperCube Demos\"
+}
+
+runServer &
+
+
+count=0
+# wait for server to be working
+while ! nc -z cube 8080 ; do
+    sleep 0.1
+    let count=$count+1
+    if [ "$count" = "50" ] ; then
+        echo "Failed to connect to server"
+        kill $server
+        exit 1
+    fi
+done
 
 
 echo "server is running"
 
-wait
+# We wish to have signal control of the server
+
+trap catch SIGINT SIGTERM SIGQUIT
+
+firefox http://cube:8080/
+
+while [ -n "$server" ] ; do
+    wait $server
+done
