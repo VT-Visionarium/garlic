@@ -9,12 +9,18 @@ BIN = $(PREFIX)/bin
 
 CFLAGS = -g
 
+HOSTNAME = $(shell hostname)
+
 cbinaries = $(patsubst %.c,%,$(wildcard *.c))
 built_files = $(patsubst %.in,%,$(wildcard hy_*.in)) $(cbinaries)
 
+ifeq ($(HOSTNAME),cube)
 inst_files = $(sort\
  $(filter-out %.in,$(wildcard hy_*) $(built_files))\
  nv-control-blend-visbox encap.exclude)
+else
+inst_files = hy_demoRunner
+endif
 
 build: $(built_files)
 
@@ -49,6 +55,7 @@ install: build
 	cp $(inst_files) $(BIN)
 	@echo
 	@echo "You may want to run: sudo encap"
+ifeq ($(HOSTNAME),cube)
 	@echo
 	@echo "You also need to run:"
 	@echo
@@ -57,6 +64,7 @@ install: build
 	@echo
 	@echo "So that any user may stop an X session and dtk-server for other users."
 	@echo
+endif
 
 clean:
 	rm -f $(built_files) *.o
