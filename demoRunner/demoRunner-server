@@ -27,6 +27,7 @@ var
     // so that the code has less chance of braking.
     wsPort = 8888,
     heading = '',
+    remote = '',
     title = '',
     signal = [],
     exitOnLast = false,
@@ -83,7 +84,7 @@ function usage() {
     // Heredoc should be part of javascript!
 
     console.log(
-"   Usage: " + prog + " [DOC_ROOT] [--title TITLE] " +
+"   Usage: " + prog + " [DOC_ROOT] [--title TITLE] [--remote ADDRESS]" +
 "[--heading HEADING] [--exit-on-last] [--kill-children]\n" +
 "\n" +
 "  Run a " + prog + " HTTP server and WebSocket server.\n" +
@@ -96,6 +97,7 @@ function usage() {
 "     --heading HEADING    set <h1> page heading text to HEADING\n" +
 "                          the default HEADING is \"" + defaultHeading + "\n" +
 "     --kill-children      kill all launched children on exiting the server\n" +
+"     --remote ADDRESS     accept connections only from address ADDRESS\n" +
 "     --signal SIG PID     signal the process with PID with signal SIG just after the\n" +
 "                          listening sockets are open.  Example:  --signal SIGUSR1 2354 \n" +
 "     --title TITLE        set the page title text to TITLE\n" +
@@ -248,6 +250,13 @@ function config() {
                 else
                     usage();
                 break;
+            case '-remote':
+            case '--remote':
+                if(++i < process.argv.length)
+                    remote = process.argv[i];
+                else
+                    usage();
+                break;
             case '-signal':
             case '--signal':
                 if(++i < process.argv.length)
@@ -279,6 +288,10 @@ function config() {
                     heading = process.argv[i].replace(/^-(-|)heading=/,'');
                     break;
                 }
+                if(/^-(-|)remote=/.test( process.argv[i])) {
+                    remote = process.argv[i].replace(/^-(-|)remote=/,'');
+                    break;
+                }
                 if(/^-(-|)title=/.test( process.argv[i])) {
                     title = process.argv[i].replace(/^-(-|)title=/,'');
                     break;
@@ -296,7 +309,6 @@ function config() {
         }
     };
     if(title.length < 1) {
-        console.log('WTF ------------------------------');
         if(heading.length >= 1)
             title =  heading;
         else
@@ -397,11 +409,10 @@ function spewObject(obj, pre) {
 var children = {},
     socketCount = 0;
 
-var wss = new ws({port: 8888, host: 'localhost'});
+var wss = new ws({port: 8888});
 
 function handleMessageLaunch(socket, obj)
 {
-
     console.log('Got JSON message: {' +
             'type: "' + obj.type +
             ', state: "' + obj.state +
@@ -509,18 +520,17 @@ var server = http.createServer(function(request, response) {
         return "text/plain";
     }
 
-    //spewObject(request, 'request');
-    //spewObject(response, 'response');
-    console.log('remoteAddress' + '= ' +
-        request.connection.remoteAddress);
-
-    // For now, no remote access to this server.
-    if(request.connection.remoteAddress != '127.0.0.1')
-    {
-        response.end();
-        return;
-    }
-
+    if(remote.length > 0)
+        // Restrict access to this server.
+        if(request.connection.remoteAddress != remote) {
+            response.end();
+            console.log('rejected connection from address: ' +
+                request.connection.remoteAddress);
+            return;
+        } else {
+             console.log('accepted connection from address:  ' +
+                request.connection.remoteAddress);
+        }
 
     var parse =  url.parse(request.url);
 
@@ -660,7 +670,7 @@ var server = http.createServer(function(request, response) {
         response.write("404 Not Found\n");
         response.end();
     }
-}).listen(httpPort, 'localhost');
+}).listen(httpPort);
 
 console.log("demoRunner service at  => http://localhost:" + httpPort);
 
