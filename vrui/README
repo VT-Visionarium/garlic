@@ -2,6 +2,9 @@
 We got the source for VRUI from http://idav.ucdavis.edu/~okreylos/ResDev/Vrui/Vrui-3.0-001.tar.gz
 We got the version 3.0  because that was found to work with Paraview 4.0
 
+We got a request to get LiDAR Viewer working in the CAVE which uses VRUI.
+http://idav.ucdavis.edu/~okreylos/ResDev/LiDAR/
+
 
 FILES:
 
