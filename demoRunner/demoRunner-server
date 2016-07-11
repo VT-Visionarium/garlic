@@ -302,12 +302,14 @@ function config() {
                     process.chdir(str);
                 }
                 catch(err) {
+                    console.log('remote=' + remote);
                     console.log('Cannot cd to ' + str + "\n\n");
                     usage();
                 }
                 break;
         }
     };
+
     if(title.length < 1) {
         if(heading.length >= 1)
             title =  heading;
@@ -447,7 +449,7 @@ function handleMessageLaunch(socket, obj)
             socket.send(JSON.stringify(obj));
         }
     } else {
-         console.log('ERROR: Got bad WebSocket message: ' + message);
+         console.log('ERROR: Got bad WebSocket message state: ' + obj.state);
     }
 }
 
