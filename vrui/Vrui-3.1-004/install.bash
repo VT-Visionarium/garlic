@@ -1,0 +1,1 @@
+../Vrui-3.0-001/install.bash
