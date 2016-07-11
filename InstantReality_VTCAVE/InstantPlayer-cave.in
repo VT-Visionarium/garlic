@@ -395,6 +395,16 @@ ComposeCommand
 ReportSettings
 CheckCd
 
+# sax BUG Workaround:
+#
+# By running sax via fork() and exec() from the shell
+# we are able to make sax exit via a signal.  We tried
+# running:
+#            exec sax arg1 arg2 ...
+#
+# but failed get it to exit by signaling it with SIGINT,
+# it ends up just hanging with an error message.
+
 
 trap catcher SIGINT SIGTERM SIGQUIT
 
