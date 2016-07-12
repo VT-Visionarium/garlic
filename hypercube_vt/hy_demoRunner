@@ -1,7 +1,8 @@
 #!/bin/bash -x
 
 root=/NTFS/Shared/demos
-
+host=cube
+rhost=$(hostname)
 
 function catch()
 {
@@ -14,9 +15,9 @@ function catch()
 
 function runServer()
 {
-    ssh cube -X\
+    ssh $host -X\
  demoRunner-server $root\
- --remote '::ffff:128.173.49.149'\
+ --remote $rhost\
  --title Demos\
  --exit-on-last\
  --kill-children\
@@ -28,8 +29,8 @@ runServer &
 
 count=0
 # wait for server to be working
-while ! nc -z cube 8080 ; do
-    sleep 0.1
+while ! nc -z $host 8080 ; do
+    sleep 0.3
     let count=$count+1
     if [ "$count" = "50" ] ; then
         echo "Failed to connect to server"
@@ -45,7 +46,7 @@ echo "server is running"
 
 trap catch SIGINT SIGTERM SIGQUIT
 
-firefox http://cube:8080/
+firefox http://$host:8080/
 
 while [ -n "$server" ] ; do
     wait $server
