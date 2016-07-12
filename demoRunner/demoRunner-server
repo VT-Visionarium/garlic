@@ -31,6 +31,7 @@ var
     signal = [],
     exitOnLast = false,
     killChildren = false,
+    rootDir = '',
 
 //////////////////////////////////////////////////////////////////////
 //         Supporting Files
@@ -72,8 +73,7 @@ var
     scriptDir = path.dirname(fs.realpathSync(__filename)),
     cwdOrg = process.cwd(),
     filenames = [],
-    etcDir = '',
-    defaultPage = '';
+    etcDir = '';
 
 
 function usage() {
@@ -111,8 +111,11 @@ var launcherFooter =
     "  </div>\n" +
     "</div>\n\n";
 
-function addDemosFromDirectoryToDefaultPage(dir, relDir) {
-    
+function addDemosToPage(dir, relDir) {
+ 
+
+    var page = '';
+
     for(var i=0; i<runnerScriptFilenames.length; ++i)
     {
         var scriptPath = path.join(dir, runnerScriptFilenames[i]);
@@ -131,7 +134,7 @@ function addDemosFromDirectoryToDefaultPage(dir, relDir) {
 
         // We have script.
 
-        defaultPage += "<div class=box>\n" +
+        page = "<div class=box>\n" +
 "  <span class=state>Not run yet.</span>\n" +
 "  <div class=head>\n" +
 "    <div onclick=\"launch(this)\" id=" + tagCount++ +
@@ -144,7 +147,7 @@ function addDemosFromDirectoryToDefaultPage(dir, relDir) {
         try {
             // TODO: fix relative URLs in this test
             text = fs.readFileSync(f).toString();
-            defaultPage += text + launcherFooter;
+            page += text + launcherFooter;
             // We have enough HTML for the launcher
             break;
         }
@@ -203,11 +206,26 @@ function addDemosFromDirectoryToDefaultPage(dir, relDir) {
                 "\n    </p>\n";
         }
 
-        defaultPage += text + launcherFooter;
+        page += text + launcherFooter;
         // We how have a script to launch for this directory
         break;
     }
-    
+    return page;
+}
+
+function escapeHTML(s) { 
+    return s.replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/@/g, '');
+}
+
+function addDirsToPage(dir, relDir) {
+
+    var page = '';
+
+
     // Now find directories in this directory
     try {
         var dirs = fs.readdirSync(dir);
@@ -216,18 +234,77 @@ function addDemosFromDirectoryToDefaultPage(dir, relDir) {
         // not able to open as a directory
         dirs = [];
     }
+
+    console.log('relDir=' + relDir + ' dirs=' + dirs);
+
     for(var i=0; i<dirs.length;++i)
-        addDemosFromDirectoryToDefaultPage(
+        if(fs.lstatSync(path.join(dir, dirs[i])).isDirectory()) {
+            var p = path.join(relDir, dirs[i]);
+            page +=
+                '    <tr>' +
+                '<td><a href="' + p + '">' + p + '</a></td>' +
+                '</tr>\n';
+        }
+
+    
+    return page;
+}
+
+
+function getPage(dir, relDir) {
+
+    var page = serverFiles['head.htm'].toString().
+        replace('@HEADING@', heading).
+        replace('@TITLE@', title) +
+        "\n<!-- This was a generated file.\n  END head.htm -->\n\n";
+    var preTable =
+            '<table class=index>\n' +
+            '  <tr><th colspan=1>Directories</th</tr>\n';
+
+    var postTable = '</table>\n';
+
+    // Now find directories in this directory
+    try {
+        var dirs = fs.readdirSync(dir);
+    }
+    catch(e) {
+        // not able to open as a directory
+        dirs = [];
+    }
+
+
+    if(relDir != '/') {
+        page += preTable +
+            '  <tr>' +
+            '<td><a href="..">Parent Directory ..</a></td>' +
+            '</tr>\n';
+        preTable = false;
+    }
+
+    for(var i=0; i<dirs.length;++i)
+        if(fs.lstatSync(path.join(dir,dirs[i])).isDirectory()) {
+            if(preTable) {
+                page += preTable;
+                preTable = false;
+            }
+            page += addDirsToPage(
                 path.join(dir, dirs[i]),
                 path.join(relDir, dirs[i]));
-}
-    
-function escapeHTML(s) { 
-    return s.replace(/&/g, '&amp;')
-            .replace(/"/g, '&quot;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/@/g, '');
+        }
+
+    if(!preTable)
+        page += postTable;
+
+
+    for(var i=0; i<dirs.length;++i)
+        if(fs.lstatSync(path.join(dir,dirs[i])).isDirectory()) {
+            page += addDemosToPage(
+                path.join(dir, dirs[i]),
+                path.join(relDir, dirs[i]));
+        }
+
+    return page + "\n<!-- BEGIN foot.htm -->\n" +
+        serverFiles['foot.htm'];
 }
 
 function config() {
@@ -378,19 +455,6 @@ function config() {
         process.exit(1);
     }
 
-    defaultPage = serverFiles['head.htm'].toString().
-        replace('@HEADING@', heading).
-        replace('@TITLE@', title) +
-        "\n<!-- This was a generated file.\n  END head.htm -->\n\n";
-
-    // recurse through directories in the demos directory
-    var dir = process.cwd();
-
-    addDemosFromDirectoryToDefaultPage(dir, '/');
-
-    defaultPage += "\n<!-- BEGIN foot.htm -->\n" +
-        serverFiles['foot.htm'];
-
     if(remote.length > 0) {
         /*
         dns.lookup(remote, (err, address, family) => {
@@ -412,6 +476,8 @@ function config() {
         console.log('remote (cononical) address is restricted to: ' + remote);
     } //else
         // Unrestricted  remote = ''
+
+    rootDir =  process.cwd();
 
     // Report
     console.log('Document root is ' + process.cwd());
@@ -664,10 +730,10 @@ function httpRequest(request, response) {
 
     } else if(stats && stats.isDirectory()) {
         /////////////////////////////////////
-        ////////// Send default page ////////
+        /////// Send demo runner page ///////
         /////////////////////////////////////
         response.writeHead(200, { 'Content-Type': 'text/html' });
-        response.write(defaultPage, "binary");
+        response.write(getPage(fpath, parse.pathname), "binary");
         response.end();
     } else if(stats) {
         /////////////////////////////////////
@@ -691,7 +757,7 @@ function httpRequest(request, response) {
         /////////// file not found //////////
         /////////////////////////////////////
         response.writeHead(404, {"Content-Type": "text/plain"});
-        response.write("404 Not Found\n");
+        response.write(fpath + " 404 Not Found\n");
         response.end();
     }
 }

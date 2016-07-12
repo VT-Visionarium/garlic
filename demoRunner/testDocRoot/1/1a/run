@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec xclock -geometry 272x272-40+40 -bg yellow -fg black &
