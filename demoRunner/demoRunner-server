@@ -531,7 +531,8 @@ wss.on('connection', function(socket) {
                     exit();
                 }
             }, 3000 /* milli-seconds */);
-        });
+        }
+    });
 });
 
 
