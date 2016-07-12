@@ -47,8 +47,7 @@ var
 
     // Filename of Demo Runner Scripts to link.
     runnerScriptFilenames = [
-        'run.bash',
-        'runDemo'
+        'run'
     ],
 
     // Filename of Demo Description Files
