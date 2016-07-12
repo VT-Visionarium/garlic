@@ -6,11 +6,11 @@ require 'find'
 #         CONFIGURATION
 #################################################
 
-# directory that has demos with run.bash files
+# directory that has demos with run files
 $demoRoot = '/NTFS/Shared/demos'
 
 # demos to run are named:
-$runDemoName = 'run.bash'
+$runDemoName = 'run'
 
 
 #################################################
