@@ -11,12 +11,11 @@ var
     defaultHeading = 'Demos',
 
 
-
-
 //////////////////////////////////////////////////////////////////////
 
     http = require('http'),
     child_process = require('child_process'),
+    dns = require('dns'),
     url = require('url'),
     path = require('path'),
     fs = require('fs'),
@@ -236,6 +235,7 @@ function config() {
 
     for(var i=2; i < process.argv.length; ++i) {
         var str = process.argv[i];
+        // TODO: rewrite this switch mess!!!!
         switch(str) {
             case '-h':
             case '--h':
@@ -302,7 +302,6 @@ function config() {
                     process.chdir(str);
                 }
                 catch(err) {
-                    console.log('remote=' + remote);
                     console.log('Cannot cd to ' + str + "\n\n");
                     usage();
                 }
@@ -393,6 +392,28 @@ function config() {
     defaultPage += "\n<!-- BEGIN foot.htm -->\n" +
         serverFiles['foot.htm'];
 
+    if(remote.length > 0) {
+        /*
+        dns.lookup(remote, (err, address, family) => {
+            if(err) {
+                console.log('dns.lookup("' + remote + '") err: ' + err);
+                process.exit(1);
+            }
+            remote = address;
+        });
+        console.log('remote address is restricted to: ' + remote);
+        */
+        dns.resolve4(remote, (err, caddress) => {   
+            if(err) {
+                console.log('dns.resolveCname(["' + remote + '"]) err: ' + err);
+                process.exit(1);
+            }
+            remote = caddress;
+        });
+        console.log('remote (cononical) address is restricted to: ' + remote);
+    } //else
+        // Unrestricted  remote = ''
+
     // Report
     console.log('Document root is ' + process.cwd());
     console.log('HTTP server Port is ' + httpPort);
@@ -463,18 +484,24 @@ function exit() {
             child.kill('SIGTERM');
         }
 
+    console.log("Server Exiting")
     process.exit();
 }
 
 wss.on('connection', function(socket) {
 
     ++socketCount;
-    console.log('got WebSocket connection (' +
-            socketCount + ")" );
-
     socket.Children = {};
 
-    //if(socket.address().address != '127.0.0.1') return;
+    if(remote.length > 0 &&
+        socket._socket.remoteAddress != remote) {
+            console.log('revoking WebSocket connection (' +
+                socketCount + ") address=" + socket._socket.remoteAddress);
+            socket.close();
+            return;
+    }
+    console.log('got WebSocket connection (' +
+        socketCount + ") address=" + socket._socket.remoteAddress);
 
     socket.on('message', function(message) {
  
@@ -505,7 +532,8 @@ wss.on('connection', function(socket) {
 });
 
 
-var server = http.createServer(function(request, response) {
+
+function httpRequest(request, response) {
 
     function getContentType(file) {
 
@@ -522,17 +550,7 @@ var server = http.createServer(function(request, response) {
         return "text/plain";
     }
 
-    if(remote.length > 0)
-        // Restrict access to this server.
-        if(request.connection.remoteAddress != remote) {
-            response.end();
-            console.log('rejected connection from address: ' +
-                request.connection.remoteAddress);
-            return;
-        } else {
-             console.log('accepted connection from address:  ' +
-                request.connection.remoteAddress);
-        }
+    console.log('accepted connection from address:  ' + request.connection.remoteAddress);
 
     var parse =  url.parse(request.url);
 
@@ -672,9 +690,53 @@ var server = http.createServer(function(request, response) {
         response.write("404 Not Found\n");
         response.end();
     }
+}
+
+var didLookup = false;
+
+
+var server = http.createServer(function(request, response) {
+
+    if(remote.length > 0)
+        // Restrict access to this server.
+        // TODO: The address has a prefix like ::ffff:  I don't know why.
+        var raddress = request.connection.remoteAddress.replace(/^.*:/, '');
+        if(raddress  != remote) {
+
+            // First try a DNS lookup to see if this is the same address.
+
+            if(! didLookup) {
+                didLookup = true;
+                dns.resolve(raddress , (err, address) => {   
+                    if(err) {
+                        console.log('dns.resolve("' +
+                            raddress  + '") err: ' + err);
+                        process.exit(1);
+                    }
+                    if(remote == address) {
+                        remote = request.connection.remoteAddress;
+                        httpRequest(request, response);
+                    } else {
+                        console.log('rejected connection from address:  ' + raddress );
+                        response.end();
+                        return;
+                    }
+                });
+                return;
+            }
+            console.log('rejected connection from address:  ' + raddress );
+            response.end();
+            return;
+        }
+    
+    httpRequest(request, response);
+
 }).listen(httpPort);
 
-console.log("demoRunner service at  => http://localhost:" + httpPort);
+
+// TODO: Hostname happens to be a value domain name, but this is not
+// good for the general server URL.
+console.log("demoRunner service at  => http://" + require('os').hostname() + ":" + httpPort);
 
 if(signal.length >= 1)
 {
