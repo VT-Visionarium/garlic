@@ -189,11 +189,11 @@ function addDemosFromDirectoryToDefaultPage(dir, relDir) {
             text = false;
         }
 
-        if(!text && images.length < 1) {
+        if(!text) {
             text = '';
             // Put images at the top but with generic text
             for(var i=0; i<images.length; ++i)
-                text += "      <img class=icon src='" + images + "'>\n";
+                text += "      <img class=icon src='" + images[i] + "'>\n";
             text +=
                 "      <p class=genericprog>Run " + scriptURI +
                 "      <\p>\n" +
@@ -495,6 +495,7 @@ wss.on('connection', function(socket) {
     ++socketCount;
     socket.Children = {};
 
+
     if(remote.length > 0 &&
         socket._socket.remoteAddress != remote) {
             console.log('revoking WebSocket connection (' +
@@ -701,9 +702,10 @@ var didLookup = false;
 
 var server = http.createServer(function(request, response) {
 
-    if(remote.length > 0)
+    if(remote.length > 0) {
         // Restrict access to this server.
         // TODO: The address has a prefix like ::ffff:  I don't know why.
+
         var raddress = request.connection.remoteAddress.replace(/^.*:/, '');
         if(raddress  != remote) {
 
@@ -732,6 +734,7 @@ var server = http.createServer(function(request, response) {
             response.end();
             return;
         }
+    }
     
     httpRequest(request, response);
 
