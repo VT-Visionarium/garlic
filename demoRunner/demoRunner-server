@@ -488,6 +488,8 @@ function exit() {
     process.exit();
 }
 
+
+
 wss.on('connection', function(socket) {
 
     ++socketCount;
@@ -514,21 +516,22 @@ wss.on('connection', function(socket) {
         else if(obj.type == 'quit')
             exit();
     });
+
     socket.on('close', function() {
         --socketCount;
-        console.log('Web Socket connection closed');
-        if(socketCount == 0 && exitOnLast) {
-            console.log('no more Web Socket connections: exiting');
-            exit();
-        }
-        if(killChildren)
-            for(var pid in this.Children) {
-                var child = this.Children[pid];
-                child.kill('SIGINT');
-                child.kill('SIGTERM');
-            }
-    });
+        console.log('Web Socket ' + socket._socket.remoteAddress + ' closed');
 
+        if(socketCount == 0 && exitOnLast) {
+
+            setTimeout(function() {
+                // We exit is no connection came to be in the timeout.
+                // This makes a browser page reload possible.
+                if(socketCount < 1) {
+                    console.log('no more Web Socket connections: exiting');
+                    exit();
+                }
+            }, 3000 /* milli-seconds */);
+        });
 });
 
 
