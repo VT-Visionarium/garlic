@@ -189,7 +189,7 @@ function addDemosFromDirectoryToDefaultPage(dir, relDir) {
             text = false;
         }
 
-        if(!text) {
+        if(!text && images.length < 1) {
             text = '';
             // Put images at the top but with generic text
             for(var i=0; i<images.length; ++i)
