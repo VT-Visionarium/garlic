@@ -24,6 +24,10 @@ function runServer()
  --heading \"HyperCube Demos\"
 }
 
+if [ ! -d $root ] ; then
+    root=/usr/local/src/demoRunner/testDocRoot
+fi
+
 runServer &
 
 

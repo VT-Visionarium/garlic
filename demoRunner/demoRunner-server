@@ -32,6 +32,11 @@ var
     exitOnLast = false,
     killChildren = false,
     rootDir = '',
+    launcher = {},
+    sockets = {},
+    socketCount = 0,
+    socketCreateCount = 0,
+
 
 //////////////////////////////////////////////////////////////////////
 //         Supporting Files
@@ -75,6 +80,35 @@ var
     filenames = [],
     etcDir = '';
 
+function exit(stat) {
+    var ret = 0;
+    if(arguments.length > 0)
+        ret = stat;
+
+    if(killChildren)
+        for(var key in launcher) {
+            var child = launcher[key].child;
+            if(child) {
+                child.kill('SIGINT');
+                child.kill('SIGTERM');
+            }
+        }
+
+    console.log("Server Exiting")
+    process.exit(ret);
+}
+
+function ASSERT(x, msg) {
+    if(x) return;
+
+    console.log('Assertion FAILED');
+
+    if(arguments.length > 1)
+        console.log(msg);
+
+    throw('error'); // print stack trace??
+    exit(1);
+}
 
 function usage() {
     var prog = path.basename(__filename);
@@ -105,14 +139,67 @@ function usage() {
     process.exit(1);
 }
 
-var tagCount = 0;
-var launcherFooter =
-    "    </div>\n" +
-    "  </div>\n" +
-    "</div>\n\n";
+function printLauncherObj(pre, json) {
+        console.log(pre + JSON.stringify(json));
+}
+
+// This is the launcher object factory. It returns the child object from
+// the global object launcher{}. Launcher objects are never destroyed so
+// long as the server is running so that state is kept about what is
+// running independent of what clients are connected, and a client
+// (browser) page reload can get current run states.
+function getLauncher(relPath, child_in) {
+
+    console.log('getLauncher("' + relPath + '", ' + child_in + ')');
+
+    var child = null;
+    if(arguments.length > 1) {
+        child = child_in;
+        // There must be a entry already
+        ASSERT(launcher[relPath], 'child with relaive path ' + relPath +
+                ' not found');
+    }
+
+    if(launcher[relPath]) {
+        if(child) {
+            // set the child_process object
+            launcher[relPath].child = child;
+            launcher[relPath].json.pid = child.pid;
+        }
+        // We let the caller set other stuff in the
+        // launcher[relPath]
+        return launcher[relPath];
+    }
+
+    // Create a new launcher object
+    launcher[relPath] = {
+        json:  /* json is JSON sent to client */ {
+            command: 'state',
+            state: 'dead', // 'dead' or 'running'
+            stateText: 'Not running yet.', // display in browser
+            relPath: relPath, // unique relative path to program path to run
+                              // also key for launcher
+            className: 'launch', // <div> button class for CSS style 
+            runCount: 0, // number of times that this ran
+            pid: 0 // 0 or child process ID
+        },
+        child: child, // last returned from child_process.spawn()
+        // so child can't be in JSON sent to client.
+    };
+    if(child) child.Launch = launcher[relPath];
+
+    printLauncherObj("made new launcher=", launcher[relPath].json);
+
+    return launcher[relPath];
+}
+
 
 function addDemosToPage(dir, relDir) {
  
+    var launcherFooter =
+        "    </div>\n" +
+        "  </div>\n" +
+        "</div>\n\n";
 
     var page = '';
 
@@ -132,16 +219,20 @@ function addDemosToPage(dir, relDir) {
         console.log('found demo script path=' + scriptPath);
 
 
-        // We have script.
+        // We have script.  For each script we get a child/state
+        // launcher object.
+        var json = getLauncher(scriptURI).json;
+        var onclick = "\"launch(this)\"";
+        if(json.state == 'running')
+            onclick = "\"kill(this)\""
 
         page = "<div class=box>\n" +
-"  <span class=state>Not run yet.</span>\n" +
+"  <span class=state>" + json.stateText + "</span>\n" +
 "  <div class=head>\n" +
-"    <div onclick=\"launch(this)\" id=" + tagCount++ +
-" class=launch title='run: " +
-    scriptURI + "'\n" +
-"      data-run='" + scriptURI + "'>\n";
-            
+"    <div onclick=" + onclick + " id='" + scriptURI +
+"' class='" + json.className + "' title='run: " +
+    scriptURI + "'>\n";
+
         var f = path.join(dir, htmDescFilename);
         var text;
         try {
@@ -250,18 +341,44 @@ function addDirsToPage(dir, relDir) {
     return page;
 }
 
+// Returns true if dir has a directory in it
+function checkForDirectories(dir)
+{
+    try {
+        var ch = fs.lstatSync(dir).isDirectory();
+    } catch(e) {
+        return false;
+    }
+    if(!ch) return false; // it's not a directory
+
+
+    // Now find directories in this directory
+    try {
+        var dirs = fs.readdirSync(dir);
+    }
+    catch(e) {
+        // not able to open as a directory
+        dirs = [];
+    }
+    for(var i=0; i<dirs.length;++i)
+        if(fs.lstatSync(path.join(dir,dirs[i])).isDirectory())
+            return true;
+    return false;
+}
 
 function getPage(dir, relDir) {
+
+    console.log('CALLING getPage(dir="' + dir + '", relDir="' + relDir + '")');
 
     var page = serverFiles['head.htm'].toString().
         replace('@HEADING@', heading).
         replace('@TITLE@', title) +
         "\n<!-- This was a generated file.\n  END head.htm -->\n\n";
     var preTable =
-            '<table class=index>\n' +
-            '  <tr><th colspan=1>Directories</th</tr>\n';
+            '<hr>\n<table class=index>\n' +
+            '  <tr><th colspan=1>' + relDir + ' Directories</th</tr>\n';
 
-    var postTable = '</table>\n';
+    var postTable = '</table>\n<hr>\n';
 
     // Now find directories in this directory
     try {
@@ -281,16 +398,19 @@ function getPage(dir, relDir) {
         preTable = false;
     }
 
-    for(var i=0; i<dirs.length;++i)
-        if(fs.lstatSync(path.join(dir,dirs[i])).isDirectory()) {
+    for(var i=0; i<dirs.length;++i) {
+        if(checkForDirectories(path.join(dir,dirs[i]))) {
             if(preTable) {
                 page += preTable;
                 preTable = false;
             }
-            page += addDirsToPage(
-                path.join(dir, dirs[i]),
-                path.join(relDir, dirs[i]));
+            var p = path.join(relDir, dirs[i]);
+            page +=
+                '    <tr>' +
+                '<td><a href="' + p + '">' + p + '</a></td>' +
+                '</tr>\n';
         }
+    }
 
     if(!preTable)
         page += postTable;
@@ -494,72 +614,91 @@ function spewObject(obj, pre) {
     console.log(pre + '= ' + JSON.stringify(obj));
 }
 
-var children = {},
-    socketCount = 0;
+// Server state is what child programs are running: Launchers has unique
+// hash key of the programs servers path relative to the server root.
+//
+//  The demo Runner Protocol is:
+//     browser (client) sends http GET of /bla/bla?run
+//     server replies with JSON "State" object
+//     
+
+
 
 var wss = new ws({port: 8888});
 
-function handleMessageLaunch(socket, obj)
-{
-    console.log('Got JSON message: {' +
-            'type: "' + obj.type +
-            ', state: "' + obj.state +
-            '", pid: "' + obj.pid +
-            '", id: "' + obj.id + '"}');
+function socketsSend(text) {
 
-    if(obj.state == 'kill' && children[ obj.pid ]) {
-        var child = children[ obj.pid ];
+    var deleteCount = 0;
+    for(var key in sockets) {
         try {
-            console.log('will kill pid ' + child.pid);
-            // child close event will delete it from children{}
-            child.kill('SIGINT');
-            child.kill('SIGTERM');
-            //process.kill(obj.pid, 'SIGINT');
+            var pre = 'sending to ' +
+                sockets[key]._socket.remoteAddress +
+                ':' + sockets[key]._socket.remotePort + ' ';
+            console.log(pre + text);
+            sockets[key].send(text);
+        } catch(e) {
+            console.log(pre + ': FAILED:' + e);
+            // I don't think we can edit the sockets list as we iterate
+            // through it, so:
+            sockets[key].DeleteMe = true;
+            ++deleteCount;
+            /* The socket may have been closed already; it's a race
+             * we handle here. */
         }
-        catch(err) {
-            console.log('signaling ' + child.pid + ' failed');
+    }
+
+    // I don't think we can edit the sockets list as we iterate through
+    // it, so we break at each delete like so:
+    while(deleteCount > 0)
+        for(var key in sockets) {
+            if(sockets[key].DeleteMe) {
+                delete sockets[key];
+                --deleteCount;
+                break;
+            }
         }
-    } else if(obj.state == 'running' && children[ obj.pid ]) {
-        if(children[ obj.pid ]) {
-            // Create new child object
-            children[ obj.pid ].Socket = socket;
-            socket.Children[ obj.pid ] = children[ obj.pid ];
-            // we have state for example: 
-            //    { state: 'running', pid: '1234', id: '5' }
-            children[ obj.pid ].State = obj;
-        } else {
-            // The process is no longer running
-            obj.state = 'kill';
-            // Tell the browser that the process is no longer
-            // running and to go to launch mode for this demo.
-            socket.send(JSON.stringify(obj));
-        }
-    } else {
-         console.log('ERROR: Got bad WebSocket message state: ' + obj.state);
+}
+
+
+function sendDeadToSockets(launch, stateText) {
+
+    launch.json.state = 'dead';
+    launch.child = null;
+    launch.json.pid = 0;
+    launch.json.className = 'launch';
+    if(arguments.length >= 2)
+        launch.json.stateText = stateText;
+    else
+        launch.json.stateText = 'Ran ' + launch.json.runCount + ' times.';
+
+    launch.json.pid = 0;
+
+    socketsSend(JSON.stringify(launch.json));
+}
+
+function handleMessageKill(json)
+{
+    var launch = getLauncher(json.relPath);
+    var child = launch.child;
+
+    sendDeadToSockets(launch);
+    
+    try {
+       console.log('will kill pid ' + child.pid);
+        // The child close event will change the launcher object
+        child.kill('SIGINT');
+        child.kill('SIGTERM');
+
+        //process.kill(child.pid, 'SIGINT');
+    } catch(err) {
+        console.log('signaling child failed: ' + err);
     }
 }
-
-function exit() {
-   
-    if(killChildren)
-        for(var key in children) {
-            var child = children[key];
-            // child close event will delete it from children{}
-            child.kill('SIGINT');
-            child.kill('SIGTERM');
-        }
-
-    console.log("Server Exiting")
-    process.exit();
-}
-
-
 
 wss.on('connection', function(socket) {
 
     ++socketCount;
-    socket.Children = {};
-
+    ++socketCreateCount;
 
     if(remote.length > 0 &&
         socket._socket.remoteAddress != remote) {
@@ -572,26 +711,41 @@ wss.on('connection', function(socket) {
         socketCount + ") address=" + socket._socket.remoteAddress);
 
     socket.on('message', function(message) {
+
+        var pre = 'WebSocket received from ' +
+            socket._socket.remoteAddress + ':' +
+            socket._socket.remotePort + ' ' ;
  
-        console.log('WebSocket received: ' + message);
+        console.log(pre + message);
 
-        var obj = JSON.parse(message);
+        var json = JSON.parse(message);
 
-        if(obj.type == 'launch')
-            handleMessageLaunch(this, obj);
-        else if(obj.type == 'quit')
+        if(json.command == 'kill')
+            handleMessageKill(json);
+        else if(json.command == 'quit')
             exit();
+        else
+            console.log(pre + message + ' IS AN UNKNOWN COMMAND');
     });
 
     socket.on('close', function() {
-        --socketCount;
         console.log('Web Socket ' + socket._socket.remoteAddress + ' closed');
 
-        if(socketCount == 0 && exitOnLast) {
+        // Remove this socket from our list of sockets.
+        // TODO: Yes this is stupid.  The wss should already
+        // know all the socket connections. Okay, then fix this code.
+        for(var key in sockets)
+            if(sockets[key] == socket) {
+                delete sockets[key];
+                break;
+            }
+
+        if(sockets.length == 0 && exitOnLast) {
 
             setTimeout(function() {
-                // We exit is no connection came to be in the timeout.
-                // This makes a browser page reload possible.
+                // We exit if no connection came to be in the timeout.
+                // This makes a browser page reload possible, if the
+                // reload is fast enough.
                 if(socketCount < 1) {
                     console.log('no more Web Socket connections: exiting');
                     exit();
@@ -599,6 +753,9 @@ wss.on('connection', function(socket) {
             }, 3000 /* milli-seconds */);
         }
     });
+
+    // Add this socket to our list of sockets.
+    sockets[socketCreateCount] = socket;
 });
 
 
@@ -631,20 +788,39 @@ function httpRequest(request, response) {
 
     try {
         var stats = fs.lstatSync(fpath);
-    }
-    catch (e) {
+    } catch (e) {
+        // There is no file with this path.
         stats = false;
     }
-
 
 
     if(stats && parse.query == 'run') {
         /////////////////////////////////////
         //////////// Run fpath //////////////
         /////////////////////////////////////
-        console.log('server running: ' + fpath);
-        //////////// async version //////////
+        
+        var launch = getLauncher(parse.pathname);
+
+        if(launch.child) {
+            var sdata = JSON.stringify(launch.json);
+
+            ASSERT(launch.json.state == 'running',
+                    'child exists and state != "running"');
+            // We are running this already.  This can happen because of
+            // a race condition.  Not a big deal.
+            response.write(sdata);
+            response.end();
+            console.log('sent to ' + request.connection.remoteAddress +
+                     ' ' + sdata);
+            console.log('server ALREADY running: ' + fpath + ' with pid ' +
+                    launch.child.pid);
+            return;
+        }
+
+        //console.log('server running: ' + fpath);
+
         try {
+            //////////// async version //////////
             var child = child_process.spawn(fpath, 
                 {
                     cwd: path.dirname(fpath),
@@ -652,58 +828,47 @@ function httpRequest(request, response) {
                     stdio: [0,1,2]
                 }
             );
-        }
-        catch(err) {
+        } catch(err) {
 
-            console.log('Failed to start child process: ' + err);
-            
+            console.log('Failed to start ' + fpath + ': ' + err);
+            ++launch.json.runCount;
+            sendDeadToSockets(launch, 'Failed to run (' +
+                        launch.json.runCount + ').');
+
             response.writeHead(200, {"Content-Type": "text/plain"});
-            response.write(JSON.stringify({ state: 'failed', pid: '0' }));
+            response.write(JSON.stringify(launch.json));
             response.end();
-            child = false;
+            return;
         }
 
-        if(child)
-        {
-            console.log('         ' +
-                    fpath + " is running  child.pid=", child.pid);
+        console.log('ran ' + fpath + " child.pid=", child.pid);
 
-            children[ child.pid.toString() ] = child;
-            
-            response.writeHead(200, {"Content-Type": "text/plain"});
-            response.write(JSON.stringify( { state: 'running',
-                                    pid: child.pid.toString() }));
-            response.end();
+        launch = getLauncher(parse.pathname, child);
+        launch.json.className = 'running';
+        launch.json.state = 'running';
+        ++launch.json.runCount;
+        launch.json.stateText = 'Running (' + launch.json.runCount +
+                ') pid: ' + child.pid;
+        launch.child = child;
+        launch.json.pid = child.pid;
 
-            child.on('close', (code) => {
-                if (code !== 0) {
-                    console.log(fpath +
-                            ' exited with status code=' +
-                            code);
-                }
-                var pid = child.pid.toString();
+        response.writeHead(200, {"Content-Type": "text/plain"});
+        // The program may of may not be running now.  If it's not
+        // running we'll find out in the child "close" event in due
+        // time; so for now, to keep things simple, we just say it's
+        // running, it gets updated later.
+        response.write(JSON.stringify(launch.json));
+        response.end();
 
-                console.log('child with pid=' + pid + ' exited');
-                console.log('children[' + pid + ']=' + children[pid]);
-                if(children[ pid ]) {
-                    var socket = children[ pid ].Socket;
-                    var state = children[ pid ].State;
-                    if(socket)
-                    {
-                        state.state = 'dead';
-                        try {
-                            console.log('sending: ' + JSON.stringify(state));
-                            socket.send(JSON.stringify(state));
-                            delete socket.Children[ pid ];
-                        } catch(e){
-                            /* The socket may have been closed already */
-                        }
-                    }
-                    delete children[ pid ];
-                }
-            });
+        socketsSend(JSON.stringify(launch.json));
 
-        }
+        child.on('close', (code) => {
+            // This handler is just a FAIL.  this.pid is undefined
+            // code == null:  WTF
+            console.log(fpath + ' pid=' +
+                this.pid + ' exited with status code=' + code);
+        });
+
     } else if(parse.query == 'etc') {
         /////////////////////////////////////
         ////////// Files from etc/   ////////
