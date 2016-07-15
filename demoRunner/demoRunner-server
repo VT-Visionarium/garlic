@@ -72,6 +72,9 @@ var
     // For large (Preview) images we match this regrex
     imgPreviewFilename = /^demoPreview.*\.(png|jpg|JPG)$/,
 
+    // Directory name in rootDir with top level programs
+    headerDir = 'header', // that are included in every page.
+
 
 //////////////////////////////////////////////////////////////////////
 
@@ -79,6 +82,9 @@ var
     cwdOrg = process.cwd(),
     filenames = [],
     etcDir = '';
+
+//////////////////////////////////////////////////////////////////////
+
 
 function exit(stat) {
     var ret = 0;
@@ -150,7 +156,12 @@ function printLauncherObj(pre, json) {
 // (browser) page reload can get current run states.
 function getLauncher(relPath, child_in) {
 
-    console.log('getLauncher("' + relPath + '", ' + child_in + ')');
+    // Since URIs can had a leading '/' or not and still refer
+    // to the same resource, we add the leading '/' if it's not
+    // there already, so the lookup for foo is the same as for /foo
+    relPath = path.join('/', relPath);
+
+    //console.log('getLauncher("' + relPath + '", ' + child_in + ')');
 
     var child = null;
     if(arguments.length > 1) {
@@ -288,7 +299,8 @@ function addDemosToPage(dir, relDir) {
             for(var i=0; i<images.length; ++i)
                 text += "      <img class=icon src='" + images[i] + "'>\n";
             text +=
-                "      <p class=genericprog>Run " + scriptURI +
+                "      <p class=genericprog>Run " +
+                path.basename(path.dirname(scriptURI)) +
                 "      <\p>\n" +
                 "      <p class=genericdesc>You can add a description to this " +
                 "program by creating the\n" +
@@ -368,15 +380,66 @@ function checkForDirectories(dir)
 
 function getPage(dir, relDir) {
 
-    console.log('CALLING getPage(dir="' + dir + '", relDir="' + relDir + '")');
+    //console.log('CALLING getPage(dir="' + dir + '", relDir="' + relDir + '")');
 
+    // TODO: This could read head.htm (and foot.htm) each time so
+    // that changes go into effect immediately.
     var page = serverFiles['head.htm'].toString().
         replace('@HEADING@', heading).
         replace('@TITLE@', title) +
         "\n<!-- This was a generated file.\n  END head.htm -->\n\n";
+
+
+    /////////////////////////////////////////////
+    // Top directory demos plus header demos
+    /////////////////////////////////////////////
+
+    // TODO: port '/' to Windoz.
+   page += 
+        "<hr><h2>Top Directory: " + rootDir + "</h2>\n";
+
+    // Top Top demo launcher
+    page +=  addDemosToPage(rootDir,'/');
+    
+    var headerDirFull = path.join(rootDir, headerDir);
+
+    var s = '';
+
+    try {
+
+        if(fs.lstatSync(headerDirFull).isDirectory())
+            s += addDemosToPage(headerDirFull, '/' + headerDir);
+
+        if(checkForDirectories(headerDirFull)) {
+
+            // Now look for scripts in sub-directories of headerDir
+            var dirs = fs.readdirSync(headerDirFull);
+
+            for(var i=0; i<dirs.length;++i) {
+                var d = path.join(headerDirFull,dirs[i]);
+                if(fs.lstatSync(d).isDirectory()) {
+                    s += addDemosToPage(d, path.join('/' + headerDir, dirs[i]));
+                }
+            }
+        }
+    } catch(e) {
+        // The directory headerDir was not readable which is fine.
+        s = '';
+        console.log('No header scripts found');
+    }
+    
+    page += s;
+    
+
+    /////////////////////////////////////////////
+    // Current directory index 
+    /////////////////////////////////////////////
+
+ 
     var preTable =
+            "<div style='clear:left;'><div>\n" +
             '<hr>\n<table class=index>\n' +
-            '  <tr><th colspan=1>' + relDir + ' Directories</th</tr>\n';
+            '  <tr><th colspan=1>' + dir + ' Directories</th</tr>\n';
 
     var postTable = '</table>\n<hr>\n';
 
@@ -391,15 +454,20 @@ function getPage(dir, relDir) {
 
 
     if(relDir != '/') {
+        var href = path.dirname(relDir);
         page += preTable +
             '  <tr>' +
-            '<td><a href="..">Parent Directory ..</a></td>' +
+            '<td><a href="' + href + '">Parent Directory ..</a></td>' +
             '</tr>\n';
         preTable = false;
     }
 
     for(var i=0; i<dirs.length;++i) {
-        if(checkForDirectories(path.join(dir,dirs[i]))) {
+        var d = path.join(dir,dirs[i]);
+        if(d == headerDirFull)
+            // Skip demos header launchers
+            continue;
+        if(checkForDirectories(d)) {
             if(preTable) {
                 page += preTable;
                 preTable = false;
@@ -415,14 +483,25 @@ function getPage(dir, relDir) {
     if(!preTable)
         page += postTable;
 
+    /////////////////////////////////////////////
+    // Current directory demos 
+    /////////////////////////////////////////////
+
+
+    page +=
+        "<div style='clear:left;'><div>\n" +
+        "<h2>Directory " + dir + "</h2>\n";
 
     for(var i=0; i<dirs.length;++i)
-        if(fs.lstatSync(path.join(dir,dirs[i])).isDirectory()) {
+        if(dir != headerDir &&
+                fs.lstatSync(path.join(dir,dirs[i])).isDirectory() ) {
             page += addDemosToPage(
                 path.join(dir, dirs[i]),
                 path.join(relDir, dirs[i]));
         }
 
+    // TODO: This could read foot.htm (and head.htm) each time
+    // so that changes go into effect immediately.
     return page + "\n<!-- BEGIN foot.htm -->\n" +
         serverFiles['foot.htm'];
 }
@@ -600,7 +679,7 @@ function config() {
     rootDir =  process.cwd();
 
     // Report
-    console.log('Document root is ' + process.cwd());
+    console.log('Document root is ' + rootDir);
     console.log('HTTP server Port is ' + httpPort);
     console.log('WebSocket Port is ' + wsPort);
 }
@@ -781,10 +860,11 @@ function httpRequest(request, response) {
 
     var parse =  url.parse(request.url);
 
-    console.log("parse.path=" + parse.path);
-    console.log("parse.query=" + parse.query);
+    console.log("parse.path=" + parse.path +
+            " parse.query=" + parse.query +
+            " parse.pathname=" + parse.pathname);
 
-    var fpath = path.join(process.cwd(), parse.pathname);
+    var fpath = path.join(rootDir, parse.pathname);
 
     try {
         var stats = fs.lstatSync(fpath);

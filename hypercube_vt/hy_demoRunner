@@ -1,15 +1,15 @@
 #!/bin/bash -x
 
-############################
+######################################
 # defaults
-############################
+######################################
 
 root=/NTFS/Shared/demos
 host=cube
 rhost=$(hostname)
 mono=
 
-############################
+######################################
 
 
 function usage()
@@ -49,6 +49,13 @@ function catch()
 
 function runServer()
 {
+    local heading="HyperCube Demos in stereo"
+
+    if [ -n "$mono" ] ; then
+        export INSTANTPLAYER_CAVE_OPTIONS="--mono"
+        export HYPERCUBE_OPTIONS="--mono"
+        heading="HyperCube Demos in mono"
+    fi
 
     ssh $host -X\
  demoRunner-server $root\
@@ -56,7 +63,7 @@ function runServer()
  --title Demos\
  --exit-on-last\
  --kill-children\
- --heading \"HyperCube Demos\"
+ --heading \"$heading\"
 }
 
 
@@ -68,6 +75,9 @@ fi
 
 while [ -n "$1" ] ; do
     case "$1" in
+        -m*|--m*)
+            mono=--mono
+            ;;
         -*)
             usage
             ;;

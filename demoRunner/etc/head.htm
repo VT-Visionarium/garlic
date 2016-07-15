@@ -12,6 +12,9 @@ body {
 body.warning {
     background-color:#DDA1DC;
 }
+h2 {
+    font-size: 100%;
+}
 
 table.index {
     background-color:#8EA1D9;
@@ -177,20 +180,21 @@ function turnOffOnClicks(node)
 
     if(node.onclick)
         node.onclick = null;
+
     // Recursive function turns off onclick for
     // this node and all siblings and all descendents.
     if(node.firstChild)
         turnOffOnClicks(node.firstChild);
 
-    for(node = node.nextSibling; node; node = node.nextSibling)
-        turnOffOnClicks(node);
+    if(node.nextSibling)
+        turnOffOnClicks(node.nextSibling);
 }
 
 function quit()
 {
     var body = document.getElementsByTagName("BODY")[0];
     turnOffOnClicks(body);
-    
+
     var p = document.createElement("P");
     p.className = 'warning';
     body.className = 'warning';

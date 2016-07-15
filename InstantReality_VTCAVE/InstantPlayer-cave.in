@@ -24,6 +24,10 @@
 #default_stereo=without
 default_stereo=with
 
+if [ -n "$HYPERCUBE_mono" ] ; then
+    default_stereo=without
+fi
+
 
 # head tracking with OR without
 #default_head=without
@@ -131,6 +135,11 @@ function Usage()
     -wr|-raycast    Use tracked wand with raycasting 
 
 
+  The of environmant variable INSTANTPLAYER_CAVE_OPTIONS  will be appended to
+  the command line options.  Currently
+      
+        INSTANTPLAYER_CAVE_OPTIONS="${INSTANTPLAYER_CAVE_OPTIONS}".
+
 
   All options other than those listed above are passed to InstantPlayer.
   You will not get to use --wand and --raycast together, the latter of the
@@ -191,8 +200,27 @@ function CheckIRVersion()
 
 function ParseArgs()
 {
+    local opts
+    local i=0
+
     while [ -n "$1" ] ; do
-        case "$1" in
+        opts[$i]="$1"
+        ((++i))
+        shift
+    done
+
+    # We append INSTANTPLAYER_CAVE_OPTIONS options
+    
+    if [ -n "${INSTANTPLAYER_CAVE_OPTIONS}" ] ; then
+        for opt in ${INSTANTPLAYER_CAVE_OPTIONS} ; do
+            opts[$i]=$opt
+            ((i++))
+        done
+    fi
+
+    i=0
+    while [ -n "${opts[$i]}" ] ; do
+        case "${opts[$i]}" in
             -cd|--cd)
                 cwd=yes
                 ;;
@@ -246,13 +274,13 @@ function ParseArgs()
                 ;;
             *)
                 if [ -n "$IR_args" ] ; then
-                    IR_args="$IR_args $1"
+                    IR_args="$IR_args ${opts[$i]}"
                 else
-                    IR_args=" $1"
+                    IR_args=" ${opts[$i]}"
                 fi
                 ;;
         esac
-        shift
+        ((++i))
     done
 
     # if we had no -h or --help than we make it
