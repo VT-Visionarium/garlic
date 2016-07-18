@@ -27,7 +27,6 @@ function usage()
     -h|--help      Print this help and exit
 
     -m|--mono      Run programs with mono visuals (not stereo)
-                   NOT WRITTEN YET  need env DEMORUNNER_OPTIONS
 
     SERVER_HOST    Run the nodejs demoRunner server on SERVER_HOST.
                    That's for testing.
@@ -51,13 +50,15 @@ function runServer()
 {
     local heading="HyperCube Demos in stereo"
 
+    env_opts=" "
+
     if [ -n "$mono" ] ; then
-        export INSTANTPLAYER_CAVE_OPTIONS="--mono"
-        export HYPERCUBE_OPTIONS="--mono"
+        env_opts=" INSTANTPLAYER_CAVE_OPTIONS=--mono HYPERCUBE_OPTIONS=--mono"
         heading="HyperCube Demos in mono"
     fi
 
-    if ! ssh $host -X\
+    if ! ssh\
+ $host -X${env_opts}\
  demoRunner-server $root\
  --remote $rhost\
  --title Demos\
