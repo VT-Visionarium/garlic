@@ -97,6 +97,7 @@ Dir.chdir $demoRoot
 
 getRunList
 
+# We use exec so it does not fork() again.
 $cmd = 'exec qs_demo_launcher --list - --title "Debugging HyperCube Demos"'
 
 $io = IO.popen($cmd, 'w')
