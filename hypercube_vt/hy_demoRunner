@@ -123,3 +123,5 @@ while [ -n "$server" ] ; do
     wait $server
 done
 
+hy_stop
+

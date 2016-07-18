@@ -42,6 +42,13 @@ function Run()
 # default mono is off
 mono=
 
+# TODO: We need to do this better.
+if [ -n "$HYPERCUBE_OPTIONS" ] ; then
+    if [ "$HYPERCUBE_OPTIONS" = "--mono" ] ; then
+        mono="--mono"
+    fi
+fi
+
 
 while [ -n "$1" ] ; do
     case $1 in

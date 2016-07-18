@@ -62,6 +62,8 @@ ARGV.each do |arg|
     end
 end
 
+$mono = ' --mono' if ENV['HYPERCUBE_OPTIONS'] == '--mono'
+
 
 
 $programs = "hy_start#{$mono}
