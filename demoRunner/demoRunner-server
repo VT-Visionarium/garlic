@@ -357,12 +357,11 @@ function addDirsToPage(dir, relDir) {
     return page;
 }
 
-// Returns true if dir has a directory in it
-// and another directory or a run script in that
-// sub-directory.
+// Returns true if dir has a directory in it and another directory in that
+// (3 levels of directories), or a run script a sub-directory
+// (dir/dir2/script) of dir.
 function checkForDirectories(dir)
 {
-
     try {
         var ch = fs.lstatSync(dir).isDirectory();
     } catch(e) {
@@ -383,12 +382,23 @@ function checkForDirectories(dir)
     try {
         for(var i=0; i<dirs.length;++i) {
             var d = path.join(dir,dirs[i]);
-            if(fs.lstatSync(d).isDirectory())
-                return true;
             for(var j=0; j<runnerScriptFilenames.length; ++j)
                 if(fileExists(path.join(d, runnerScriptFilenames[j])))
                     // We have a run script in a directory (d) in dir
                     return true;
+            if(fs.lstatSync(d).isDirectory()) {
+                try {
+                    var ds = fs.readdirSync(d);
+
+                    for(var k=0; k<ds.length;++k) {
+                        if(fs.lstatSync(path.join(d,ds[i])).isDirectory())
+                            // We have a directory in a directory in dir.
+                            return true;
+                    }
+                } catch(e) {
+                    continue;
+                }
+            }
         }
     } catch(e) {
         return false;
