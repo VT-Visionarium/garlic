@@ -57,20 +57,22 @@ function runServer()
         heading="HyperCube Demos in mono"
     fi
 
-    ssh $host -X\
+    if ! ssh $host -X\
  demoRunner-server $root\
  --remote $rhost\
  --title Demos\
  --exit-on-last\
  --kill-children\
- --heading \"$heading\"
+ --heading \"$heading\" ; then
+    exit 1
+fi
 }
 
 
 # I guess this assumes that you are using a bash shell on $host
-if ssh $host "if [ -d $root ] ; then exit 0 ; fi ; exit 1" ; then
-    root=/usr/local/src/demoRunner/testDocRoot
-fi
+#if ssh $host "if [ ! -d $root ] ; then exit 1 ; fi" ; then
+#    root=/usr/local/src/demoRunner/testDocRoot
+#fi
 
 
 while [ -n "$1" ] ; do
@@ -123,5 +125,10 @@ while [ -n "$server" ] ; do
     wait $server
 done
 
-hy_stop
+
+if [ "$host" != "$rhost" ] ; then
+    ssh $host /usr/local/bin/hy_stop
+else
+    /usr/local/bin/hy_stop
+fi
 
