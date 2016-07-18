@@ -204,6 +204,17 @@ function getLauncher(relPath, child_in) {
     return launcher[relPath];
 }
 
+function fileExists(f) {
+
+    try {
+        fs.lstatSync(f);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+
 
 function addDemosToPage(dir, relDir) {
  
@@ -218,14 +229,7 @@ function addDemosToPage(dir, relDir) {
     {
         var scriptPath = path.join(dir, runnerScriptFilenames[i]);
         var scriptURI = path.join(relDir, runnerScriptFilenames[i]);
-
-        try {
-            var stats = fs.lstatSync(scriptPath);
-        }
-        catch (e) {
-            stats = false;
-        }
-        if(!stats) continue;
+        if(!fileExists(scriptPath)) continue;
 
         console.log('found demo script path=' + scriptPath);
 
@@ -354,8 +358,11 @@ function addDirsToPage(dir, relDir) {
 }
 
 // Returns true if dir has a directory in it
+// and another directory or a run script in that
+// sub-directory.
 function checkForDirectories(dir)
 {
+
     try {
         var ch = fs.lstatSync(dir).isDirectory();
     } catch(e) {
@@ -370,11 +377,23 @@ function checkForDirectories(dir)
     }
     catch(e) {
         // not able to open as a directory
-        dirs = [];
+        return false;
     }
-    for(var i=0; i<dirs.length;++i)
-        if(fs.lstatSync(path.join(dir,dirs[i])).isDirectory())
-            return true;
+
+    try {
+        for(var i=0; i<dirs.length;++i) {
+            var d = path.join(dir,dirs[i]);
+            if(fs.lstatSync(d).isDirectory())
+                return true;
+            for(var j=0; j<runnerScriptFilenames.length; ++j)
+                if(fileExists(path.join(d, runnerScriptFilenames[j])))
+                    // We have a run script in a directory (d) in dir
+                    return true;
+        }
+    } catch(e) {
+        return false;
+    }
+
     return false;
 }
 
@@ -394,11 +413,11 @@ function getPage(dir, relDir) {
     // Top directory demos plus header demos
     /////////////////////////////////////////////
 
-    // TODO: port '/' to Windoz.
    page += 
         "<hr><h2>Top Directory: " + rootDir + "</h2>\n";
 
     // Top Top demo launcher
+    // TODO: port '/' to Windoz.
     page +=  addDemosToPage(rootDir,'/');
     
     var headerDirFull = path.join(rootDir, headerDir);
