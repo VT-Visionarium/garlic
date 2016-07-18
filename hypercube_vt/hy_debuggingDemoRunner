@@ -97,12 +97,28 @@ Dir.chdir $demoRoot
 
 getRunList
 
-$cmd = '__GL_YIELD=USLEEP qs_demo_launcher --list - --title "Debugging HyperCube Demos"'
+$cmd = 'exec qs_demo_launcher --list - --title "Debugging HyperCube Demos"'
 
-io = IO.popen($cmd, 'w')
-io.write $programs
+$io = IO.popen($cmd, 'w')
+$io.write $programs
+
+$pid = $io.pid
+
+Signal.trap("TERM") do
+    puts 'killing child pid ' + $pid.to_s
+    Process.kill("INT", $pid);
+end
+Signal.trap("INT") do
+    puts 'killing child pid ' + $pid.to_s
+    Process.kill("INT", $pid);
+end
+Signal.trap("QUIT") do
+    puts 'killing child pid ' + $pid.to_s
+    Process.kill("INT", $pid);
+end
+
 # close will wait for the child to exit
-io.close
+$io.close
 
 puts $0 + ' PID ' + $$.to_s + ' exiting'
 
