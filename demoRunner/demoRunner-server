@@ -943,10 +943,9 @@ function httpRequest(request, response) {
         socketsSend(JSON.stringify(launch.json));
 
         child.on('close', (code) => {
-            // This handler is just a FAIL.  this.pid is undefined
-            // code == null:  WTF
-            console.log(fpath + ' pid=' +
-                this.pid + ' exited with status code=' + code);
+            console.log(launch.json.relPath + ' pid=' +
+                child.pid + ' exited with status code=' + code);
+            sendDeadToSockets(launch);
         });
 
     } else if(parse.query == 'etc') {
