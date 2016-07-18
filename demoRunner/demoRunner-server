@@ -360,6 +360,11 @@ function addDirsToPage(dir, relDir) {
 // Returns true if dir has a directory in it and another directory in that
 // (3 levels of directories), or a run script a sub-directory
 // (dir/dir2/script) of dir.
+//
+// Note: There is no point in indexing a directory unless there a script
+// in a sub-directory of that directory, or there is a in a sub-directory
+// of that directory (where there may be a script).  How deep does the
+// rabbit hole go?
 function checkForDirectories(dir)
 {
     try {
