@@ -104,4 +104,5 @@ io.write $programs
 # close will wait for the child to exit
 io.close
 
-puts $0 + ' exiting'
+puts $0 + ' PID ' + $$.to_s + ' exiting'
+
