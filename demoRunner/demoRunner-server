@@ -1084,7 +1084,7 @@ var server = http.createServer(function(request, response) {
         // TODO: The address has a prefix like ::ffff:  I don't know why.
 
         var raddress = request.connection.remoteAddress.replace(/^.*:/, '');
-        if(raddress  != remote) {
+        if(raddress != remote && raddress != '127.0.0.1') {
 
             // First try a DNS lookup to see if this is the same address.
 
