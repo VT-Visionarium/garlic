@@ -429,7 +429,7 @@ function getPage(dir, relDir) {
     /////////////////////////////////////////////
 
    page += 
-        "<hr><h2>Top Directory: " + rootDir + "</h2>\n";
+        "<hr><h2>Main Menu: " + rootDir + "</h2>\n";
 
     // Top Top demo launcher
     // TODO: port '/' to Windoz.
