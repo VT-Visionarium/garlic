@@ -11,6 +11,7 @@ mono=
 
 ######################################
 
+rhost=console.sv.vt.edu
 
 function usage()
 {
@@ -122,9 +123,7 @@ trap catch SIGINT SIGTERM SIGQUIT
 
 firefox http://$host:8080/
 
-while [ -n "$server" ] ; do
-    wait $server
-done
+wait $server
 
 
 if [ "$host" != "$rhost" ] ; then
