@@ -34,7 +34,6 @@ var
     rootDir = '',
     launcher = {},
     sockets = {},
-    socketCount = 0,
     socketCreateCount = 0,
 
 
@@ -810,18 +809,19 @@ function handleMessageKill(json)
 
 wss.on('connection', function(socket) {
 
-    ++socketCount;
     ++socketCreateCount;
 
     if(remote.length > 0 &&
         socket._socket.remoteAddress != remote) {
-            console.log('revoking WebSocket connection (' +
-                socketCount + ") address=" + socket._socket.remoteAddress);
+            console.log('revoking WebSocket connection (count=' +
+                Object.keys(sockets).length +
+                ") address=" + socket._socket.remoteAddress);
             socket.close();
             return;
     }
-    console.log('got WebSocket connection (' +
-        socketCount + ") address=" + socket._socket.remoteAddress);
+    console.log('got WebSocket connection (count=' +
+        Object.keys(sockets).length +
+        ") address=" + socket._socket.remoteAddress);
 
     socket.on('message', function(message) {
 
@@ -853,18 +853,19 @@ wss.on('connection', function(socket) {
                 break;
             }
 
-        if(sockets.length == 0 && exitOnLast) {
+        if(Object.keys(sockets).length == 0 && exitOnLast) {
 
             setTimeout(function() {
                 // We exit if no connection came to be in the timeout.
                 // This makes a browser page reload possible, if the
                 // reload is fast enough.
-                if(socketCount < 1) {
+                if(Object.keys(sockets).length < 1) {
                     console.log('no more Web Socket connections: exiting');
                     exit();
                 }
             }, 3000 /* milli-seconds */);
         }
+        console.log("There are now " + Object.keys(sockets).length + " Web Socket connection(s)");
     });
 
     // Add this socket to our list of sockets.
