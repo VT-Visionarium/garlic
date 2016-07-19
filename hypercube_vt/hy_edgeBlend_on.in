@@ -4,6 +4,20 @@ scriptdir="$(dirname ${BASH_SOURCE[0]})"
 cd "$scriptdir" || exit 1
 scriptdir="$PWD"
 
+if [ -n "$1" ] ; then
+    cat << EOF
+
+  Usage: $(basename $0) [-h|--help]
+
+  Turn on edge blending between adjacent X11 windows.
+  See also \`hy_edgeBlend_off -h'.
+
+EOF
+    exit 1
+fi
+
+
+
 if [ -f "$scriptdir/hy_edgeBlend_common" ] ; then
     # running from the source directory
     source "$scriptdir/hy_edgeBlend_common"
