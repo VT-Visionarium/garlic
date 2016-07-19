@@ -6,6 +6,7 @@
 PREFIX := /usr/local/encap/hypercube_vt-0.1
 
 BIN = $(PREFIX)/bin
+ETC = $(PREFIX)/etc
 
 CFLAGS = -g
 
@@ -51,8 +52,9 @@ hy_edgeBlend_on hy_edgeBlend_off: %:%.in
 
 
 install: build
-	mkdir -p $(BIN)
+	mkdir -p $(BIN) $(ETC)
 	cp $(inst_files) $(BIN)
+	cp cave_128x128.png $(ETC)
 	@echo
 	@echo "You may want to run: sudo encap"
 ifeq ($(HOSTNAME),cube)

@@ -153,7 +153,8 @@ echo "server is running"
 trap catch SIGINT SIGTERM SIGQUIT
 
 set -x
-firefox -no-remote http://$host:8080/ &
+#firefox -no-remote http://$host:8080/ &
+firefox http://$host:8080/ &
 set +x
 
 wait $server
