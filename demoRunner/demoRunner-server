@@ -35,6 +35,9 @@ var
     launcher = {},
     sockets = {},
     socketCreateCount = 0,
+    // clone the actual env vars to avoid overrides
+    env = Object.create(process.env),
+    querystring = require('querystring'),
 
 
 //////////////////////////////////////////////////////////////////////
@@ -80,7 +83,8 @@ var
     scriptDir = path.dirname(fs.realpathSync(__filename)),
     cwdOrg = process.cwd(),
     filenames = [],
-    etcDir = '';
+    etcDir = '',
+    requestRunCount = 0;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -940,7 +944,8 @@ function httpRequest(request, response) {
                 {
                     cwd: path.dirname(fpath),
                     detached: false,
-                    stdio: [0,1,2]
+                    stdio: [0,1,2],
+                    env: env
                 }
             );
         } catch(err) {
@@ -1006,7 +1011,6 @@ function httpRequest(request, response) {
                 console.log('sent file: ' + fpath);
             }
         });
-
     } else if(stats && stats.isDirectory()) {
         /////////////////////////////////////
         /////// Send demo runner page ///////
@@ -1031,6 +1035,30 @@ function httpRequest(request, response) {
                 console.log('sent file: ' + fpath);
             }
         });
+
+
+   } else if(parse.query.length > 1 && parse.pathname == '/ENV') {
+    /////////////////////////////////////
+    /////////// Set server env   ////////
+    /////////////////////////////////////
+
+    console.log("GOT parse.query=" + parse.query);
+    var obj = querystring.parse(parse.query);
+    console.log("GOT parse.query=" + JSON.stringify(obj));
+
+    if(obj.HEADING) {
+        heading = obj.HEADING;
+        response.write(JSON.stringify({ type: 'HEADING', heading: heading }));
+        socketsSend(JSON.stringify({ type: 'HEADING', heading: heading }));
+    }
+
+    // add it to the spawn environment
+    for(var key in obj)
+        env[key] = obj[key];
+
+    response.end();
+
+
     } else {
         /////////////////////////////////////
         /////////// file not found //////////

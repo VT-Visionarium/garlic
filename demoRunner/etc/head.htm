@@ -234,6 +234,17 @@ function main()
         //alert('Client received the message ' + event.data);
 
         var state = JSON.parse(event.data);
+
+        if(state.type && state.type == 'HEADING')
+        {
+            var n = document.getElementsByTagName("BODY")[0];
+            n = n.firstChild;
+            while(n && n.nodeName != 'H1')
+                n = n.nextSibling;
+            if(n) n.innerHTML = state.heading;
+            return;
+        }
+
         var tag = document.getElementById(state.relPath);
 
         if(!tag) /* We likely do not have this tag's relPath in this
@@ -243,6 +254,7 @@ function main()
                     We get the correct state we need if we load different
                     demo runner pages. */
             return;
+
 
         tag.State = state;
 
