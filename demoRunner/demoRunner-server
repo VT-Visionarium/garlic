@@ -1053,8 +1053,13 @@ function httpRequest(request, response) {
     }
 
     // add it to the spawn environment
-    for(var key in obj)
-        env[key] = obj[key];
+    for(var key in obj) {
+        if(obj[key].length > 0)
+            env[key] = obj[key];
+        else
+            delete env[key];
+        console.log('env[' + key + ']="' + env[key] + '"');
+    }
 
     response.end();
 
