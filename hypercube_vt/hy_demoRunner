@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 ######################################
 # defaults
@@ -8,16 +8,16 @@ root=/NTFS/Shared/demos
 host=cube
 rhost=$(hostname)
 mono=
+run_stop=yes
+just_server=
 
 ######################################
-
-rhost=console.sv.vt.edu
 
 function usage()
 {
     cat << EOF
 
-  Usage: $0 [SERVER_HOST][-m|--mono]|[-h|--help]
+  Usage: $0 [SERVER_HOST][-m|--mono][--no-stop][--just-server]|[-h|--help]
 
   Run the hyperCube demoRunner.
 
@@ -26,8 +26,13 @@ function usage()
 
 
     -h|--help      Print this help and exit
+    
+    --just-server  Just run the demoRunner server
 
     -m|--mono      Run programs with mono visuals (not stereo)
+
+    --no-stop      Don't run hy_stop after quiting.  hy_stop stops the
+                   X session and turn off projects.
 
     SERVER_HOST    Run the nodejs demoRunner server on SERVER_HOST.
                    That's for testing.
@@ -58,7 +63,14 @@ function runServer()
         heading="HyperCube Demos in mono"
     fi
 
-    if ! ssh\
+    local exe=
+
+    if [ -n "$just_server" ] ; then
+        exe="exec "
+    fi
+
+    set -x
+    if ! ${exe}ssh\
  $host -X${env_opts}\
  demoRunner-server $root\
  --remote $rhost\
@@ -66,8 +78,9 @@ function runServer()
  --exit-on-last\
  --kill-children\
  --heading \"$heading\" ; then
-    exit 1
-fi
+        exit 1
+    fi
+    set +x
     
 }
 
@@ -80,6 +93,12 @@ fi
 
 while [ -n "$1" ] ; do
     case "$1" in
+        --no-stop)
+            run_stop=
+            ;;
+        --just-server)
+            just_server=yes
+            ;;
         -m*|--m*)
             mono=--mono
             ;;
@@ -93,10 +112,19 @@ while [ -n "$1" ] ; do
     shift 1
 done
 
-if ! gar_pushSshKeys $host ; then
-    echo
-    echo "FAILED to check ssh keys"
-    echo
+
+if [ "$host" != "$rhost" ] ; then
+    if ! gar_pushSshKeys $host ; then
+        echo
+        echo "FAILED to check ssh keys"
+        echo
+        exit 1
+    fi
+fi
+
+
+if [ -n "$just_server" ] ; then
+    runServer
     exit 1
 fi
 
@@ -106,7 +134,7 @@ server=$!
 
 
 count=0
-# wait for server to be working
+# wait for server to be working via a netcat connect.
 while ! nc -z $host 8080 ; do
     sleep 0.3
     let count=$count+1
@@ -124,14 +152,18 @@ echo "server is running"
 
 trap catch SIGINT SIGTERM SIGQUIT
 
-firefox http://$host:8080/ &
+set -x
+firefox -no-remote http://$host:8080/ &
+set +x
 
 wait $server
 
 
-if [ "$host" != "$rhost" ] ; then
-    ssh $host /usr/local/bin/hy_stop
-else
-    /usr/local/bin/hy_stop
+if [ -n "$run_stop" ] ; then
+    if [ "$host" != "$rhost" ] ; then
+        ssh $host /usr/local/bin/hy_stop
+    else
+        /usr/local/bin/hy_stop
+    fi
 fi
 
