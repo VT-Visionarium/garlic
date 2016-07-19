@@ -1037,7 +1037,7 @@ function httpRequest(request, response) {
         });
 
 
-   } else if(parse.query.length > 1 && parse.pathname == '/ENV') {
+   } else if(parse.query && parse.query.length > 1 && parse.pathname == '/ENV') {
     /////////////////////////////////////
     /////////// Set server env   ////////
     /////////////////////////////////////
