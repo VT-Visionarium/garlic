@@ -68,6 +68,7 @@ function runServer()
  --heading \"$heading\" ; then
     exit 1
 fi
+    
 }
 
 
@@ -101,6 +102,8 @@ fi
 
 runServer &
 
+server=$!
+
 
 count=0
 # wait for server to be working
@@ -121,7 +124,7 @@ echo "server is running"
 
 trap catch SIGINT SIGTERM SIGQUIT
 
-firefox http://$host:8080/
+firefox http://$host:8080/ &
 
 wait $server
 
