@@ -428,6 +428,34 @@ function getPage(dir, relDir) {
 
 
     /////////////////////////////////////////////
+    // Top of page description
+    ////////////////////////////////////////////
+
+    // TODO: add images to top like in addDemosToPage()
+    // but here.
+    // TODO: add htmDescFilename option in place of simple
+    // text.
+
+    var s = '';
+
+    try {
+        // Add simple description text
+        var f = path.join(rootDir, txtDescFilename);
+        s +=
+                "      <p>\n" +
+                fs.readFileSync(f).toString().replace(/\n\n/g,
+                "\n" +
+                "      </p>\n" +
+                "      <p>\n") +
+                "      </p>\n";
+    } catch (e) {
+        s = '';
+    }
+
+    page += s;
+    s = '';
+
+    /////////////////////////////////////////////
     // Top directory demos plus main menu demos
     /////////////////////////////////////////////
 
@@ -437,10 +465,8 @@ function getPage(dir, relDir) {
     // Top Top demo launcher
     // TODO: port '/' to Windoz.
     page +=  addDemosToPage(rootDir,'/');
-    
-    var headerDirFull = path.join(rootDir, headerDir);
 
-    var s = '';
+    var headerDirFull = path.join(rootDir, headerDir);
 
     try {
 
@@ -464,8 +490,9 @@ function getPage(dir, relDir) {
         s = '';
         console.log('No header scripts found');
     }
-    
+
     page += s;
+    s = '';
     
 
     /////////////////////////////////////////////
