@@ -74,8 +74,8 @@ var
     // For large (Preview) images we match this regrex
     imgPreviewFilename = /^demoPreview.*\.(png|jpg|JPG)$/,
 
-    // Directory name in rootDir with top level programs
-    headerDir = 'header', // that are included in every page.
+    // Directory name in rootDir with main menu level programs
+    headerDir = 'main_menu', // that are included in every page.
 
 
 //////////////////////////////////////////////////////////////////////
@@ -428,7 +428,7 @@ function getPage(dir, relDir) {
 
 
     /////////////////////////////////////////////
-    // Top directory demos plus header demos
+    // Top directory demos plus main menu demos
     /////////////////////////////////////////////
 
    page += 
