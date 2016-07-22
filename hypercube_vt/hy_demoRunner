@@ -68,19 +68,20 @@ function runServer()
     if [ -n "$just_server" ] ; then
         exe="exec "
     fi
+    if [ "$rhost" != "$host" ] ; then
+        exec="$exec ssh $host -X"
+    fi
 
-    local passcode=$(openssl rand -hex 6)
+    passcode=$(openssl rand -hex 6)
 
     set -x
-    if ! ${exe}ssh\
- $host -X${env_opts}\
+    if ! ${exe}${env_opts}\
  demoRunner-server $root\
- --remote $rhost\
  --title Demos\
  --exit-on-last\
  --kill-children\
  --passcode $passcode\
- --heading \"$heading\" ; then
+ --heading "$heading" ; then
         exit 1
     fi
     set +x
@@ -89,9 +90,9 @@ function runServer()
 
 
 # I guess this assumes that you are using a bash shell on $host
-#if ssh $host "if [ ! -d $root ] ; then exit 1 ; fi" ; then
-#    root=/usr/local/src/demoRunner/testDocRoot
-#fi
+if ssh $host "if [ ! -d $root ] ; then exit 1 ; fi" ; then
+    root=/usr/local/src/demoRunner/testDocRoot
+fi
 
 
 while [ -n "$1" ] ; do
@@ -114,6 +115,8 @@ while [ -n "$1" ] ; do
     esac
     shift 1
 done
+
+echo "host=$host rhost=$rhost"
 
 
 if [ "$host" != "$rhost" ] ; then

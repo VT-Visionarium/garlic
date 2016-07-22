@@ -660,7 +660,7 @@ function config() {
                     process.chdir(str);
                 }
                 catch(err) {
-                    console.log('Cannot cd to ' + str + "\n\n");
+                    console.log('Cannot cd to ' + str + " i=" + i + "\n\n");
                     usage();
                 }
                 break;
@@ -675,6 +675,7 @@ function config() {
     }
 
     title = escapeHTML(title);
+
     checkHeading();
 
     var etcDirs = [
@@ -960,7 +961,7 @@ function httpRequest(request, response) {
 }
 
 // The http server
-var server = http.createServer(httpRequest).listen(httpPort);
+var server = http.createServer(httpRequest).listen(httpPort, 'localhost');
 
 // Just adding one argument is the difference between http and https :)
 // For the https server
@@ -1160,7 +1161,14 @@ function ws_OnConnection(socket) {
 
 // TODO: Hostname happens to be a value domain name, but this is not
 // good for the general server URL.
-console.log("demoRunner service at  => https://" + require('os').hostname() + ":" + httpsPort);
+if(passcode.length < 1)
+    console.log("demoRunner service at  => https://" +
+            require('os').hostname() + ":" + httpsPort);
+else
+    console.log("demoRunner service at  => https://" +
+            require('os').hostname() + ":" + httpsPort +
+            '/?passcode=' + passcode);
+
 console.log("          and locally  => http://localhost:" + httpPort);
 
 
