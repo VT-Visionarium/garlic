@@ -2,6 +2,6 @@
 
 heading="The%20New%20Heading%20is%20$(date +%s)"
 
-wget http://localhost:8080/ENV?HEADING=${heading}\&foo=bar\&VAR1=\&VAR2=val -O -
-
-
+wget --no-check-certificate\
+ http://localhost:8080/ENV?HEADING=${heading}\&foo=bar\&VAR1=\&VAR2=VAR2val\
+ -O -

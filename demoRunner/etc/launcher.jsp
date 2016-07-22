@@ -96,9 +96,8 @@ function setTagToRunning(tag)
 
 function main()
 {
-    var socketUrl =
-        window.location.href.replace(/^http(s|)/, 'ws').
-        replace(/8080/, '8888');
+    // Change 'http' to 'ws' and 'https' to 'wss'
+    var socketUrl = location.href.replace(/^http/, 'ws');
     socket = new WebSocket(socketUrl);
     socket.Url = socketUrl;
     socket.onmessage = function(event) {

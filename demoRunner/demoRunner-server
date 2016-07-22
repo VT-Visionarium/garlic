@@ -13,6 +13,7 @@ var
 
 //////////////////////////////////////////////////////////////////////
 
+    https = require('https'),
     http = require('http'),
     child_process = require('child_process'),
     dns = require('dns'),
@@ -22,11 +23,10 @@ var
     util = require('util'),
     ws = require('ws').Server,
     httpPort = 8080,
+    httpsPort = 8383,
     // We use a separate port for the web sockets
     // so that the code has less chance of braking.
-    wsPort = 8888,
     heading = '',
-    remote = '',
     title = '',
     signal = [],
     exitOnLast = false,
@@ -38,6 +38,7 @@ var
     // clone the actual env vars to avoid overrides
     env = Object.create(process.env),
     querystring = require('querystring'),
+    passcode = '',
 
 
 //////////////////////////////////////////////////////////////////////
@@ -125,8 +126,8 @@ function usage() {
     // Heredoc should be part of javascript!
 
     console.log(
-"   Usage: " + prog + " [DOC_ROOT] [--title TITLE] [--remote ADDRESS]" +
-"[--heading HEADING] [--exit-on-last] [--kill-children]\n" +
+"   Usage: " + prog + " [DOC_ROOT] [--title TITLE]\\\n" +
+"       [--heading HEADING] [--exit-on-last] [--kill-children] [--passcode PASSCODE]\n" +
 "\n" +
 "  Run a " + prog + " HTTP server and WebSocket server.\n" +
 "\n" +
@@ -138,9 +139,13 @@ function usage() {
 "     --heading HEADING    set <h1> page heading text to HEADING\n" +
 "                          the default HEADING is \"" + defaultHeading + "\n" +
 "     --kill-children      kill all launched children on exiting the server\n" +
-"     --remote ADDRESS     accept connections only from address ADDRESS\n" +
 "     --signal SIG PID     signal the process with PID with signal SIG just after the\n" +
-"                          listening sockets are open.  Example:  --signal SIGUSR1 2354 \n" +
+"                          listening sockets are open.  Example: --signal SIGUSR1 2354\n" +
+"     --passcode PASSCODE  set client passcode to PASSCODE, if set the initial URL for\n" +
+"                          the service will appended with something like:\n" +
+"\n" +
+"                                 https://host.com/?passcode=PASSCODE\n" +
+"\n" +
 "     --title TITLE        set the page title text to TITLE\n" +
 "                          the default title is \"" + defaultTitle + "\n" +
 "\n"
@@ -603,10 +608,10 @@ function config() {
                 else
                     usage();
                 break;
-            case '-remote':
-            case '--remote':
+            case '-passcode':
+            case '--passcode':
                 if(++i < process.argv.length)
-                    remote = process.argv[i];
+                    passcode = process.argv[i];
                 else
                     usage();
                 break;
@@ -641,8 +646,8 @@ function config() {
                     heading = process.argv[i].replace(/^-(-|)heading=/,'');
                     break;
                 }
-                if(/^-(-|)remote=/.test( process.argv[i])) {
-                    remote = process.argv[i].replace(/^-(-|)remote=/,'');
+                if(/^-(-|)passcode=/.test( process.argv[i])) {
+                    passcode = process.argv[i].replace(/^-(-|)passcode=/,'');
                     break;
                 }
                 if(/^-(-|)title=/.test( process.argv[i])) {
@@ -672,7 +677,10 @@ function config() {
     title = escapeHTML(title);
     checkHeading();
 
-    var etcDirs = [ scriptDir + '/../etc' , scriptDir + '/etc' ];
+    var etcDirs = [
+        path.join(scriptDir, '../etc'),
+        path.join(scriptDir, '/etc')
+    ];
     var filenames = Object.keys(serverFiles);
 
 
@@ -727,34 +735,13 @@ function config() {
         process.exit(1);
     }
 
-    if(remote.length > 0) {
-        /*
-        dns.lookup(remote, (err, address, family) => {
-            if(err) {
-                console.log('dns.lookup("' + remote + '") err: ' + err);
-                process.exit(1);
-            }
-            remote = address;
-        });
-        console.log('remote address is restricted to: ' + remote);
-        */
-        dns.resolve4(remote, (err, caddress) => {   
-            if(err) {
-                console.log('dns.resolveCname(["' + remote + '"]) err: ' + err);
-                process.exit(1);
-            }
-            remote = caddress;
-        });
-        console.log('remote (cononical) address is restricted to: ' + remote);
-    } //else
-        // Unrestricted  remote = ''
 
     rootDir =  process.cwd();
 
     // Report
     console.log('Document root is ' + rootDir);
-    console.log('HTTP server Port is ' + httpPort);
-    console.log('WebSocket Port is ' + wsPort);
+    console.log('HTTPS server Port is ' + httpsPort);
+    console.log('localhost HTTP server Port is ' + httpPort);
 }
 
 
@@ -774,143 +761,6 @@ function spewObject(obj, pre) {
 //     server replies with JSON "State" object
 //     
 
-
-
-var wss = new ws({port: 8888});
-
-function socketsSend(text) {
-
-    var deleteCount = 0;
-    for(var key in sockets) {
-        try {
-            var pre = 'sending to ' +
-                sockets[key]._socket.remoteAddress +
-                ':' + sockets[key]._socket.remotePort + ' ';
-            console.log(pre + text);
-            sockets[key].send(text);
-        } catch(e) {
-            console.log(pre + ': FAILED:' + e);
-            // I don't think we can edit the sockets list as we iterate
-            // through it, so:
-            sockets[key].DeleteMe = true;
-            ++deleteCount;
-            /* The socket may have been closed already; it's a race
-             * we handle here. */
-        }
-    }
-
-    // I don't think we can edit the sockets list as we iterate through
-    // it, so we break at each delete like so:
-    while(deleteCount > 0)
-        for(var key in sockets) {
-            if(sockets[key].DeleteMe) {
-                delete sockets[key];
-                --deleteCount;
-                break;
-            }
-        }
-}
-
-
-function sendDeadToSockets(launch, stateText) {
-
-    launch.json.state = 'dead';
-    launch.child = null;
-    launch.json.pid = 0;
-    launch.json.className = 'launch';
-    if(arguments.length >= 2)
-        launch.json.stateText = stateText;
-    else
-        launch.json.stateText = 'Ran ' + launch.json.runCount + ' times.';
-
-    launch.json.pid = 0;
-
-    socketsSend(JSON.stringify(launch.json));
-}
-
-function handleMessageKill(json)
-{
-    var launch = getLauncher(json.relPath);
-    var child = launch.child;
-
-    sendDeadToSockets(launch);
-    
-    try {
-       console.log('will kill pid ' + child.pid);
-        // The child close event will change the launcher object
-        child.kill('SIGINT');
-        child.kill('SIGTERM');
-
-        //process.kill(child.pid, 'SIGINT');
-    } catch(err) {
-        console.log('signaling child failed: ' + err);
-    }
-}
-
-wss.on('connection', function(socket) {
-
-    ++socketCreateCount;
-
-    if(remote.length > 0 &&
-        socket._socket.remoteAddress != remote) {
-            console.log('revoking WebSocket connection (count=' +
-                Object.keys(sockets).length +
-                ") address=" + socket._socket.remoteAddress);
-            socket.close();
-            return;
-    }
-    console.log('got WebSocket connection (count=' +
-        Object.keys(sockets).length +
-        ") address=" + socket._socket.remoteAddress);
-
-    socket.on('message', function(message) {
-
-        var pre = 'WebSocket received from ' +
-            socket._socket.remoteAddress + ':' +
-            socket._socket.remotePort + ' ' ;
- 
-        console.log(pre + message);
-
-        var json = JSON.parse(message);
-
-        if(json.command == 'kill')
-            handleMessageKill(json);
-        else if(json.command == 'quit')
-            exit();
-        else
-            console.log(pre + message + ' IS AN UNKNOWN COMMAND');
-    });
-
-    socket.on('close', function() {
-        console.log('Web Socket ' + socket._socket.remoteAddress + ' closed');
-
-        // Remove this socket from our list of sockets.
-        // TODO: Yes this is stupid.  The wss should already
-        // know all the socket connections. Okay, then fix this code.
-        for(var key in sockets)
-            if(sockets[key] == socket) {
-                delete sockets[key];
-                break;
-            }
-
-        if(Object.keys(sockets).length == 0 && exitOnLast) {
-
-            setTimeout(function() {
-                // We exit if no connection came to be in the timeout.
-                // This makes a browser page reload possible, if the
-                // reload is fast enough.
-                if(Object.keys(sockets).length < 1) {
-                    console.log('no more Web Socket connections: exiting');
-                    exit();
-                }
-            }, 3000 /* milli-seconds */);
-        }
-        console.log("There are now " + Object.keys(sockets).length + " Web Socket connection(s)");
-    });
-
-    // Add this socket to our list of sockets.
-    sockets[socketCreateCount] = socket;
-});
 
 
 
@@ -1039,10 +889,6 @@ function httpRequest(request, response) {
                 response.end();
                 console.log(fpath + ' not found ' + err);
             } else {
-
-                // TODO: find the file mime type from the filename
-                // to fix this writeHead():
-
                 response.writeHead(200, { 'Content-Type': getContentType(fpath) });
                 response.write(file, "binary");
                 response.end();
@@ -1082,7 +928,7 @@ function httpRequest(request, response) {
 
     console.log("GOT parse.query=" + parse.query);
     var obj = querystring.parse(parse.query);
-    console.log("GOT parse.query=" + JSON.stringify(obj));
+    console.log("GOT parse.query JSON=" + JSON.stringify(obj));
 
     if(obj.HEADING) {
         heading = obj.HEADING;
@@ -1113,53 +959,211 @@ function httpRequest(request, response) {
     }
 }
 
-var didLookup = false;
+// The http server
+var server = http.createServer(httpRequest).listen(httpPort);
 
+// Just adding one argument is the difference between http and https :)
+// For the https server
+var sserver = https.createServer({
+            key: fs.readFileSync(path.join(etcDir, 'key.pem')),
+            cert: fs.readFileSync(path.join(etcDir, 'cert.pem'))
+}, function(request, response) {
 
-var server = http.createServer(function(request, response) {
+    function parseCookies (request) {
+        var list = {},
+            rc = request.headers.cookie;
 
-    if(remote.length > 0) {
-        // Restrict access to this server.
-        // TODO: The address has a prefix like ::ffff:  I don't know why.
+        rc && rc.split(';').forEach(function( cookie ) {
+            var parts = cookie.split('=');
+            list[parts.shift().trim()] = decodeURI(parts.join('='));
+        });
 
-        var raddress = request.connection.remoteAddress.replace(/^.*:/, '');
-        if(raddress != remote && raddress != '127.0.0.1') {
+        return list;
+    }
 
-            // First try a DNS lookup to see if this is the same address.
+    ////////////////////////////////////////////////////////////////////
+    // Restrict access to this server.
+    // We do this by:
+    //
+    //      Checking that a valid session cookie (passcode) was sent
+    //
+    //                 or
+    //
+    //      A valid query with the passcode
+    //
+    //
 
-            if(! didLookup) {
-                didLookup = true;
-                dns.resolve(raddress , (err, address) => {   
-                    if(err) {
-                        console.log('dns.resolve("' +
-                            raddress  + '") err: ' + err);
-                        process.exit(1);
-                    }
-                    if(remote == address) {
-                        remote = request.connection.remoteAddress;
-                        httpRequest(request, response);
-                    } else {
-                        console.log('rejected connection from address:  ' + raddress );
-                        response.end();
-                        return;
-                    }
-                });
+    if(passcode.length > 0) {
+        
+        var obj = querystring.parse(url.parse(request.url).query);
+        var cookie = parseCookies(request);
+
+        if((!cookie.passcode || cookie.passcode != passcode)
+                &&
+            (!obj.passcode || obj.passcode.length < 1 || obj.passcode != passcode)) {
+
+                console.log('rejected connection from address:  ' +
+                    request.connection.remoteAddress.replace(/^.*:/, '') +
+                    ' invalid passcode');
+                // TODO: IS there a way to close the socket without sending
+                // the http header?
+                response.statusCode = 408;
+                response.setHeader("Connection", "close");
+                response.end();
                 return;
             }
-            console.log('rejected connection from address:  ' + raddress );
-            response.end();
-            return;
-        }
+        response.setHeader('Set-Cookie', 'passcode=' + passcode);
     }
-    
+
+
     httpRequest(request, response);
 
-}).listen(httpPort);
+}).listen(httpsPort);
+
+
+
+
+function socketsSend(text) {
+
+    var deleteCount = 0;
+    for(var key in sockets) {
+        try {
+            var pre = 'sending to ' +
+                sockets[key]._socket.remoteAddress +
+                ':' + sockets[key]._socket.remotePort + ' ';
+            console.log(pre + text);
+            sockets[key].send(text);
+        } catch(e) {
+            console.log(pre + ': FAILED:' + e);
+            // I don't think we can edit the sockets list as we iterate
+            // through it, so:
+            sockets[key].DeleteMe = true;
+            ++deleteCount;
+            /* The socket may have been closed already; it's a race
+             * we handle here. */
+        }
+    }
+
+    // I don't think we can edit the sockets list as we iterate through
+    // it, so we break at each delete like so:
+    while(deleteCount > 0)
+        for(var key in sockets) {
+            if(sockets[key].DeleteMe) {
+                delete sockets[key];
+                --deleteCount;
+                break;
+            }
+        }
+}
+
+
+function sendDeadToSockets(launch, stateText) {
+
+    launch.json.state = 'dead';
+    launch.child = null;
+    launch.json.pid = 0;
+    launch.json.className = 'launch';
+    if(arguments.length >= 2)
+        launch.json.stateText = stateText;
+    else
+        launch.json.stateText = 'Ran ' + launch.json.runCount + ' times.';
+
+    launch.json.pid = 0;
+
+    socketsSend(JSON.stringify(launch.json));
+}
+
+function handleMessageKill(json)
+{
+    var launch = getLauncher(json.relPath);
+    var child = launch.child;
+
+    sendDeadToSockets(launch);
+    
+    try {
+       console.log('will kill pid ' + child.pid);
+        // The child close event will change the launcher object
+        child.kill('SIGINT');
+        child.kill('SIGTERM');
+
+        //process.kill(child.pid, 'SIGINT');
+    } catch(err) {
+        console.log('signaling child failed: ' + err);
+    }
+}
+
+function ws_OnConnection(socket) {
+
+    ++socketCreateCount;
+
+    console.log('got WebSocket connection (count=' +
+        Object.keys(sockets).length +
+        ") address=" + socket._socket.remoteAddress);
+
+    socket.on('message', function(message) {
+
+        var pre = 'WebSocket received from ' +
+            socket._socket.remoteAddress + ':' +
+            socket._socket.remotePort + ' ' ;
+ 
+        console.log(pre + message);
+
+        var json = JSON.parse(message);
+
+        if(json.command == 'kill')
+            handleMessageKill(json);
+        else if(json.command == 'quit')
+            exit();
+        else
+            console.log(pre + message + ' IS AN UNKNOWN COMMAND');
+    });
+
+    socket.on('close', function() {
+        console.log('Web Socket ' + socket._socket.remoteAddress + ' closed');
+
+        // Remove this socket from our list of sockets.
+        // TODO: Yes this is stupid.  The wss should already
+        // know all the socket connections. Okay, then fix this code.
+        for(var key in sockets)
+            if(sockets[key] == socket) {
+                delete sockets[key];
+                break;
+            }
+
+        if(Object.keys(sockets).length == 0 && exitOnLast) {
+
+            setTimeout(function() {
+                // We exit if no connection came to be in the timeout.
+                // This makes a browser page reload possible, if the
+                // reload is fast enough.
+                if(Object.keys(sockets).length < 1) {
+                    console.log('no more Web Socket connections: exiting');
+                    exit();
+                }
+            }, 3000 /* milli-seconds */);
+        }
+        console.log("There are now " + Object.keys(sockets).length + " Web Socket connection(s)");
+    });
+
+    // Add this socket to our list of sockets.
+    sockets[socketCreateCount] = socket;
+}
+
+
+// This server shares the same port as the https server;
+// some data in the message header tells it what to do.
+(new ws({server: sserver})).on('connection', ws_OnConnection);
+// This server shared with the http server; ya.
+(new ws({server: server})).on('connection', ws_OnConnection);
+
 
 
 // TODO: Hostname happens to be a value domain name, but this is not
 // good for the general server URL.
-console.log("demoRunner service at  => http://" + require('os').hostname() + ":" + httpPort);
+console.log("demoRunner service at  => https://" + require('os').hostname() + ":" + httpsPort);
+console.log("          and locally  => http://localhost:" + httpPort);
+
+
 
 if(signal.length >= 1)
 {

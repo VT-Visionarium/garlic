@@ -1,5 +1,11 @@
 # This is a GNU makefile
 
+# Comment out DEBUG for production build which compresses the
+# CSS and javascript files that are served.
+DEBUG = 1
+
+hostname = $(shell hostname)
+
 # from running ./configure [--prefix=/my/prefix]
 -include config
 
@@ -11,7 +17,7 @@
 # running ./configure --prefix=/my/prefix
 PREFIX ?= /usr/local/encap/demoRunner-0.0
 
-WS_VERSION = ws@1.1.1 # This version of ws works
+WS = ws@1.1.1 # This version of ws works
 ####################################################
 
 built_js_files = $(patsubst %.jsp,%.js,$(wildcard etc/*.jsp))
@@ -36,8 +42,9 @@ ETC = $(PREFIX)/etc
 
 # We npm install a copy of ws for development
 build: $(built_files) $(keys)
-	npm install $(WS_VERSION)
+	npm install $(WS)
 
+# ref: http://superuser.com/questions/226192/openssl-without-prompt
 $(keys):
 	openssl req\
  -new\
@@ -47,16 +54,23 @@ $(keys):
  -keyout etc/key.pem\
  -subj "/C=US/ST=Denial/L=Blacksburg/O=Dis/CN=any" \
  -out etc/cert.pem\
- -days 1000000
+ -days 36500
 
-
+ifndef DEBUG
 %.js: %.jsp
 	echo "// This is a generated file" > $@
 	yui-compressor --line-break 70 --type js $^ >> $@
 %.css: %.cs
 	echo "/* This is a generated file */" > $@
 	yui-compressor --line-break 70 --type css $^ >> $@
-
+else
+%.js: %.jsp
+	echo "// This is a generated file" > $@
+	cat $^ >> $@
+%.css: %.cs
+	echo "/* This is a generated file */" > $@
+	cat $^ >> $@
+endif
 
 mkdirs:
 	rm -rf $(ETC) $(BIN) && mkdir -p $(ETC) $(BIN)
@@ -69,7 +83,7 @@ mkdirs:
 install: mkdirs
 	cp  -r $(etc_files) $(ETC)/
 	cp demoRunner-server $(BIN)/
-	cd $(BIN)/ && npm install $(WS_VERSION)
+	cd $(BIN)/ && npm install $(WS)
 	echo "etc" > $(PREFIX)/encap.exclude
 	echo "node_modules" > $(BIN)/encap.exclude
 
