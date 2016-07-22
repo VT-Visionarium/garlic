@@ -660,7 +660,7 @@ function config() {
                     process.chdir(str);
                 }
                 catch(err) {
-                    console.log('Cannot cd to ' + str + " i=" + i + "\n\n");
+                    console.log('Cannot cd to ' + str + "\n\n");
                     usage();
                 }
                 break;
@@ -949,6 +949,17 @@ function httpRequest(request, response) {
 
     response.end();
 
+   } else if(parse.query && parse.query.length > 1 && parse.pathname == '/QUIT') {
+    /////////////////////////////////////
+    //////////////  QUIT  ///////////////
+    /////////////////////////////////////
+
+    console.log("GOT QUIT command");
+    response.writeHead(200, { 'Content-Type': "text/plain" });
+    response.write("\n\n\nSERVER EXITING\n\n\n");
+    response.end();
+
+    exit();
 
     } else {
         /////////////////////////////////////

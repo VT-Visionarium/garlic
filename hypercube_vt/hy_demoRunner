@@ -10,6 +10,7 @@ rhost=$(hostname)
 mono=
 run_stop=yes
 just_server=
+server_running=
 
 ######################################
 
@@ -45,12 +46,16 @@ EOF
 
 function catch()
 {
-    if [ -n "$server" ] ; then
-        echo "killing server pid $server"
-        kill $server
-        server=
+    if [ -n "$server_running" ] ; then
+        wget --no-check-certificate\
+ https://$host:8383/QUIT?passcode=${passcode}
+        # That should tell the server to quit
+        # If that failed, too bad.
+        server_running=
     fi
 }
+
+passcode=$(openssl rand -hex 6)
 
 function runServer()
 {
@@ -68,11 +73,12 @@ function runServer()
     if [ -n "$just_server" ] ; then
         exe="exec "
     fi
+
     if [ "$rhost" != "$host" ] ; then
-        exec="$exec ssh $host -X"
+        exe="$exec ssh $host -X"
+        heading="\"$heading\""
     fi
 
-    passcode=$(openssl rand -hex 6)
 
     set -x
     if ! ${exe}${env_opts}\
@@ -90,8 +96,9 @@ function runServer()
 
 
 # I guess this assumes that you are using a bash shell on $host
-if ssh $host "if [ ! -d $root ] ; then exit 1 ; fi" ; then
+if ! ssh $host "if [ ! -d $root ] ; then exit 1 ; fi" ; then
     root=/usr/local/src/demoRunner/testDocRoot
+    echo "Setting server doc root to: $root"
 fi
 
 
@@ -136,17 +143,16 @@ fi
 
 runServer &
 
-server=$!
-
 
 count=0
 # wait for server to be working via a netcat connect.
-while ! nc -z $host 8080 ; do
-    sleep 0.3
+while ! nc -z $host 8383 ; do
+    sleep 0.6
+    echo "wanting to server to start"
     let count=$count+1
-    if [ "$count" = "50" ] ; then
+    if [ "$count" = "20" ] ; then
         echo "Failed to connect to server"
-        kill $server
+        sleep 100
         exit 1
     fi
 done
@@ -158,12 +164,22 @@ echo "server is running"
 
 trap catch SIGINT SIGTERM SIGQUIT
 
+echo "passcode=$passcode"
+
 set -x
-#firefox -no-remote http://$host:8080/ &
-firefox http://$host:8080/?passcode=$passcode &
+firefox https://$host:8383/?passcode=${passcode} &
 set +x
 
-wait $server
+
+server_running=yes
+while [ -n "$server_running" ] ; do
+    # wait for a signal and check if it's running OK
+    sleep 10000
+    if ! nc -z $host 8383 ; then
+        # We are not able to connect to the server
+        server_running=
+    fi
+done
 
 
 if [ -n "$run_stop" ] ; then

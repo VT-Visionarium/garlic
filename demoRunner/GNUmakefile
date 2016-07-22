@@ -56,7 +56,7 @@ $(keys):
  -x509\
  -newkey rsa:2048\
  -keyout etc/key.pem\
- -subj "/C=US/ST=Denial/L=Blacksburg/O=Dis/CN=any" \
+ -subj "/C=US/ST=Denial/L=Blacksburg/O=Dis/CN=$(hostname)" \
  -out etc/cert.pem\
  -days 36500
 
