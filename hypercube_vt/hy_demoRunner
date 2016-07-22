@@ -69,6 +69,8 @@ function runServer()
         exe="exec "
     fi
 
+    local passcode=$(openssl rand -hex 6)
+
     set -x
     if ! ${exe}ssh\
  $host -X${env_opts}\
@@ -77,6 +79,7 @@ function runServer()
  --title Demos\
  --exit-on-last\
  --kill-children\
+ --passcode $passcode\
  --heading \"$heading\" ; then
         exit 1
     fi
@@ -154,7 +157,7 @@ trap catch SIGINT SIGTERM SIGQUIT
 
 set -x
 #firefox -no-remote http://$host:8080/ &
-firefox http://$host:8080/ &
+firefox http://$host:8080/?passcode=$passcode &
 set +x
 
 wait $server

@@ -23,12 +23,16 @@ WS = ws@1.1.1 # This version of ws works
 built_js_files = $(patsubst %.jsp,%.js,$(wildcard etc/*.jsp))
 built_css_files = $(patsubst %.cs,%.css,$(wildcard etc/*.cs))
 
-built_files = $(sort $(built_js_files) $(built_css_files))
+keys = etc/key.pem etc/cert.pem
+
+built_files = $(sort\
+ $(built_js_files)\
+ $(built_css_files)\
+ $(keys))
 
 js_files = $(sort $(wildcard etc/*.js) $(built_js_files))
 css_files = $(sort $(wildcard etc/*.css) $(built_css_files))
 
-keys = etc/key.pem etc/cert.pem
 
 
 # Stuff we install in etc/
@@ -41,7 +45,7 @@ ETC = $(PREFIX)/etc
 
 
 # We npm install a copy of ws for development
-build: $(built_files) $(keys)
+build: $(built_files)
 	npm install $(WS)
 
 # ref: http://superuser.com/questions/226192/openssl-without-prompt
@@ -88,5 +92,5 @@ install: mkdirs
 	echo "node_modules" > $(BIN)/encap.exclude
 
 clean:
-	rm -rf node_modules config $(built_files) $(keys)
+	rm -rf node_modules config $(built_files)
 
