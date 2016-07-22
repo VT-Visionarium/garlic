@@ -1,0 +1,4 @@
+Run xlogo
+
+This will print out the environment.
+

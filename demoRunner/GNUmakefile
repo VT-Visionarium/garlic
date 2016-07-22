@@ -14,17 +14,49 @@ PREFIX ?= /usr/local/encap/demoRunner-0.0
 WS_VERSION = ws@1.1.1 # This version of ws works
 ####################################################
 
+built_js_files = $(patsubst %.jsp,%.js,$(wildcard etc/*.jsp))
+built_css_files = $(patsubst %.cs,%.css,$(wildcard etc/*.cs))
 
-# Stuff we install in BIN
-private_files = \
- $(wildcard etc/*.htm etc/*.js etc/*.css etc/*.png etc/*.jpg)\
+built_files = $(sort $(built_js_files) $(built_css_files))
+
+js_files = $(sort $(wildcard etc/*.js) $(built_js_files))
+css_files = $(sort $(wildcard etc/*.css) $(built_css_files))
+
+keys = etc/key.pem etc/cert.pem
+
+
+# Stuff we install in etc/
+etc_files = $(js_files) $(css_files) $(keys)\
+ $(wildcard etc/*.htm etc/*.png etc/*.jpg)
 
 BIN = $(PREFIX)/bin
 ETC = $(PREFIX)/etc
 
+
+
 # We npm install a copy of ws for development
-build:
+build: $(built_files) $(keys)
 	npm install $(WS_VERSION)
+
+$(keys):
+	openssl req\
+ -new\
+ -nodes\
+ -x509\
+ -newkey rsa:2048\
+ -keyout etc/key.pem\
+ -subj "/C=US/ST=Denial/L=Blacksburg/O=Dis/CN=any" \
+ -out etc/cert.pem\
+ -days 1000000
+
+
+%.js: %.jsp
+	echo "// This is a generated file" > $@
+	yui-compressor --line-break 70 --type js $^ >> $@
+%.css: %.cs
+	echo "/* This is a generated file */" > $@
+	yui-compressor --line-break 70 --type css $^ >> $@
+
 
 mkdirs:
 	rm -rf $(ETC) $(BIN) && mkdir -p $(ETC) $(BIN)
@@ -33,13 +65,14 @@ mkdirs:
 # The current version of socket.io seems to be broken when used
 # with firefox and chromium-browser.  So we are trying nodejs 'ws'
 # WebSockets.
+
 install: mkdirs
-	cp  -r $(private_files) $(ETC)/
+	cp  -r $(etc_files) $(ETC)/
 	cp demoRunner-server $(BIN)/
 	cd $(BIN)/ && npm install $(WS_VERSION)
 	echo "etc" > $(PREFIX)/encap.exclude
 	echo "node_modules" > $(BIN)/encap.exclude
 
 clean:
-	rm -rf node_modules config
+	rm -rf node_modules config $(built_files) $(keys)
 

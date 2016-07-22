@@ -422,8 +422,8 @@ function getPage(dir, relDir) {
     // TODO: This could read head.htm (and foot.htm) each time so
     // that changes go into effect immediately.
     var page = serverFiles['head.htm'].toString().
-        replace('@HEADING@', heading).
-        replace('@TITLE@', title) +
+        replace('@TITLE@', title) + "\n" +
+        '<div id=heading>' + heading + "</div>\n" + 
         "\n<!-- This was a generated file.\n  END head.htm -->\n\n";
 
 
@@ -570,6 +570,20 @@ function getPage(dir, relDir) {
         serverFiles['foot.htm'];
 }
 
+function checkHeading() {
+
+    if(heading.length < 1) {
+        if(title.length >= 1)
+            heading = '<h1>' + title + '</h1>';
+        else
+            heading = defaultHeading;
+    }
+    if(!heading.match(/</)) {
+        heading = escapeHTML(heading);
+        heading = '<h1>' + heading + '</h1>';
+    }
+}
+
 function config() {
 
     for(var i=2; i < process.argv.length; ++i) {
@@ -654,14 +668,9 @@ function config() {
         else
             title = defaultTitle;
     }
-    if(heading.length < 1) {
-        if(title.length >= 1)
-            heading = title;
-        else
-            heading = defaultHeading;
-    }
-    heading = escapeHTML(heading);
+
     title = escapeHTML(title);
+    checkHeading();
 
     var etcDirs = [ scriptDir + '/../etc' , scriptDir + '/etc' ];
     var filenames = Object.keys(serverFiles);
@@ -911,6 +920,8 @@ function httpRequest(request, response) {
 
         var suffix = {
             "text/plain": /\.txt$/,
+            "application/javascript": /\.js$/,
+            "text/css": /\.css$/,
             "image/png": /\.png$/,
             "image/jpeg": /\.(jpg|JPG|jpeg|JPEG)$/,
             "text/html": /\.html$/,
@@ -1075,6 +1086,7 @@ function httpRequest(request, response) {
 
     if(obj.HEADING) {
         heading = obj.HEADING;
+        checkHeading();
         response.write(JSON.stringify({ type: 'HEADING', heading: heading }));
         socketsSend(JSON.stringify({ type: 'HEADING', heading: heading }));
     }
