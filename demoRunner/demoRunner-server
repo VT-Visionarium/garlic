@@ -993,25 +993,25 @@ var sserver = https.createServer({
         return list;
     }
 
-    ////////////////////////////////////////////////////////////////////
-    // Restrict access to this server.
-    // We do this by:
-    //
-    //      Checking that a valid session cookie (passcode) was sent
-    //
-    //                 or
-    //
-    //      A valid query with the passcode
-    //
-    //
 
     if(passcode.length > 0) {
-        
+        ////////////////////////////////////////////////////////////////////
+        // Restrict access to this server.
+        // We do this by:
+        //
+        //      Checking that a valid session cookie (passcode) was sent
+        //
+        //                 or
+        //
+        //      A valid query with the passcode
+        //
+        //
+
         var obj = querystring.parse(url.parse(request.url).query);
         var cookie = parseCookies(request);
+        var need_pass_cookie = !cookie.passcode || cookie.passcode != passcode;
 
-        if((!cookie.passcode || cookie.passcode != passcode)
-                &&
+        if(need_pass_cookie &&
             (!obj.passcode || obj.passcode.length < 1 || obj.passcode != passcode)) {
 
                 console.log('rejected connection from address:  ' +
@@ -1024,7 +1024,8 @@ var sserver = https.createServer({
                 response.end();
                 return;
             }
-        response.setHeader('Set-Cookie', 'passcode=' + passcode);
+        else if(need_pass_cookie)
+            response.setHeader('Set-Cookie', 'passcode=' + passcode);
     }
 
 
