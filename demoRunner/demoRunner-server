@@ -1017,10 +1017,10 @@ var sserver = https.createServer({
                 console.log('rejected connection from address:  ' +
                     request.connection.remoteAddress.replace(/^.*:/, '') +
                     ' invalid passcode');
-                // TODO: IS there a way to close the socket without sending
-                // the http header?
-                response.statusCode = 408;
-                response.setHeader("Connection", "close");
+                // TODO: IS there a way to close the socket after the end()
+
+                response.writeHead(500, {"Content-Type": "text/plain"});
+                response.write("\nBad passcode\n\n");
                 response.end();
                 return;
             }
