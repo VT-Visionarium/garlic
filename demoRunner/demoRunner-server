@@ -39,6 +39,7 @@ var
     env = Object.create(process.env),
     querystring = require('querystring'),
     passcode = '',
+    onExit = '',
 
 
 //////////////////////////////////////////////////////////////////////
@@ -104,6 +105,42 @@ function exit(stat) {
             }
         }
 
+    if(onExit.length > 0) {
+
+        var _onExit = onExit; // Save a copy of onExit
+
+        console.log("Running pre-exit program: " + onExit);
+
+        try {
+            //////////// async version //////////
+            var child = child_process.spawn(onExit, 
+                {
+                    cwd: cwdOrg,
+                    detached: false,
+                    stdio: [0,1,2],
+                    env: env
+                }
+            );
+        } catch(err) {
+            console.log('Failed to start ' + onExit + ': ' + err);
+            process.exit(34); // return error status
+        }
+
+        console.log('running ' + onExit + " child.pid=", child.pid);
+
+        child.on('close', (code) => {
+            console.log(_onExit + ' pid=' +
+                child.pid + ' exited with status code=' + code);
+            console.log("Server Exiting")
+            process.exit(code);
+        });
+
+        onExit = ''; // stop it from being run again.
+        return; // We can't exit until the child finishes.
+    }
+
+
+
     console.log("Server Exiting")
     process.exit(ret);
 }
@@ -126,26 +163,28 @@ function usage() {
     // Heredoc should be part of javascript!
 
     console.log(
-"   Usage: " + prog + " [DOC_ROOT] [--title TITLE]\\\n" +
-"       [--heading HEADING] [--exit-on-last] [--kill-children] [--passcode PASSCODE]\n" +
+"   Usage: " + prog + " [DOC_ROOT] [--exit-on-last] [--heading HEADING] [--kill-children]\\\n" +
+"        [--on-exit PROGRAM] [--passcode PASSCODE] [--signal SIG PID] [--title TITLE]\n" +
 "\n" +
 "  Run a " + prog + " HTTP server and WebSocket server.\n" +
 "\n" +
 "  The default DOC_ROOT is the current working directory.\n" +
 "\n" +
-"                  OPTIONS\n" +
+"\n" +
+"                    OPTIONS\n" +
 "\n" +
 "     --exit-on-last       have server exit after last connection closes\n" +
 "     --heading HEADING    set <h1> page heading text to HEADING\n" +
 "                          the default HEADING is \"" + defaultHeading + "\n" +
 "     --kill-children      kill all launched children on exiting the server\n" +
-"     --signal SIG PID     signal the process with PID with signal SIG just after the\n" +
-"                          listening sockets are open.  Example: --signal SIGUSR1 2354\n" +
+"     --on-exit PROGRAM    run PROGRAM just before the server exits\n" +
 "     --passcode PASSCODE  set client passcode to PASSCODE, if set the initial URL for\n" +
 "                          the service will appended with something like:\n" +
 "\n" +
 "                                 https://host.com/?passcode=PASSCODE\n" +
 "\n" +
+"     --signal SIG PID     signal the process with PID with signal SIG just after the\n" +
+"                          listening sockets are open.  Example: --signal SIGUSR1 2354\n" +
 "     --title TITLE        set the page title text to TITLE\n" +
 "                          the default title is \"" + defaultTitle + "\n" +
 "\n"
@@ -633,6 +672,13 @@ function config() {
                 else
                     usage();
                 break;
+            case '-on-exit':
+            case '--on-exit':
+                if(++i < process.argv.length)
+                    onExit = process.argv[i];
+                else
+                    usage();
+                break;
             case '--exit-on-last':
             case '-exit-on-last':
                 exitOnLast = true;
@@ -648,6 +694,10 @@ function config() {
                 }
                 if(/^-(-|)passcode=/.test( process.argv[i])) {
                     passcode = process.argv[i].replace(/^-(-|)passcode=/,'');
+                    break;
+                }
+                if(/^-(-|)on-exit=/.test( process.argv[i])) {
+                    onExit = process.argv[i].replace(/^-(-|)on-exit=/,'');
                     break;
                 }
                 if(/^-(-|)title=/.test( process.argv[i])) {
@@ -992,9 +1042,7 @@ var sserver = https.createServer({
 
         return list;
     }
-
-
-    if(passcode.length > 0) {
+   if(passcode.length > 0) {
         ////////////////////////////////////////////////////////////////////
         // Restrict access to this server.
         // We do this by:
@@ -1012,6 +1060,7 @@ var sserver = https.createServer({
         var need_pass_cookie = !cookie.passcode || cookie.passcode != passcode;
 
         if(need_pass_cookie &&
+
             (!obj.passcode || obj.passcode.length < 1 || obj.passcode != passcode)) {
 
                 console.log('rejected connection from address:  ' +
@@ -1032,8 +1081,6 @@ var sserver = https.createServer({
     httpRequest(request, response);
 
 }).listen(httpsPort);
-
-
 
 
 function socketsSend(text) {

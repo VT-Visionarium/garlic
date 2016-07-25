@@ -8,9 +8,8 @@ root=/NTFS/Shared/demos
 host=cube
 rhost=$(hostname)
 mono=
-run_stop=yes
+run_stop=" --on-exit hy_stop"
 just_server=
-server_running=
 
 ######################################
 
@@ -46,13 +45,11 @@ EOF
 
 function catch()
 {
-    if [ -n "$server_running" ] ; then
-        wget --no-check-certificate\
+    wget --no-check-certificate\
  https://$host:8383/QUIT?passcode=${passcode}
-        # That should tell the server to quit
-        # If that failed, too bad.
-        server_running=
-    fi
+    # That should tell the server to quit
+    # If that failed, too bad.
+    exit
 }
 
 passcode=$(openssl rand -hex 6)
@@ -86,6 +83,7 @@ function runServer()
  --title Demos\
  --exit-on-last\
  --kill-children\
+${run_stop}\
  --passcode $passcode\
  --heading "$heading" ; then
         exit 1
@@ -167,26 +165,5 @@ trap catch SIGINT SIGTERM SIGQUIT
 echo "passcode=$passcode"
 
 set -x
-firefox https://$host:8383/?passcode=${passcode} &
-set +x
-
-
-server_running=yes
-while [ -n "$server_running" ] ; do
-    # wait for a signal and check if it's running OK
-    sleep 10000
-    if ! nc -z $host 8383 ; then
-        # We are not able to connect to the server
-        server_running=
-    fi
-done
-
-
-if [ -n "$run_stop" ] ; then
-    if [ "$host" != "$rhost" ] ; then
-        ssh $host /usr/local/bin/hy_stop
-    else
-        /usr/local/bin/hy_stop
-    fi
-fi
+firefox https://$host:8383/?passcode=${passcode}
 
