@@ -46,7 +46,8 @@ EOF
 function catch()
 {
     wget --no-check-certificate\
- https://$host:8383/QUIT?passcode=${passcode}
+ https://$host:8383/QUIT?passcode=${passcode}\
+ -O -
     # That should tell the server to quit
     # If that failed, too bad.
     exit
@@ -89,7 +90,6 @@ ${run_stop}\
         exit 1
     fi
     set +x
-    
 }
 
 
@@ -166,4 +166,19 @@ echo "passcode=$passcode"
 
 set -x
 firefox https://$host:8383/?passcode=${passcode}
+set +x
+
+
+while true ; do
+    # TODO: Fix this crap!   I don't like this
+    # server polling shit.
+    # Getting a PID to wait on was a problem.
+    # If the server is not running exit
+    if ! nc -z $host 8383 ; then
+        echo "Server is unreachable"
+        sleep 10
+        exit
+    fi
+    sleep 10
+done
 
