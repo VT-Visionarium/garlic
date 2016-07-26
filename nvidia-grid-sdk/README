@@ -1,0 +1,13 @@
+
+https://developer.nvidia.com/grid-app-game-streaming
+
+had to get a nvidia developer account:
+https://developer.nvidia.com/
+
+
+ran:
+
+mkdir -p grid-sdk-2.2-linux &&\
+cd grid-sdk-2.2-linux/ &&\
+cp grid-sdk-2.2-linux.zip .\
+unzip grid-sdk-2.2-linux.zip
