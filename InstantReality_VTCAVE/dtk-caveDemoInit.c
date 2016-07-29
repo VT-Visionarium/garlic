@@ -26,7 +26,12 @@ int main(int argc, char **argv)
    
     system("dtk-server is900 &");
 
-    setenv("DISPLAY", "localhost:10.0", 1);
+    char *disEnv;
+    disEnv = getenv("DISPLAY");
+    printf("DISPLAY=\"%s\"\n", disEnv);
+
+    if(!disEnv)
+        setenv("DISPLAY", "localhost:10.0", 1);
 
     system("dtk-floatSliders head"
         " -u"
@@ -63,8 +68,8 @@ int main(int argc, char **argv)
     system("dtk-buttons buttons"
         " -g 120x290-5+44 &");
 
-    // Last one running in the foreground
-    system("dtk-readCAVEDevices");
+    // Last one
+    system("xfce4-terminal --geometry 148x7-0+522  -x dtk-readCAVEDevices &");
 
     // TODO: See if there was a process and check
     // for failure if there was.
