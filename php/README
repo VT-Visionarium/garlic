@@ -1,6 +1,6 @@
-php_demorunner - This just installs a striped down version of PHP for
-                 demoRunner.  You may install this indirectly by
-                 installing demoRunner.
+php - This just installs a striped down version of PHP.
+      It used to be for demoRunner but PHP is no longer
+      used for demoRunner.  It uses nodejs instead.
 
 
 # besides the GNU autotools we need re2c to build PHP:

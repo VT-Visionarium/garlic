@@ -1,0 +1,11 @@
+# From: https://docs.globus.org/resource-provider-guide/#install_section
+# https://docs.globus.org/resource-provider-guide/#debian_ubuntu
+
+sudo curl -LOs http://toolkit.globus.org/ftppub/globus-connect-server/globus-connect-server-repo_latest_all.deb
+sudo dpkg -i globus-connect-server-repo_latest_all.deb
+sudo apt-get update
+
+# Then, install Globus Connect Server:
+
+sudo apt-get install globus-connect-server
+
