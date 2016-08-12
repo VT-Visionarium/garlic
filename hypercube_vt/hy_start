@@ -8,11 +8,12 @@ function usage()
 
   Run many programs needed to start a HyperCube session.
 
-  Runs the following 7 programs:
+  Runs the following 8 programs:
 
     hy_stopx                   makes sure no user X sessions are running
     hy_kill_dtk-server         kill any dtk-server
     hy_startx                  start a user login X session
+    hy_demoRunner              a demo launcher browser/server
     hy_edgeBlend_on            turn on screen edge blending
     hy_projectors_on [--mono]  turn on projects
     hy_frameLock_on            turn on nvidia frame locking
@@ -42,13 +43,6 @@ function Run()
 # default mono is off
 mono=
 
-# TODO: We need to do this better.
-if [ -n "$HYPERCUBE_OPTIONS" ] ; then
-    if [ "$HYPERCUBE_OPTIONS" = "--mono" ] ; then
-        mono="--mono"
-    fi
-fi
-
 
 while [ -n "$1" ] ; do
     case $1 in
@@ -70,7 +64,10 @@ done
 
 # first kill any old user X sessions
 Run hy_stopx
+# then kill any old DTK servers
 Run hy_kill_dtk-server
+
+
 Run hy_startx
 
 
@@ -108,6 +105,7 @@ echo "found a good X server at DISPLAY=$display"
 # the return status value from the nvidia-settings program.
 
 # all 3 are nvidia driver scripts.
+Run hy_demoRunner
 Run hy_edgeBlend_on
 Run hy_frameLock_on
 Run hy_syncToVBlank_on

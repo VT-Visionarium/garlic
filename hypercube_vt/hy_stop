@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ret=0
+
 function usage()
 {
     cat <<EOF
@@ -24,7 +26,7 @@ function Run()
     if ! $* ; then
         echo
         echo "$* FAILED"
-        exit 1
+        let ret=$ret+1
     fi
 }
 
@@ -39,7 +41,9 @@ while [ -n "$1" ] ; do
 done
 
 Run hy_kill_dtk-server
-Run hy_stopx
 Run hy_projectors_off
+Run hy_stopx
 
-echo "$0 finished"
+echo "$0 finished with return status $ret"
+
+exit $ret

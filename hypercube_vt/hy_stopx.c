@@ -10,7 +10,9 @@ int usage(const char *argv0)
         "\n"
         "    Stop all user X sessions. Specifically this signals\n"
         "  the x-session-manager which then does a proper X session\n"
-        "  shutdown, like logout.\n"
+        "  shutdown, like logout.  This runs until it sees that the\n"
+        "  x session has stopped, so that when this returns you can be\n"
+        "  assured that the X session no longer exists.\n"
         "\n", argv0);
     return 1;
 }
