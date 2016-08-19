@@ -105,7 +105,6 @@ echo "found a good X server at DISPLAY=$display"
 # the return status value from the nvidia-settings program.
 
 # all 3 are nvidia driver scripts.
-Run hy_demoRunner
 Run hy_edgeBlend_on
 Run hy_frameLock_on
 Run hy_syncToVBlank_on
