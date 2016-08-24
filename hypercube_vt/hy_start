@@ -13,7 +13,6 @@ function usage()
     hy_stopx                   makes sure no user X sessions are running
     hy_kill_dtk-server         kill any dtk-server
     hy_startx                  start a user login X session
-    hy_demoRunner              a demo launcher browser/server
     hy_edgeBlend_on            turn on screen edge blending
     hy_projectors_on [--mono]  turn on projects
     hy_frameLock_on            turn on nvidia frame locking
