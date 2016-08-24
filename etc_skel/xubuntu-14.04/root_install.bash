@@ -42,7 +42,7 @@ set +x
 
 if [ -d "$host_skel" ] ; then
     for i in $host_skel/*.??* $host_skel/* ; do
-        if [ -f "$i" ] ; then
+        if [ -e "$i" ] ; then
             echo "cp -r $i /etc/skel"
             cp -r $i /etc/skel || Fail "cp -r $i /etc/skel FAILED"
         fi
