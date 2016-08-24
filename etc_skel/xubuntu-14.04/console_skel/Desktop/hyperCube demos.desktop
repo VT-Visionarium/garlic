@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=hyperCube demos
+Comment=hyperCube demos in Stereo
+GenericName=HyperCube Demo Runner
+Exec=/usr/local/bin/hy_demoRunner --no-stop
+Icon=/usr/local/etc/cave_128x128.png
+Path=/
+Name=hyperCube demos
+Terminal=true
+Categories=Application;
+StartupNotify=true

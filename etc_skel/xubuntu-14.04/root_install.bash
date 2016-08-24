@@ -18,6 +18,8 @@ scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
 cd "$scriptdir" || exit $?
 scriptdir="$PWD"
 
+host_skel="$(hostname -s)_skel" || Fail "hostname -s FAILED"
+
 
 bakdir=
 
@@ -37,9 +39,14 @@ cp -r skel /etc/ || exit $?
 chmod -R a+r /etc/skel || exit $?
 set +x
 
-if [ "$(hostname -s)" = "cube" ] ; then
-    echo "install host cube skel into /etc/skel yourself"
-    echo "by mergeing in stuff from cube_skel into /etc/skel"
-else
-    echo "SUCCESS"
+
+if [ -d "$host_skel" ] ; then
+    for i in $host_skel/*.??* $host_skel/* ; do
+        if [ -f "$i" ] ; then
+            echo "cp -r $i /etc/skel"
+            cp -r $i /etc/skel || Fail "cp -r $i /etc/skel FAILED"
+        fi
+    done
 fi
+
+echo "SUCCESS"
