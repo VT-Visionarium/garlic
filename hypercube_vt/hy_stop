@@ -10,8 +10,14 @@ function usage()
 
   Run programs needed to stop a HyperCube session.
 
-  Runs the following 3 programs:
+  Runs the following 4 programs:
       
+       # to shutdown the demoRunner server
+       wget http://localhost:8080/QUIT?foo=bar -O -
+
+       # If the demoRunner server was running it may have
+       # ran these for us already, but if not we do this
+       # anyway:
        hy_kill_dtk-server     kill any dtk-server programs
        hy_stopx               turn off all user X sessions 
        hy_projectors_off      turn off the projectors
@@ -39,6 +45,11 @@ while [ -n "$1" ] ; do
     esac
     shift 1
 done
+
+# The server may not be running, but in any case if this
+# fails we have no other recourse.
+# A bug in the server requires there be a query in the URL.
+wget http://localhost:8080/QUIT?foo=bar -O -
 
 Run hy_kill_dtk-server
 Run hy_projectors_off

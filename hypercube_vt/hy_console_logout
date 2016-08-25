@@ -1,0 +1,48 @@
+#!/bin/bash
+
+function usage()
+{
+    cat <<EOF
+
+  Usage: $0 [-h|--help]
+
+  Run programs needed to stop a HyperCube session from
+  the remote console and then logs out.  It tries the
+  best it can.
+
+  Runs the following 3 programs (on hyperCube) via hy_stop:
+      
+       hy_kill_dtk-server     kill any dtk-server programs
+       hy_stopx               turn off all user X sessions 
+       hy_projectors_off      turn off the projectors
+
+   and
+
+       signal demoRunner server via ssh wget telling it to quit
+
+   and finally
+
+       logout on console
+
+EOF
+
+    exit 1
+}
+
+if [ "$(hostname -s)" != "console" ] ; then
+    echo "your hostname must be console to run this"
+    exit 1
+fi
+
+# make sure we can ssh to cube without a password.
+if ! ssh -oBatchMode=yes cube echo "ssh to cube worked" ; then
+    xfce4-terminal -x gar_pushSshKeys cube
+fi
+
+ssh cube hy_stop
+
+# Okay we tried
+
+echo "logging out"
+xfce4-session-logout 
+
