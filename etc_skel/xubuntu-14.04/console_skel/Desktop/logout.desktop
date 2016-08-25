@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=logout
+Comment=Log out of the Xfce Desktop
+GenericName=LogOut
+Exec=xfce4-session-logout -l
+Icon=system-log-out
+Path=
+Name=Log Out
+Terminal=false
+Categories=Application;
+StartupNotify=false

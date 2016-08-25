@@ -17,7 +17,8 @@ function usage()
 {
     cat << EOF
 
-  Usage: $0 [SERVER_HOST][-m|--mono][--no-stop][--just-server]|[-h|--help]
+  Usage: $0 [SERVER_HOST][-m|--mono][--no-stop][--just-server]\
+      [--with-term [args ...]]|[-h|--help]
 
   Run the hyperCube demoRunner.
 
@@ -25,17 +26,20 @@ function usage()
           OPTIONS
 
 
-    -h|--help      Print this help and exit
+    -h|--help        Print this help and exit
     
-    --just-server  Just run the demoRunner server
+    --just-server    Just run the demoRunner server
 
-    -m|--mono      Run programs with mono visuals (not stereo)
+    -m|--mono        Run programs with mono visuals (not stereo)
 
-    --no-stop      Don't run hy_stop after quiting.  hy_stop stops the
-                   X session and turn off projects.
+    --no-stop        Don't run hy_stop after quiting.  hy_stop stops the
+                     X session and turn off projects.
 
-    SERVER_HOST    Run the nodejs demoRunner server on SERVER_HOST.
-                   That's for testing.
+    --with-term      Run this program in a xfce4-terminal with the
+                     remaining arguments passed to xfce4-terminal
+
+    SERVER_HOST      Run the nodejs demoRunner server on SERVER_HOST.
+                     That's for testing.
 
 EOF
 
@@ -50,7 +54,6 @@ function catch()
  -O -
     # That should tell the server to quit
     # If that failed, too bad.
-    exit
 }
 
 passcode=$(openssl rand -hex 6)
@@ -99,8 +102,12 @@ if ! ssh $host "if [ ! -d $root ] ; then exit 1 ; fi" ; then
     echo "Setting server doc root to: $root"
 fi
 
+script_args=
 
 while [ -n "$1" ] ; do
+    if [ "$1" != "--with-term" ] ; then
+        script_args="$script_args $1"
+    fi
     case "$1" in
         --no-stop)
             run_stop=
@@ -110,6 +117,12 @@ while [ -n "$1" ] ; do
             ;;
         -m*|--m*)
             mono=--mono
+            ;;
+        --with-term)
+            shift 1
+            # rerun in a terminal
+            set -x
+            exec xfce4-terminal --geometry 100x32-0+0 -e "$0 $script_args $*"
             ;;
         -*)
             usage
@@ -176,9 +189,9 @@ while true ; do
     # If the server is not running exit
     if ! nc -z $host 8383 ; then
         echo "Server is unreachable"
-        sleep 10
+        sleep 20 # let the user see the spew
         exit
     fi
-    sleep 10
+    sleep 6
 done
 
