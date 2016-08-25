@@ -25,6 +25,9 @@ def usage()
 
    will turn @on@ the left top (LT) and floor bottom (FB) projectors.
 
+   This program will get options from environment variable
+   HYPERCUBE_OPTIONS which will override command line options.
+
 
                OPTIONS
 
@@ -73,6 +76,22 @@ ARGV.each do |arg|
          else $proj << arg
     end
 end
+
+if ENV['HYPERCUBE_OPTIONS']
+    $args = ENV['HYPERCUBE_OPTIONS'].split(/\W+/)
+    $args.each do |arg|
+        case arg
+            when '--help' then usage
+            when '-h' then usage
+            when '-m' then $stereo = false
+            when '--mono' then $stereo = false
+            when '--m' then $stereo = false
+            when '-mono' then $stereo = false
+            else $proj << arg
+        end
+    end
+end
+
 
 if $proj.length == 0
     $projectorIPs.each { |name,ip| $proj << name }
