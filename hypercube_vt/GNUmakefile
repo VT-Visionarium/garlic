@@ -20,7 +20,7 @@ inst_files = $(sort\
  $(filter-out %.in,$(wildcard hy_*) $(built_files))\
  nv-control-blend-visbox encap.exclude)
 else
-inst_files = hy_demoRunner
+inst_files = hy_demoRunner hy_console_logout
 endif
 
 build: $(built_files)

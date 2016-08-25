@@ -1,7 +1,6 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=hyperCube demos Mono
 Comment=hyperCube demos in Mono
 GenericName=HyperCube Demo Runner
 Exec=/usr/local/bin/hy_demoRunner --mono --with-term

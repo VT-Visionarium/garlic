@@ -1,12 +1,13 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Comment=Log out of the Xfce Desktop
+Name=logout
+Comment=Stop remote HyperCube session and Log out of the Xfce Desktop
 GenericName=LogOut
-Exec=xfce4-session-logout -l
+Exec=hy_console_logout
 Icon=system-log-out
 Path=
-Name=Log Out
+Name=HyperCube Log Out
 Terminal=false
 Categories=Application;
 StartupNotify=false
