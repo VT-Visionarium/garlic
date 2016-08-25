@@ -65,6 +65,13 @@ end
 $proj = []
 $stereo = true
 
+# debugging commandline
+$env = ''
+$env =  'HYPERCUBE_OPTIONS=' + ENV['HYPERCUBE_OPTIONS'] + ' ' if ENV['HYPERCUBE_OPTIONS']
+puts "\n\n" + $env + $0 + ' ' + ARGV.join(' ')
+#######################
+
+
 ARGV.each do |arg|
     case arg
         when '--help' then usage
@@ -78,7 +85,9 @@ ARGV.each do |arg|
 end
 
 if ENV['HYPERCUBE_OPTIONS']
-    $args = ENV['HYPERCUBE_OPTIONS'].split(/\W+/)
+    puts 'parsing env HYPERCUBE_OPTIONS="' +
+        ENV['HYPERCUBE_OPTIONS'] + '"'
+    $args = ENV['HYPERCUBE_OPTIONS'].split(' ')
     $args.each do |arg|
         case arg
             when '--help' then usage
@@ -104,13 +113,25 @@ else
     end
 end
 
+if '@CMD@' == 'POWR0'
+    $mode = 'Off'
+elsif $stereo
+    $mode = "On in Stereo"
+else
+    $mode = "On in Mono"
+end
+
+puts "\nTurning " + $mode + " the following projectors: " +
+    $proj.join(' ') + "\n\n"
+
 # send command to array of projectors
 $proj.each { |p| sendToName('@CMD@',p) }
 
 
 exit unless '@CMD@' == 'POWR1'
 
-# We are turning on projectors
+# We are turning on projectors so we set all the projectors
+# to Stereo or Mono
 
 if $stereo
 
