@@ -44,5 +44,5 @@ ssh cube hy_stop
 # Okay we tried
 
 echo "logging out"
-xfce4-session-logout 
+xfce4-session-logout -l
 
