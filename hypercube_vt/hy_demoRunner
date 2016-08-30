@@ -52,7 +52,7 @@ function catch()
     echo "caught signal, sending QUIT request"
     set -x
     ssh $host wget --no-check-certificate\
- https://$host:8383/QUIT?passcode=${passcode}\
+ http://$host:8080/QUIT?foo=bar\
  -O -
     set +x
     # That should tell the server to quit
