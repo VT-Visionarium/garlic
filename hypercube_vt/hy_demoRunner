@@ -46,20 +46,24 @@ EOF
     exit 1
 }
 
+passcode=$(openssl rand -hex 3)
+
 
 function catch()
 {
     echo "caught signal, sending QUIT request"
     set -x
-    ssh $host wget --no-check-certificate\
- http://$host:8080/QUIT?foo=bar\
- -O -
+    # We tell the server with this passcode to QUIT.
+    if ! wget --no-check-certificate --tries=1\
+ https://$host:8383/QUIT?passcode=${passcode}\
+ -O - > /dev/null ; then
+        exit
+    fi
     set +x
     # That should tell the server to quit
     # If that failed, too bad.
 }
 
-passcode=$(openssl rand -hex 3)
 
 function runServer()
 {
@@ -74,18 +78,25 @@ function runServer()
 
     local exe=
 
+    if nc -z $host 8383 ; then
+        # If there is an old server running tell it to quit.
+        set -x
+        ssh $host wget --tries=1\
+ http://localhost:8080/QUIT?foo=bar -O -
+        # I hate doing this (sleep), but we have no way to know
+        # how long it takes the server to shut down
+        sleep 2
+        set +x
+    fi
+
     if [ -n "$just_server" ] ; then
         exe="exec "
     fi
 
     if [ "$rhost" != "$host" ] ; then
-        exe="$exec ssh $host -X"
+        exe="$exe ssh $host -X"
         heading="\"$heading\""
     fi
-
-    # If there is an old server running tell it to quit.
-    ssh $host wget\
- http://localhost:8080/QUIT?foo=bar -O -
 
     set -x
     if ! ${exe}${env_opts}\
@@ -161,16 +172,22 @@ fi
 
 runServer &
 
+waitPid=$!
+
 
 count=0
-# wait for server to be working via a netcat connect.
-while ! nc -z $host 8383 ; do
+# wait for server to be working via a wget request
+# We tried netcat but that was connecting before
+# the server was working.
+while ! wget --no-check-certificate --tries=1\
+ https://$host:8383/?passcode=${passcode}\
+ -O - > /dev/null ; do
     sleep 0.6
-    echo "wanting to server to start"
+    echo "waiting for server to start"
     let count=$count+1
     if [ "$count" = "20" ] ; then
         echo "Failed to connect to server"
-        sleep 100
+        sleep 10
         exit 1
     fi
 done
@@ -185,19 +202,21 @@ trap catch SIGINT SIGTERM SIGQUIT
 echo "passcode=$passcode"
 
 set -x
-firefox https://$host:8383/?passcode=${passcode}
+firefox -no-remote https://$host:8383/?passcode=${passcode} &
 set +x
 
 
-while wait ; do
+while wait $waitPid ; do
     # Getting a PID to wait on was a problem.
     # If the server is not running exit
     # BUG: If a dumb user start again after quiting
     # then the previous version will keep running
     # in this loop.
-    if ! nc -z $host 8383 ; then
+    # TODO: make a less expensive wget ping
+    # this gets many files.
+    if ! wget --no-check-certificate --tries=1 https://$host:8383/?passcode=${passcode} -O - > /dev/null ; then
         echo "Server is unreachable"
-        sleep 10 # let the user see the spew
+        sleep 5 # let the user see the spew
         exit
     fi
 done
