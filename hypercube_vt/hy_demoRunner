@@ -189,16 +189,16 @@ firefox https://$host:8383/?passcode=${passcode}
 set +x
 
 
-while true ; do
-    # TODO: Fix this crap!   I don't like this
-    # server polling shit.
+while wait ; do
     # Getting a PID to wait on was a problem.
     # If the server is not running exit
+    # BUG: If a dumb user start again after quiting
+    # then the previous version will keep running
+    # in this loop.
     if ! nc -z $host 8383 ; then
         echo "Server is unreachable"
         sleep 10 # let the user see the spew
         exit
     fi
-    sleep 6
 done
 
