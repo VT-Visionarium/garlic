@@ -8,7 +8,7 @@ root=/NTFS/Shared/demos
 host=cube
 rhost=$(hostname)
 mono=
-run_stop=" --on-exit hy_stop"
+run_stop=" --on_exit hy_stop"
 just_server=
 
 ######################################
@@ -49,14 +49,17 @@ EOF
 
 function catch()
 {
-    wget --no-check-certificate\
+    echo "caught signal, sending QUIT request"
+    set -x
+    ssh $host wget --no-check-certificate\
  https://$host:8383/QUIT?passcode=${passcode}\
  -O -
+    set +x
     # That should tell the server to quit
     # If that failed, too bad.
 }
 
-passcode=$(openssl rand -hex 6)
+passcode=$(openssl rand -hex 3)
 
 function runServer()
 {
@@ -80,15 +83,19 @@ function runServer()
         heading="\"$heading\""
     fi
 
+    # If there is an old server running tell it to quit.
+    ssh $host wget\
+ http://localhost:8080/QUIT?foo=bar -O -
 
     set -x
     if ! ${exe}${env_opts}\
- demoRunner-server $root\
+ webLauncher --root_dir $root\
  --title Demos\
- --exit-on-last\
- --kill-children\
+ --exit_on_last 6000\
+ --kill_children\
 ${run_stop}\
  --passcode $passcode\
+ --catch_signal SIGINT\
  --heading "$heading" ; then
         exit 1
     fi
@@ -98,7 +105,7 @@ ${run_stop}\
 
 # I guess this assumes that you are using a bash shell on $host
 if ! ssh $host "if [ ! -d $root ] ; then exit 1 ; fi" ; then
-    root=/usr/local/src/demoRunner/testDocRoot
+    root=/usr/local/src/webLauncher
     echo "Setting server doc root to: $root"
 fi
 
@@ -189,7 +196,7 @@ while true ; do
     # If the server is not running exit
     if ! nc -z $host 8383 ; then
         echo "Server is unreachable"
-        sleep 20 # let the user see the spew
+        sleep 10 # let the user see the spew
         exit
     fi
     sleep 6
