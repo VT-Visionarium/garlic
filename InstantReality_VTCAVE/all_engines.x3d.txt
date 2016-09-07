@@ -80,11 +80,11 @@
                 <IFcaveWalls>
 
                     <!-- LEFT WALL -->
-                    <LocalWindow position='0 0' size='2560 1600'
+                    <LocalWindow position='0 0' size='@SCREEN_RES@'
                         fullScreen='FALSE' pipe=':0.0' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='2560 1600'
+                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
@@ -113,11 +113,11 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='2560 1600'
+                        <LocalWindow position='0 0' size='@SCREEN_RES@'
                             fullScreen='FALSE' pipe=':0.1' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='2560 1600'
+                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoLT_rightEye'
@@ -134,11 +134,11 @@
                         </LocalWindow>
                     </IFcaveStereo>
 
-                    <LocalWindow position='0 0' size='2560 1600'
+                    <LocalWindow position='0 0' size='@SCREEN_RES@'
                         fullScreen='FALSE' pipe=':0.2' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='2560 1600'
+                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
@@ -167,11 +167,11 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='2560 1600'
+                        <LocalWindow position='0 0' size='@SCREEN_RES@'
                             fullScreen='FALSE' pipe=':0.3' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='2560 1600'
+                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoLB_rightEye'
@@ -196,11 +196,11 @@
 
 
                     <!-- CENTER WALL -->
-                    <LocalWindow position='0 0' size='2560 1600'
+                    <LocalWindow position='0 0' size='@SCREEN_RES@'
                         fullScreen='FALSE' pipe=':0.4' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='2560 1600'
+                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
@@ -229,11 +229,11 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='2560 1600'
+                        <LocalWindow position='0 0' size='@SCREEN_RES@'
                             fullScreen='FALSE' pipe=':0.5' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='2560 1600'
+                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoCT_rightEye'
@@ -251,11 +251,11 @@
                     </IFcaveStereo>
 
 
-                    <LocalWindow position='0 0' size='2560 1600'
+                    <LocalWindow position='0 0' size='@SCREEN_RES@'
                         fullScreen='FALSE' pipe=':0.6' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='2560 1600'
+                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
@@ -284,11 +284,11 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='2560 1600'
+                        <LocalWindow position='0 0' size='@SCREEN_RES@'
                             fullScreen='FALSE' pipe=':0.7' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='2560 1600'
+                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoCB_rightEye'
@@ -308,11 +308,11 @@
 
 
                     <!-- RIGHT WALL -->
-                    <LocalWindow position='0 0' size='2560 1600'
+                    <LocalWindow position='0 0' size='@SCREEN_RES@'
                         fullScreen='FALSE' pipe=':0.8' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='2560 1600'
+                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
@@ -341,11 +341,11 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='2560 1600'
+                        <LocalWindow position='0 0' size='@SCREEN_RES@'
                             fullScreen='FALSE' pipe=':0.9' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='2560 1600'
+                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoRT_rightEye'
@@ -363,11 +363,11 @@
                     </IFcaveStereo>
 
 
-                    <LocalWindow position='0 0' size='2560 1600'
+                    <LocalWindow position='0 0' size='@SCREEN_RES@'
                         fullScreen='FALSE' pipe=':0.10' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='2560 1600'
+                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
@@ -396,11 +396,11 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='2560 1600'
+                        <LocalWindow position='0 0' size='@SCREEN_RES@'
                             fullScreen='FALSE' pipe=':0.11' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='2560 1600'
+                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoRB_rightEye'
@@ -419,11 +419,11 @@
                     <!-- END RIGHT WALL -->
 
                     <!-- FLOOR WALL -->
-                    <LocalWindow position='0 0' size='2560 1600'
+                    <LocalWindow position='0 0' size='@SCREEN_RES@'
                         fullScreen='FALSE' pipe=':0.12' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='2560 1600'
+                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
@@ -452,11 +452,11 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='2560 1600'
+                        <LocalWindow position='0 0' size='@SCREEN_RES@'
                             fullScreen='FALSE' pipe=':0.13' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='2560 1600'
+                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoFT_rightEye'
@@ -474,11 +474,11 @@
                     </IFcaveStereo>
 
 
-                    <LocalWindow position='0 0' size='2560 1600'
+                    <LocalWindow position='0 0' size='@SCREEN_RES@'
                         fullScreen='FALSE' pipe=':0.14' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='2560 1600'
+                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
@@ -507,11 +507,11 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='2560 1600'
+                        <LocalWindow position='0 0' size='@SCREEN_RES@'
                             fullScreen='FALSE' pipe=':0.15' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='2560 1600'
+                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoFB_rightEye'

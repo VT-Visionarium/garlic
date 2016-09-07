@@ -23,9 +23,12 @@ EOF
 
 function PostProcess()
 {
+    # Configure @SCREEN_RES@ below here.
     xmlstarlet c14n --without-comments - |\
         grep -Ev '^\s*$' |\
-        sed -e 's/^\s*//g' -e 's/\s\s*/ /g' || exit 1
+        sed -e 's/^\s*//g'\
+            -e 's/\s\s*/ /g'\
+            -e 's/@SCREEN_RES@/1920 1200/g' || exit 1
 }
 
 function RemoveTags()
