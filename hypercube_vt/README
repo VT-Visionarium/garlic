@@ -18,6 +18,7 @@ To install on the VT hyperCube:
 
    edit the hy_edgeBlend_common and make sure that
    the projector resolutions are set the way you like, and
+
    edit hy_projectors_on.in and make sure that
    the projector resolutions are set the way you like,
    then:
