@@ -8,13 +8,13 @@ function usage()
 
   Run many programs needed to start a HyperCube session.
 
-  Runs the following 8 programs:
+  Runs the following 7 programs:
 
     hy_stopx                   makes sure no user X sessions are running
     hy_kill_dtk-server         kill any dtk-server
     hy_startx                  start a user login X session
-    hy_edgeBlend_on            turn on screen edge blending
     hy_projectors_on [--mono]  turn on projects
+    hy_edgeBlend_on            turn on screen edge blending
     hy_frameLock_on            turn on nvidia frame locking
     hy_syncToVBlank_on         turn on nvidia sync to verticle refresh
 
