@@ -13,14 +13,20 @@ All the programs that are installed from this project have the prefix hy_
 This project is only good for the VT CAVE, so it need not follow the
 garlic standard install methods.
 
-To install on the VT hyperCube machine run:
 
-    make install
+To install on the VT hyperCube:
 
+   edit the hy_edgeBlend_common and make sure that
+   the projector resolutions are set the way you like, and
+   edit hy_projectors_on.in and make sure that
+   the projector resolutions are set the way you like,
+   then:
 
-There is one program you can install on other machines run:
+      make install
 
-   make install_pushSshKeys
+    then pick the correct xorg.conf file to copy
+
+      sudo cp xorg.conf.cube_1920x1200 /etc/X11/xorg.conf
 
 
 
@@ -87,16 +93,11 @@ Option          "OffTime"       "0"
 
 
 
-FILES:
-
-    demos/
-
-        contain things related to hypercube demos which run something
-        that displays using the hypercube projectors.
-
-
 
 References:
 
-https://www.barco.com/tde/%280052102360800021%29/TDE6605/00/Barco_UserGuide_TDE6605_00__GP9-platform-LAN-RS232-communication-protocol.pdf
+  Projectors user guide:
+
+  https://www.barco.com/tde/%280052102360800021%29/TDE6605/00/Barco_UserGuide_TDE6605_00__GP9-platform-LAN-RS232-communication-protocol.pdf
+
 

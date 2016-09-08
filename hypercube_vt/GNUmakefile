@@ -3,7 +3,7 @@
 # Butt-ugly make files are so fun!
 # But only if you're a make expert.
 
-PREFIX := /usr/local/encap/hypercube_vt-0.1
+PREFIX := /usr/local/encap/hypercube_vt-0.2
 
 BIN = $(PREFIX)/bin
 ETC = $(PREFIX)/etc

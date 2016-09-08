@@ -1,5 +1,31 @@
 #!/usr/bin/ruby -w
 
+
+############################################################
+#             CONFIGURATION
+############################################################
+
+# PROJECTOR resolution command stuff:
+
+# set EDID resolution for dp1 to WQXGA@60hz (17 is 60hz, 18 is 120hz)
+# set EDID resolution for dp1 to WUXGA@60hz (15 is 60hz, 16 is 120hz)
+# high res send('EDIR17 25')  or low res send('EDIR15 25')
+$dp1_res='EDIR15 25' # for 1920x1200
+#$dp1_res='EDIR17 25' # for 2560x1600
+
+
+# set EDID resolution for dp2 to WQXGA@60hz (17 is 60hz, 18 is 120hz)
+# set EDID resolution for dp2 to WUXGA@60hz (15 is 60hz, 16 is 120hz)
+# high res send('EDIR17 26')  or low res send('EDIR15 26')
+$dp2_res='EDIR15 26' # for 1920x1200
+#$dp2_res='EDIR17 26' # for 2560x1600
+
+
+############################################################
+############################################################
+
+
+
 require File.dirname(__FILE__) + "/hy_projectors_common"
 
 $prog = File.basename($0)
@@ -138,10 +164,8 @@ if $stereo
     # set input to display port 1
     send('IDIP1')
 
-    # set EDID resolution for dp1 to WQXGA@60hz (17 is 60hz, 18 is 120hz)
-    send('EDIR17 25')
-    # set EDID resolution for dp2 to WQXGA@60hz (17 is 60hz, 18 is 120hz)
-    send('EDIR17 26')
+    send($dp1_res)
+    send($dp2_res)
 
     # display port eq settings (0=normal, 1=high, 2=low)
     send('DPE11')
@@ -214,3 +238,10 @@ else # mono
 end
 
 puts "#{$prog} finished"
+
+
+# References:
+
+# Projector user guide:
+# https://www.barco.com/tde/%280052102360800021%29/TDE6605/00/Barco_UserGuide_TDE6605_00__GP9-platform-LAN-RS232-communication-protocol.pdf
+

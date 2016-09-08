@@ -1,11 +1,33 @@
 #!/bin/bash
 
+
+############################################################
+#             CONFIGURATION
+############################################################
+
+# PROJECTOR resolution:
+
+# if 2 1920x1200 displays the vertical overlap is 480 pixels
+# if 2 2560x1600 displays the vertical overlap is 640 pixels
+overlap=480
+#overlap=640
+
+# res is low res: 1920x1200  or high res: 2560x1600
+res="1920 1200"
+#res="2560 1600"
+
+############################################################
+############################################################
+
+
 cscriptdir="$(dirname $(readlink ${BASH_SOURCE[0]}))" || exit $?
 cd "$cscriptdir" || exit $?
 cscriptdir="$PWD"
 
 blend="$cscriptdir/nv-control-blend-visbox"
 unset cscriptdir
+
+
 
 
 # Usage: blend DPY NUM OPT
@@ -23,7 +45,7 @@ function blend_on()
     # return code, so we are not doing: '$run || exit 1'
     # or like thing.
     set -x
-    DISPLAY=$1 $blend $2 $3 640 -g 1.65
+    DISPLAY=$1 $blend $2 $3 $overlap -g 1.65
     set +x
 }
 
@@ -36,7 +58,6 @@ function blend_off()
     # return code, so we are not doing: '$run || exit 1'
     # or like thing.
     set -x
-    DISPLAY=$1 $blend $2 2560 1600
+    DISPLAY=$1 $blend $2 $res
     set +x
 }
-
