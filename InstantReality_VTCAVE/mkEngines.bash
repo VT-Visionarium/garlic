@@ -1,5 +1,16 @@
 #!/bin/bash
 
+#########################################################
+#           CONFIGURATION
+#########################################################
+
+# X root windows pixel resolution:
+#res="1920 1200"
+res="2560 1600"
+
+#########################################################
+
+
 date="$(date)"
 
 function Header()
@@ -28,7 +39,7 @@ function PostProcess()
         grep -Ev '^\s*$' |\
         sed -e 's/^\s*//g'\
             -e 's/\s\s*/ /g'\
-            -e 's/@SCREEN_RES@/1920 1200/g' || exit 1
+            -e "s/@SCREEN_RES@/$res/g" || exit 1
 }
 
 function RemoveTags()

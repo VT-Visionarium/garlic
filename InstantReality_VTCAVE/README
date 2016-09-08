@@ -46,7 +46,10 @@ with groups of filenames in a reasonable way.  GNU make kicks it's ass.
 
 To build and test stuff:
 
-   make
+   edit mkEngines.bash and check that @SCREEN_RES@ is what you want then
+   run:
+
+     make
 
 and then run one of *.bash or an InstantPlayer command.
 
@@ -61,7 +64,7 @@ To remove generated files:
 
 
 ------------------------------------------------------------------------------
-Develment notes:
+Development notes:
 
   Moving a window: wmctrl -i -r $WID -e 0,50,50,250,250
 
