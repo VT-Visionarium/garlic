@@ -10,15 +10,20 @@
 # set EDID resolution for dp1 to WQXGA@60hz (17 is 60hz, 18 is 120hz)
 # set EDID resolution for dp1 to WUXGA@60hz (15 is 60hz, 16 is 120hz)
 # high res send('EDIR17 25')  or low res send('EDIR15 25')
-$dp1_res='EDIR15 25' # for 1920x1200
-#$dp1_res='EDIR17 25' # for 2560x1600
+$dp1_lowres='EDIR15 25' # for 1920x1200
+$dp1_highres='EDIR17 25' # for 2560x1600
 
 
 # set EDID resolution for dp2 to WQXGA@60hz (17 is 60hz, 18 is 120hz)
 # set EDID resolution for dp2 to WUXGA@60hz (15 is 60hz, 16 is 120hz)
 # high res send('EDIR17 26')  or low res send('EDIR15 26')
-$dp2_res='EDIR15 26' # for 1920x1200
-#$dp2_res='EDIR17 26' # for 2560x1600
+$dp2_lowres='EDIR15 26' # for 1920x1200
+$dp2_highres='EDIR17 26' # for 2560x1600
+
+# default
+$dp1_res = $dp1_lowres
+$dp2_res = $dp2_lowres
+
 
 
 ############################################################
@@ -58,7 +63,11 @@ def usage()
                OPTIONS
 
     -h|--help         print this help and exit
+
     -m|--mono         turn projectors on with mono viewing.  Default is stereo
+
+    --high-res        set for 2560x1600 projector resolution.  You need to
+                      configure X too.
 
 
 
@@ -98,7 +107,13 @@ puts "\n\n" + $env + $0 + ' ' + ARGV.join(' ')
 #######################
 
 
-ARGV.each do |arg|
+def set_highres()
+    $dp1_res = $dp1_highres
+    $dp2_res = $dp2_highres
+end
+
+def parse_arg(arg)
+    # lucky this program only has flag-like options
     case arg
         when '--help' then usage
         when '-h' then usage
@@ -106,24 +121,24 @@ ARGV.each do |arg|
         when '--mono' then $stereo = false
         when '--m' then $stereo = false
         when '-mono' then $stereo = false
-         else $proj << arg
+        when '-high-res' then set_highres
+        when '--high-res' then set_highres
+        else $proj << arg
     end
 end
 
+ARGV.each do |arg|
+    parse_arg(arg)
+end
+
+
+# parse options from ENV['HYPERCUBE_OPTIONS'] too
 if ENV['HYPERCUBE_OPTIONS']
     puts 'parsing env HYPERCUBE_OPTIONS="' +
         ENV['HYPERCUBE_OPTIONS'] + '"'
     $args = ENV['HYPERCUBE_OPTIONS'].split(' ')
     $args.each do |arg|
-        case arg
-            when '--help' then usage
-            when '-h' then usage
-            when '-m' then $stereo = false
-            when '--mono' then $stereo = false
-            when '--m' then $stereo = false
-            when '-mono' then $stereo = false
-            else $proj << arg
-        end
+        parse_arg(arg)
     end
 end
 
@@ -159,43 +174,56 @@ exit unless '@CMD@' == 'POWR1'
 # We are turning on projectors so we set all the projectors
 # to Stereo or Mono
 
+# set input to display port 1
+send('IDIP1')
+
+send($dp1_res)
+send($dp2_res)
+
+# display port eq settings (0=normal, 1=high, 2=low)
+send('DPE11')
+send('DPE21')
+
+# Installation->synchronization
+# 2D framelock to source
+send('FLSO0') 
+# 3D display sync to SYNC1
+send('TDLR1')
+# 3D display sync to source for first projector in chain
+sendToName('TDLR0', 'LT')
+# set SYNC1 to input
+send('TBO10')
+# set SYNC2 to display sync 
+send('TBO23')
+# set SYNC2 to glasses sync for first projector
+sendToName('TBO22', 'LT')
+# set SYNC3 to display sync
+send('TBO33')
+# set SYNC3 to glasses sync for first projector
+sendToName('TBO32', 'LT')
+
+# genlock phase delay to 0
+send('TDGD0')
+
+# Installation
+# image orientation to desktop rear (DESK is desktop front)
+send('RDES')
+# image orientation to ceiling front (RCEI is ceiling rear)
+sendToName('CEIL', 'FT')
+sendToName('DESK', 'FB')
+
+# No BARCO splash logo
+send('SPLH0')
+
+
 if $stereo
 
-    # set input to display port 1
-    send('IDIP1')
-
-    send($dp1_res)
-    send($dp2_res)
-
-    # display port eq settings (0=normal, 1=high, 2=low)
-    send('DPE11')
-    send('DPE21')
-
-    # Installation->synchronization
-    # 2D framelock to source
-    send('FLSO0') 
-    # 3D display sync to SYNC1
-    send('TDLR1')
-    # 3D display sync to source for first projector in chain
-    sendToName('TDLR0', 'LT')
-    # set SYNC1 to input
-    send('TBO10')
-    # set SYNC2 to display sync 
-    send('TBO23')
-    # set SYNC2 to glasses sync for first projector
-    sendToName('TBO22', 'LT')
-    # set SYNC3 to display sync
-    send('TBO33')
-    # set SYNC3 to glasses sync for first projector
-    sendToName('TBO32', 'LT')
 
     # 3D 
     # stereo on (1=frame sequential, 2=side-by-side, 3=dual-head)
     send('TDSM3')
     # glasses type: IR (only for F35)
     #TDGT1 ALL
-    # genlock phase delay to 0
-    send('TDGD0')
     # swap eyes to 1
     send('TDSE1')
 
@@ -205,15 +233,6 @@ if $stereo
     # set right eye to display port 2
     send('IABS18 1')
 
-    # Installation
-    # image orientation to desktop rear (DESK is desktop front)
-    send('RDES')
-    # image orientation to ceiling front (RCEI is ceiling rear)
-    sendToName('CEIL', 'FT')
-    sendToName('DESK', 'FB')
-
-    # No BARCO splash logo
-    send('SPLH0')
 
     # Full lamp power (range 0-350). Make floor slightly dimmer to match walls
     # These should not change
@@ -229,6 +248,8 @@ if $stereo
 
 
 else # mono
+
+    # TODO: This
 
     # stereo (0= off, 1=frame sequential, 2=side-by-side, 3=dual-head)
     send('TDSM0')
