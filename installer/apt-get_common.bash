@@ -3,6 +3,7 @@
 set -x
 
 apt-get -y install\
+ realpath\
  manpages-dev\
  manpages-posix-dev\
  octave\
