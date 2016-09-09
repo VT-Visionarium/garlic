@@ -22,7 +22,7 @@ else
     # default to high res 2560x1600
     overlap=640
     res="2560 1600"
-if
+fi
 
 
 
