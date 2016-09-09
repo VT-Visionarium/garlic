@@ -5,9 +5,10 @@ cd "$cscriptdir" || exit $?
 cscriptdir="$PWD"
 
 blend="$cscriptdir/nv-control-blend-visbox"
-unset cscriptdir
 
 x="$($cscriptdir/hy_getRootWidth)" || exit 1
+
+unset cscriptdir
 
 # if 2x 1920x1200 displays per wall the vertical overlap is 480 pixels
 # if 2x 2560x1600 displays per wall the vertical overlap is 640 pixels
