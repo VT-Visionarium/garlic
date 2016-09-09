@@ -1,5 +1,19 @@
 #!/bin/bash
 
+
+###########################################################
+#          CONFIGURE resolution
+###########################################################
+# These xorg.conf files need to be installed in /etc/X11/
+# then we can select which resolution we want to run with
+
+# pick one XORGCONFIG
+export XORGCONFIG=xorg.conf.cube_2560x1600
+#export XORGCONFIG=xorg.conf.cube_1920x1200
+
+###########################################################
+
+
 function usage()
 {
     cat <<EOF

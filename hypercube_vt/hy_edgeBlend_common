@@ -1,32 +1,27 @@
 #!/bin/bash
 
-
-############################################################
-#             CONFIGURATION
-############################################################
-
-# PROJECTOR resolution:
-
-# if 2 1920x1200 displays the vertical overlap is 480 pixels
-# if 2 2560x1600 displays the vertical overlap is 640 pixels
-overlap=480
-#overlap=640
-
-# res is low res: 1920x1200  or high res: 2560x1600
-res="1920 1200"
-#res="2560 1600"
-
-############################################################
-############################################################
-
-
-cscriptdir="$(dirname $(readlink ${BASH_SOURCE[0]}))" || exit $?
+cscriptdir="$(dirname $(realpath ${BASH_SOURCE[0]}))" || exit $?
 cd "$cscriptdir" || exit $?
 cscriptdir="$PWD"
 
 blend="$cscriptdir/nv-control-blend-visbox"
 unset cscriptdir
 
+x="$($cscriptdir/hy_getRootWidth)" || exit 1
+
+# if 2x 1920x1200 displays per wall the vertical overlap is 480 pixels
+# if 2x 2560x1600 displays per wall the vertical overlap is 640 pixels
+# res is low res: 1920x1200 pixels  or high res: 2560x1600 pixels
+
+if [ "$x" = "1920" ] ; then
+    # We assume res is 1920x1200
+    overlap=480
+    res="1920 1200"
+else
+    # default to high res 2560x1600
+    overlap=640
+    res="2560 1600"
+if
 
 
 

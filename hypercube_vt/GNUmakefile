@@ -12,6 +12,8 @@ CFLAGS = -g
 
 HOSTNAME = $(shell hostname)
 
+hy_getRootWidth_LFLAGS = -lX11
+
 cbinaries = $(patsubst %.c,%,$(wildcard *.c))
 built_files = $(patsubst %.in,%,$(wildcard hy_*.in)) $(cbinaries)
 
@@ -27,7 +29,7 @@ build: $(built_files)
 
 
 $(cbinaries): %: %.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $($@_LFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -c -o $@
@@ -55,16 +57,11 @@ install: build
 	mkdir -p $(BIN) $(ETC)
 	cp $(inst_files) $(BIN)
 	cp cave_128x128.png $(ETC)
-	@echo
-	@echo "You may want to run: sudo encap"
 ifeq ($(HOSTNAME),cube)
 	@echo
-	@echo "You also need to run:"
-	@echo
-	@echo "  sudo chown root:root $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server"
-	@echo "  sudo chmod u+s $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server"
-	@echo
-	@echo "So that any user may stop an X session and dtk-server for other users."
+	sudo chown root:root $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
+	sudo chmod u+s $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
+	sudo cp xorg.conf.cube_1920x1200 xorg.conf.cube_2560x1600 /etc/X11/
 	@echo
 endif
 

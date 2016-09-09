@@ -2,7 +2,7 @@
 
 
 ############################################################
-#             CONFIGURATION
+#             CONFIGURATION (kind-of)
 ############################################################
 
 # PROJECTOR resolution command stuff:
@@ -21,8 +21,8 @@ $dp2_lowres='EDIR15 26' # for 1920x1200
 $dp2_highres='EDIR17 26' # for 2560x1600
 
 # default
-$dp1_res = $dp1_lowres
-$dp2_res = $dp2_lowres
+$dp1_res = $dp1_highres
+$dp2_res = $dp2_highres
 
 
 
@@ -30,8 +30,10 @@ $dp2_res = $dp2_lowres
 ############################################################
 
 
+$dir = File.dirname(__FILE__)
 
-require File.dirname(__FILE__) + "/hy_projectors_common"
+
+require $dir + "/hy_projectors_common"
 
 $prog = File.basename($0)
  
@@ -40,7 +42,7 @@ def usage()
     nprojs = $projectorIPs.length
     puts <<EOF
 
-  Usage: #{$prog} [-m|--mono][PROJ_WALL ...]|[-h|--help]
+  Usage: #{$prog} [-m|--mono][--low-res][PROJ_WALL ...]|[-h|--help]
 
    Turn @on@ projectors via the ethernet TCP/IP interface.
 
@@ -66,9 +68,11 @@ def usage()
 
     -m|--mono         turn projectors on with mono viewing.  Default is stereo
 
-    --high-res        set for 2560x1600 projector resolution.  You need to
-                      configure X too.
-
+    --low-res         if the X11 server is not running yet this will set the
+                      projectors to a low resolution, 1920x1200 pixels.  If
+                      the X11 server is running the resolution will be determined
+                      automatically, over-riding this option, by asking the X11
+                      server.  The other default resolution is 2560x1600 pixels.
 
 
    Possible PROJ_WALL values are:
@@ -92,7 +96,6 @@ EOF
     $projectorIPs.each { |p,ip| puts '           ' + p + '  ' + ip }
     puts
 
-    
 
     exit 1
 end
@@ -107,9 +110,9 @@ puts "\n\n" + $env + $0 + ' ' + ARGV.join(' ')
 #######################
 
 
-def set_highres()
-    $dp1_res = $dp1_highres
-    $dp2_res = $dp2_highres
+def set_lowres()
+    $dp1_res = $dp1_lowres
+    $dp2_res = $dp2_lowres
 end
 
 def parse_arg(arg)
@@ -121,8 +124,8 @@ def parse_arg(arg)
         when '--mono' then $stereo = false
         when '--m' then $stereo = false
         when '-mono' then $stereo = false
-        when '-high-res' then set_highres
-        when '--high-res' then set_highres
+        when '-low-res' then set_lowres
+        when '--low-res' then set_lowres
         else $proj << arg
     end
 end
@@ -142,6 +145,20 @@ if ENV['HYPERCUBE_OPTIONS']
     end
 end
 
+# Now if X11 is running we can query the width of the root window
+def checkWidth()
+    w = `#{$dir + '/hy_getRootWidth'}`
+    w.strip!
+    puts 'Found root window width: ' + w
+    if w == '1920' # wxh = 1920x1200
+        # We must have the same resolution as the X server
+        set_lowres()
+        puts 'set low res 1920x1200 mode'
+    end
+    # else we assume it's 2560x1600
+end
+
+checkWidth()
 
 if $proj.length == 0
     $projectorIPs.each { |name,ip| $proj << name }
