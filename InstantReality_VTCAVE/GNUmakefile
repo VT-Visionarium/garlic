@@ -29,6 +29,8 @@ BIN_DIR = $(PREFIX)/bin
 DTK_ROOT = /usr/local
 IR_ROOT = /opt/instantReality
 
+InstantPlayer-caveUtil_getRootWidth_LDFLAGS = -lX11
+
 # C pre-processor flags used in the compile command to make objects
 CPPFLAGS = -fpic -I$(DTK_ROOT)/include -I$(IR_ROOT)/include
 

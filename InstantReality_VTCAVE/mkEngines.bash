@@ -108,7 +108,7 @@ function GetAllFeatures()
     fi
 }
 
-# We add the features given
+# We add the features given in the arguments
 function AddFeatures()
 {
     featuresAdd=

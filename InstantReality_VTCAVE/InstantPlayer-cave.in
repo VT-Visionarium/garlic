@@ -95,7 +95,7 @@ wand="$default_wand"
 head=$default_head
 cwd=
 report=
-run="$player"
+run="$player --num-aspects 10"
 IR_args=
 nav_mode=$default_nav_mode
 
@@ -293,6 +293,16 @@ function ComposeCommand()
 {
     local engine
     local nav
+    local res
+
+    res="$($scriptdir/InstantPlayer-caveUtil_getRootWidth)"
+    if [ "$res" = "1920" ] ; then
+        res="1920x1200" # low res
+    else
+        # default high res
+        res="2560x1600" # high res
+    fi
+
 
     if [ ! -f "$scriptdir/wandjoystick_raycast-nav.wrl.in" ] ||\
         [ ! -f "$scriptdir/cave_stereo_head_engineer.bash" ] ; then
@@ -328,6 +338,8 @@ function ComposeCommand()
             ;;
     esac
 
+    engine="${engine}_${res}"
+
     case "$head" in
         with)
             engine="${engine}_head-engine.x3d"
@@ -340,6 +352,9 @@ function ComposeCommand()
             exit 1
             ;;
     esac
+
+    
+
 
     case "$wand" in
         raycast)
