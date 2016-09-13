@@ -53,6 +53,7 @@ wget http://localhost:8080/QUIT?foo=bar -O -
 
 Run hy_kill_dtk-server
 Run hy_projectors_off
+killall hy_blackEdge
 Run hy_stopx
 
 echo "$0 finished with return status $ret"
