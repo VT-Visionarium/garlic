@@ -3,15 +3,15 @@
 #include <gtk/gtk.h>
 
 
-static int usage(const char *argv0)
+static inline
+int usage(const char *argv0)
 {
-    printf("  Usage: %s [YMIN [YMAX [TEXT]]]\n", argv0);
+    printf("  Usage: %s [L]|[-h|--help]\n\n", argv0);
 
-    printf("  Draws a black window the width of the screen.\n"
+    printf("  Draws a black window the width of the screen and length L.\n"
         "\n"
-        "In X11 drawing coordinates Y increases downward.  If\n"
-        "YMIN is less than zero than the window will be drawn from\n"
-        "from the top of the screen to -YMIN and YMAX will be ignored.\n"
+        "If L > 0 then the window is drawn from the top with length L.\n"
+        "If L < 0 then the window is drawn from the bottom with length |L|\n"
             );
     return 1;
 }
@@ -64,35 +64,34 @@ static inline runGtk(int ymin, int ymax)
 
 int main(int argc, char **argv)
 {
-    int ymin = 0, ymax;
+    int l = 0;
     int rootHeight;
+    int ymin = 0, ymax;
     
-    gtk_init(NULL, NULL);
-    rootHeight = getRootHeight();
-    ymax = rootHeight;
-
     if(argc > 1 &&
         (!strncmp(argv[1], "--", 2) || !strncmp(argv[1], "-h", 2))
         )
         return usage(argv[0]);
 
+    gtk_init(NULL, NULL);
+    rootHeight = getRootHeight();
+    ymax = rootHeight;
+
     if(argc > 1)
-        ymin = strtol(argv[1], NULL, 10);
-    if(argc > 2)
-        ymax = strtol(argv[2], NULL, 10);
+        l = strtol(argv[1], NULL, 10);
 
-    if(ymax < 1)
-        ymax = 1;
-    else if(ymax > rootHeight)
-        ymax = rootHeight;
-
-    if(ymin < 0)
+    if(l < 0)
     {
-        ymax = - ymin;
-        ymin = 0;
+        // from the bottom
+        ymin = (-l>rootHeight-1)?rootHeight-1:rootHeight+l;
+        ymax = rootHeight;
     }
-    else if(ymin > ymax)
-        ymin = ymax - 1;
+    else if(l > 0)
+    {
+        // From the top
+        ymin = 0;
+        ymax = l;
+    }
 
     runGtk(ymin, ymax);
     return 0;

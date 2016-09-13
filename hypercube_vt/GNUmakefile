@@ -13,9 +13,10 @@ CFLAGS = -g
 HOSTNAME = $(shell hostname)
 
 hy_getRootWidth_LFLAGS = -lX11
-hy_blackBackground.o_CFLAGS = $(shell pkg-config gtk+-3.0 --cflags)
-hy_blackBackground_CFLAGS = $(shell pkg-config gtk+-3.0 --cflags)
-hy_blackBackground_LFLAGS = $(shell pkg-config gtk+-3.0 --libs)
+hy_getRootHeight_LFLAGS = -lX11
+hy_blackEdge.o_CFLAGS = $(shell pkg-config gtk+-3.0 --cflags)
+hy_blackEdge_CFLAGS = $(shell pkg-config gtk+-3.0 --cflags)
+hy_blackEdge_LFLAGS = $(shell pkg-config gtk+-3.0 --libs)
 
 cbinaries = $(patsubst %.c,%,$(wildcard *.c))
 built_files = $(patsubst %.in,%,$(wildcard hy_*.in)) $(cbinaries)

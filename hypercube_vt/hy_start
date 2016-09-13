@@ -8,14 +8,14 @@ function usage()
 
   Run many programs needed to start a HyperCube session.
 
-  Runs the following 7 programs:
+  Runs the following 6 programs:
 
     hy_stopx                   makes sure no user X sessions are running
     hy_kill_dtk-server         kill any dtk-server
-    hy_startx                  start a user login X session
     hy_projectors_on [--mono]  turn on projects
-    hy_edgeBlend_on            turn on screen edge blending
-    hy_frameLock_on            turn on nvidia frame locking
+    hy_startx                  start a user login X session
+    hy_blackEdgeDraw           draws black on the overlaping window edges
+    (NOT) hy_frameLock_on      turn on nvidia frame locking (BROKEN)
     hy_syncToVBlank_on         turn on nvidia sync to verticle refresh
 
   By default we turn on the projector for stereo display, not --mono.
@@ -67,13 +67,12 @@ Run hy_stopx
 Run hy_kill_dtk-server
 
 
-Run hy_startx
 
 
 # TODO: need an error check here
-hy_projectors_on $mono &
-proj_pid=$!
+Run hy_projectors_on $mono
 
+Run hy_startx
 displaySave="$DISPLAY"
 
 # test that a particular X server is running
@@ -101,16 +100,16 @@ echo "found a good X server at DISPLAY=$display"
 [ -n "$displaySave" ] && export DISPLAY="$displaySave"
 
 # TODO: We will not get an error check here until nvidia fixes
-# the return status value from the nvidia-settings program.
+# the return status value from the nvidia-settings program
+# in hy_syncToVBlank_on
 
-# all 3 are nvidia driver scripts.
-Run hy_edgeBlend_on
-Run hy_frameLock_on
+Run hy_blackEdgeDraw
+# all 2 are nvidia driver scripts.
+
+#This on is broken.
+#Run hy_frameLock_on
+
 Run hy_syncToVBlank_on
-
-# Hang this script until the projectors finish sending back replies.
-# It's likely they are on now but just not showing any light yet.
-wait $proj_pid
 
 echo "$0 Started Okay, so it seems."
 echo "$0 finished"
