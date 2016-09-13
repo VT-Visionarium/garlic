@@ -1,6 +1,6 @@
 #!/bin/bash
 
-scriptdir="$(dirname $(realpath ${BASH_SOURCE[0]}))" || exit $?
+scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
 cd "$cscriptdir" || exit $?
 cscriptdir="$PWD"
 drawBox="$cscriptdir/hy_blackEdge"

@@ -14,7 +14,7 @@ function usage()
     hy_kill_dtk-server         kill any dtk-server
     hy_projectors_on [--mono]  turn on projects
     hy_startx                  start a user login X session
-    hy_blackEdgeDraw           draws black on the overlaping window edges
+    hy_edgeBlank               draws black on the overlaping window edges
     (NOT) hy_frameLock_on      turn on nvidia frame locking (BROKEN)
     hy_syncToVBlank_on         turn on nvidia sync to verticle refresh
 
@@ -103,7 +103,7 @@ echo "found a good X server at DISPLAY=$display"
 # the return status value from the nvidia-settings program
 # in hy_syncToVBlank_on
 
-Run hy_blackEdgeDraw
+Run hy_edgeBlank
 # all 2 are nvidia driver scripts.
 
 #This on is broken.
