@@ -4,9 +4,47 @@
 #           CONFIGURATION
 #########################################################
 
-# X root windows pixel resolution:
+# window size
+# if we do edge blending is X root windows pixel resolution
+# high res
+#res="2560 1600"
+# low res
 #res="1920 1200"
-res="2560 1600"
+
+# if we do not do edge blending it is smaller in y
+# by half the overlapping edge
+# high res
+res="2560 1280" # 1280 = 1600 - 320
+# low res
+#res="1920 960" # 960 = 1200 - 240
+
+
+
+# ypos is a constant for a given X window
+# configuration.
+#if we use edge blending
+#ypos=0
+
+# if we do not do edge blending
+# ypos is half of the overlapping pixels
+# is where we place the lower projected windows
+# in the y direction.
+# 
+# for high res 2560x1600 overlap 640
+ypos=320
+# for low res 1920x1200 overlap 480
+#ypos=240
+
+
+# half the overlap distance of the instantreality windows
+# (not root) in meters
+#
+# if using edge blending
+#yoverlap="0.381"
+#
+# if not using edge blending we do not overlap windows
+yoverlap=0
+
 
 #########################################################
 
@@ -34,12 +72,13 @@ EOF
 
 function PostProcess()
 {
-    # Configure @SCREEN_RES@ below here.
     xmlstarlet c14n --without-comments - |\
         grep -Ev '^\s*$' |\
         sed -e 's/^\s*//g'\
             -e 's/\s\s*/ /g'\
-            -e "s/@SCREEN_RES@/$res/g" || exit 1
+            -e "s/@WIN_RES@/$res/g"\
+            -e "s/@WIN_YPOS@/$ypos/g"\
+            -e "s/@WIN_YOVERLAP@/$yoverlap/g"|| exit 1
 }
 
 function RemoveTags()

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+scriptdir="$(dirname $(realpath ${BASH_SOURCE[0]}))" || exit $?
+cd "$cscriptdir" || exit $?
+cscriptdir="$PWD"
+drawBox="$cscriptdir/hy_blackEdge"
+height="$($cscriptdir/hy_getRootWidth)" || exit 1
+unset cscriptdir
+h=320
+
+[ "$height" = "1920" ] && h=240
+
+set -x
+
+function draw()
+{
+    DISPLAY=$1 $drawBox $2 || exit 1
+}
+
+draw :0.0  -$h &
+draw :0.1  -$h &
+draw :0.2   $h &
+draw :0.3   $h &
+
+draw :0.4  -$h &
+draw :0.5  -$h &
+draw :0.6   $h &
+draw :0.7   $h &
+
+draw :0.8  -$h &
+draw :0.9  -$h &
+draw :0.10  $h &
+draw :0.11  $h &
+
+draw :0.12 -$h &
+draw :0.13 -$h &
+draw :0.14  $h &
+draw :0.15  $h &
+
+echo "$0 finished"
+

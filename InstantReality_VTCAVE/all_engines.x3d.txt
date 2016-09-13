@@ -80,17 +80,17 @@
                 <IFcaveWalls>
 
                     <!-- LEFT WALL -->
-                    <LocalWindow position='0 0' size='@SCREEN_RES@'
+                    <LocalWindow position='0 0' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.0' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                            lowerLeft='0 0' upperRight='@WIN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
                                     DEF='caveStereoLT_leftEye'
-                                    surface='-1.524 -0.381 1.524,
-                                        -1.524 -0.381 -1.524,
+                                    surface='-1.524 -@WIN_YOVERLAP@ 1.524,
+                                        -1.524 -@WIN_YOVERLAP@ -1.524,
                                         -1.524 1.524 -1.524,
                                         -1.524 1.524 1.524'
                                     mono='FALSE'
@@ -102,8 +102,8 @@
                             <IFcaveMono>
                                 <ProjectionViewModifier
                                     DEF='caveMonoLT_oneEye'
-                                    surface='-1.524 -0.381 1.524,
-                                        -1.524 -0.381 -1.524,
+                                    surface='-1.524 -@WIN_YOVERLAP@ 1.524,
+                                        -1.524 -@WIN_YOVERLAP@ -1.524,
                                         -1.524 1.524 -1.524,
                                         -1.524 1.524 1.524'
                                         mono='TRUE'>
@@ -113,16 +113,16 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='@SCREEN_RES@'
+                        <LocalWindow position='0 0' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.1' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                                lowerLeft='0 0' upperRight='@WIN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoLT_rightEye'
-                                    surface='-1.524 -0.381 1.524,
-                                        -1.524 -0.381 -1.524,
+                                    surface='-1.524 -@WIN_YOVERLAP@ 1.524,
+                                        -1.524 -@WIN_YOVERLAP@ -1.524,
                                         -1.524 1.524 -1.524,
                                         -1.524 1.524 1.524'
                                     mono='FALSE'
@@ -134,19 +134,19 @@
                         </LocalWindow>
                     </IFcaveStereo>
 
-                    <LocalWindow position='0 0' size='@SCREEN_RES@'
+                    <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.2' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                            lowerLeft='0 0' upperRight='@WIN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
                                     DEF='caveStereoLB_leftEye'
                                     surface='-1.524 -1.524 1.524,
                                         -1.524 -1.524 -1.524,
-                                        -1.524 0.381 -1.524,
-                                        -1.524 0.381 1.524'
+                                        -1.524 @WIN_YOVERLAP@ -1.524,
+                                        -1.524 @WIN_YOVERLAP@ 1.524'
                                     mono='FALSE'
                                     eyeSeparation='0.065'
                                     leftEye='TRUE'
@@ -158,8 +158,8 @@
                                     DEF='caveMonoLB_oneEye'
                                     surface='-1.524 -1.524 1.524,
                                         -1.524 -1.524 -1.524,
-                                        -1.524 0.381 -1.524,
-                                        -1.524 0.381 1.524'
+                                        -1.524 @WIN_YOVERLAP@ -1.524,
+                                        -1.524 @WIN_YOVERLAP@ 1.524'
                                     mono='TRUE'>
                                 </ProjectionViewModifier>
                             </IFcaveMono>
@@ -167,18 +167,18 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='@SCREEN_RES@'
+                        <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.3' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                                lowerLeft='0 0' upperRight='@WIN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoLB_rightEye'
                                     surface='-1.524 -1.524 1.524,
                                         -1.524 -1.524 -1.524,
-                                        -1.524 0.381 -1.524,
-                                        -1.524 0.381 1.524'
+                                        -1.524 @WIN_YOVERLAP@ -1.524,
+                                        -1.524 @WIN_YOVERLAP@ 1.524'
                                     mono='FALSE'
                                     eyeSeparation='0.065'
                                     leftEye='FALSE'
@@ -190,23 +190,18 @@
                     <!-- END LEFT WALL -->
 
 
-
-
-
-
-
                     <!-- CENTER WALL -->
-                    <LocalWindow position='0 0' size='@SCREEN_RES@'
+                    <LocalWindow position='0 0' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.4' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                            lowerLeft='0 0' upperRight='@WIN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
                                     DEF='caveStereoCT_leftEye'
-                                    surface='-1.524 -0.381 -1.524,
-                                        1.524 -0.381 -1.524,
+                                    surface='-1.524 -@WIN_YOVERLAP@ -1.524,
+                                        1.524 -@WIN_YOVERLAP@ -1.524,
                                         1.524 1.524 -1.524,
                                         -1.524 1.524 -1.524'
                                     mono='FALSE'
@@ -218,8 +213,8 @@
                             <IFcaveMono>
                                 <ProjectionViewModifier
                                     DEF='caveMonoCT_oneEye'
-                                    surface='-1.524 -0.381 -1.524,
-                                        1.524 -0.381 -1.524,
+                                    surface='-1.524 -@WIN_YOVERLAP@ -1.524,
+                                        1.524 -@WIN_YOVERLAP@ -1.524,
                                         1.524 1.524 -1.524,
                                         -1.524 1.524 -1.524'
                                         mono='TRUE'>
@@ -229,16 +224,16 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='@SCREEN_RES@'
+                        <LocalWindow position='0 0' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.5' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                                lowerLeft='0 0' upperRight='@WIN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoCT_rightEye'
-                                    surface='-1.524 -0.381 -1.524,
-                                        1.524 -0.381 -1.524,
+                                    surface='-1.524 -@WIN_YOVERLAP@ -1.524,
+                                        1.524 -@WIN_YOVERLAP@ -1.524,
                                         1.524 1.524 -1.524,
                                         -1.524 1.524 -1.524'
                                     mono='FALSE'
@@ -251,19 +246,19 @@
                     </IFcaveStereo>
 
 
-                    <LocalWindow position='0 0' size='@SCREEN_RES@'
+                    <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.6' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                            lowerLeft='0 0' upperRight='@WIN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
                                     DEF='caveStereoCB_leftEye'
                                     surface='-1.524 -1.524 -1.524,
                                         1.524 -1.524 -1.524,
-                                        1.524 0.381 -1.524,
-                                        -1.524 0.381 -1.524'
+                                        1.524 @WIN_YOVERLAP@ -1.524,
+                                        -1.524 @WIN_YOVERLAP@ -1.524'
                                     mono='FALSE'
                                     eyeSeparation='0.065'
                                     leftEye='TRUE'
@@ -275,8 +270,8 @@
                                     DEF='caveMonoCB_oneEye'
                                     surface='-1.524 -1.524 -1.524,
                                         1.524 -1.524 -1.524,
-                                        1.524 0.381 -1.524,
-                                        -1.524 0.381 -1.524'
+                                        1.524 @WIN_YOVERLAP@ -1.524,
+                                        -1.524 @WIN_YOVERLAP@ -1.524'
                                     mono='TRUE'>
                                 </ProjectionViewModifier>
                             </IFcaveMono>
@@ -284,18 +279,18 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='@SCREEN_RES@'
+                        <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.7' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                                lowerLeft='0 0' upperRight='@WIN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoCB_rightEye'
                                     surface='-1.524 -1.524 -1.524,
                                         1.524 -1.524 -1.524,
-                                        1.524 0.381 -1.524,
-                                        -1.524 0.381 -1.524'
+                                        1.524 @WIN_YOVERLAP@ -1.524,
+                                        -1.524 @WIN_YOVERLAP@ -1.524'
                                     mono='FALSE'
                                     eyeSeparation='0.065'
                                     leftEye='FALSE'
@@ -308,17 +303,17 @@
 
 
                     <!-- RIGHT WALL -->
-                    <LocalWindow position='0 0' size='@SCREEN_RES@'
+                    <LocalWindow position='0 0' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.8' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                            lowerLeft='0 0' upperRight='@WIN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
                                     DEF='caveStereoRT_leftEye'
-                                    surface='1.524 -0.381 -1.524,
-                                        1.524 -0.381 1.524,
+                                    surface='1.524 -@WIN_YOVERLAP@ -1.524,
+                                        1.524 -@WIN_YOVERLAP@ 1.524,
                                         1.524 1.524 1.524,
                                         1.524 1.524 -1.524'
                                     mono='FALSE'
@@ -330,8 +325,8 @@
                             <IFcaveMono>
                                 <ProjectionViewModifier
                                     DEF='caveMonoRT_oneEye'
-                                    surface='1.524 -0.381 -1.524,
-                                        1.524 -0.381 1.524,
+                                    surface='1.524 -@WIN_YOVERLAP@ -1.524,
+                                        1.524 -@WIN_YOVERLAP@ 1.524,
                                         1.524 1.524 1.524,
                                         1.524 1.524 -1.524'
                                         mono='TRUE'>
@@ -341,16 +336,16 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='@SCREEN_RES@'
+                        <LocalWindow position='0 0' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.9' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                                lowerLeft='0 0' upperRight='@WIN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoRT_rightEye'
-                                    surface='1.524 -0.381 -1.524,
-                                        1.524 -0.381 1.524,
+                                    surface='1.524 -@WIN_YOVERLAP@ -1.524,
+                                        1.524 -@WIN_YOVERLAP@ 1.524,
                                         1.524 1.524 1.524,
                                         1.524 1.524 -1.524'
                                     mono='FALSE'
@@ -363,19 +358,19 @@
                     </IFcaveStereo>
 
 
-                    <LocalWindow position='0 0' size='@SCREEN_RES@'
+                    <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.10' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                            lowerLeft='0 0' upperRight='@WIN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
                                     DEF='caveStereoRB_leftEye'
                                     surface='1.524 -1.524 -1.524,
                                         1.524 -1.524 1.524,
-                                        1.524 0.381 1.524,
-                                        1.524 0.381 -1.524'
+                                        1.524 @WIN_YOVERLAP@ 1.524,
+                                        1.524 @WIN_YOVERLAP@ -1.524'
                                     mono='FALSE'
                                     eyeSeparation='0.065'
                                     leftEye='TRUE'
@@ -387,8 +382,8 @@
                                     DEF='caveMonoRB_oneEye'
                                     surface='1.524 -1.524 -1.524,
                                         1.524 -1.524 1.524,
-                                        1.524 0.381 1.524,
-                                        1.524 0.381 -1.524'
+                                        1.524 @WIN_YOVERLAP@ 1.524,
+                                        1.524 @WIN_YOVERLAP@ -1.524'
                                     mono='TRUE'>
                                 </ProjectionViewModifier>
                             </IFcaveMono>
@@ -396,18 +391,18 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='@SCREEN_RES@'
+                        <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.11' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                                lowerLeft='0 0' upperRight='@WIN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoRB_rightEye'
                                     surface='1.524 -1.524 -1.524,
                                         1.524 -1.524 1.524,
-                                        1.524 0.381 1.524,
-                                        1.524 0.381 -1.524'
+                                        1.524 @WIN_YOVERLAP@ 1.524,
+                                        1.524 @WIN_YOVERLAP@ -1.524'
                                     mono='FALSE'
                                     eyeSeparation='0.065'
                                     leftEye='FALSE'
@@ -419,17 +414,17 @@
                     <!-- END RIGHT WALL -->
 
                     <!-- FLOOR WALL -->
-                    <LocalWindow position='0 0' size='@SCREEN_RES@'
+                    <LocalWindow position='0 0' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.12' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                            lowerLeft='0 0' upperRight='@WIN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
                                     DEF='caveStereoFT_leftEye'
-                                    surface='-1.524 -1.524 0.381,
-                                        1.524 -1.524 0.381,
+                                    surface='-1.524 -1.524 @WIN_YOVERLAP@,
+                                        1.524 -1.524 @WIN_YOVERLAP@,
                                         1.524 -1.524 -1.524,
                                         -1.524 -1.524 -1.524'
                                     mono='FALSE'
@@ -441,8 +436,8 @@
                             <IFcaveMono>
                                 <ProjectionViewModifier
                                     DEF='caveMonoFT_oneEye'
-                                    surface='-1.524 -1.524 0.381,
-                                        1.524  -1.524 0.381,
+                                    surface='-1.524 -1.524 @WIN_YOVERLAP@,
+                                        1.524  -1.524 @WIN_YOVERLAP@,
                                         1.524 -1.524 -1.524,
                                         -1.524 -1.524 -1.524'
                                         mono='TRUE'>
@@ -452,16 +447,16 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='@SCREEN_RES@'
+                        <LocalWindow position='0 0' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.13' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                                lowerLeft='0 0' upperRight='@WIN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoFT_rightEye'
-                                    surface='-1.524 -1.524 0.381,
-                                        1.524 -1.524 0.381,
+                                    surface='-1.524 -1.524 @WIN_YOVERLAP@,
+                                        1.524 -1.524 @WIN_YOVERLAP@,
                                         1.524 -1.524 -1.524,
                                         -1.524 -1.524 -1.524'
                                     mono='FALSE'
@@ -474,19 +469,19 @@
                     </IFcaveStereo>
 
 
-                    <LocalWindow position='0 0' size='@SCREEN_RES@'
+                    <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.14' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
                         <Viewarea
-                            lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                            lowerLeft='0 0' upperRight='@WIN_RES@'
                             leftBuffer='TRUE' rightBuffer='FALSE'>
                             <IFcaveStereo>
                                 <ProjectionViewModifier
                                     DEF='caveStereoFB_leftEye'
                                     surface='-1.524 -1.524 1.524,
                                         1.524 -1.524 1.524,
-                                        1.524 -1.524 -0.381,
-                                        -1.524 -1.524 -0.381'
+                                        1.524 -1.524 -@WIN_YOVERLAP@,
+                                        -1.524 -1.524 -@WIN_YOVERLAP@'
                                     mono='FALSE'
                                     eyeSeparation='0.065'
                                     leftEye='TRUE'
@@ -498,8 +493,8 @@
                                     DEF='caveMonoFB_oneEye'
                                     surface='-1.524 -1.524 1.524,
                                         1.524 -1.524 1.524,
-                                        1.524 -1.524 -0.381,
-                                        -1.524 -1.524 -0.381'
+                                        1.524 -1.524 -@WIN_YOVERLAP@,
+                                        -1.524 -1.524 -@WIN_YOVERLAP@'
                                     mono='TRUE'>
                                 </ProjectionViewModifier>
                             </IFcaveMono>
@@ -507,18 +502,18 @@
                     </LocalWindow>
 
                     <IFcaveStereo>
-                        <LocalWindow position='0 0' size='@SCREEN_RES@'
+                        <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.15' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
                             <Viewarea
-                                lowerLeft='0 0' upperRight='@SCREEN_RES@'
+                                lowerLeft='0 0' upperRight='@WIN_RES@'
                                 leftBuffer='FALSE' rightBuffer='TRUE'>
                                 <ProjectionViewModifier
                                     DEF='caveStereoFB_rightEye'
                                     surface='-1.524 -1.524 1.524,
                                         1.524 -1.524 1.524,
-                                        1.524 -1.524 -0.381,
-                                        -1.524 -1.524 -0.381'
+                                        1.524 -1.524 -@WIN_YOVERLAP@,
+                                        -1.524 -1.524 -@WIN_YOVERLAP@'
                                     mono='FALSE'
                                     eyeSeparation='0.065'
                                     leftEye='FALSE'

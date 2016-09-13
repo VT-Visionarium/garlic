@@ -293,15 +293,6 @@ function ComposeCommand()
 {
     local engine
     local nav
-    local res
-
-    res="$($scriptdir/InstantPlayer-caveUtil_getRootWidth)"
-    if [ "$res" = "1920" ] ; then
-        res="1920x1200" # low res
-    else
-        # default high res
-        res="2560x1600" # high res
-    fi
 
 
     if [ ! -f "$scriptdir/wandjoystick_raycast-nav.wrl.in" ] ||\
@@ -337,8 +328,6 @@ function ComposeCommand()
             exit 1
             ;;
     esac
-
-    engine="${engine}_${res}"
 
     case "$head" in
         with)
