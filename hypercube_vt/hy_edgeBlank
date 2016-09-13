@@ -1,11 +1,11 @@
 #!/bin/bash
 
 scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
-cd "$cscriptdir" || exit $?
-cscriptdir="$PWD"
-drawBox="$cscriptdir/hy_blackEdge"
-height="$($cscriptdir/hy_getRootWidth)" || exit 1
-unset cscriptdir
+cd "$scriptdir" || exit $?
+scriptdir="$PWD"
+drawBox="$scriptdir/hy_blackEdge"
+height="$($scriptdir/hy_getRootWidth)" || exit 1
+unset scriptdir
 h=320
 
 [ "$height" = "1920" ] && h=240
