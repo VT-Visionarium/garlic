@@ -13,6 +13,10 @@ CFLAGS = -g
 HOSTNAME = $(shell hostname)
 
 hy_getRootWidth_LFLAGS = -lX11
+hy_getRootHeight_LFLAGS = -lX11
+hy_blackEdge.o_CFLAGS = $(shell pkg-config gtk+-3.0 --cflags)
+hy_blackEdge_CFLAGS = $(shell pkg-config gtk+-3.0 --cflags)
+hy_blackEdge_LFLAGS = $(shell pkg-config gtk+-3.0 --libs)
 
 cbinaries = $(patsubst %.c,%,$(wildcard *.c))
 built_files = $(patsubst %.in,%,$(wildcard hy_*.in)) $(cbinaries)
@@ -29,10 +33,10 @@ build: $(built_files)
 
 
 $(cbinaries): %: %.o
-	$(CC) $(CFLAGS) $^ -o $@ $($@_LFLAGS)
+	$(CC) $(CFLAGS) $($@_CFLAGS) $^ -o $@ $($@_LFLAGS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) $< -c -o $@
+	$(CC) $(CFLAGS) $($@_CFLAGS) $< -c -o $@
 
 hy_projectors_on: hy_projectors_on.in
 	echo "#!/usr/bin/ruby -w" > $@
