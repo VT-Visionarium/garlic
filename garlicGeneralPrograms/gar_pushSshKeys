@@ -126,7 +126,7 @@ function pushPublicKeyToHyHost()
 {
     set -x
     cat ${HOME}/.ssh/id_rsa.pub | ssh -o 'StrictHostKeyChecking no' $1\
- 'mkdir -p ${HOME}/.ssh && cat >> ${HOME}/.ssh/authorized_keys && chmod 600 ${HOME}/.ssh/authorized_keys'\
+ 'mkdir -p ${HOME}/.ssh && cat >> ${HOME}/.ssh/authorized_keys && chmod 600 ${HOME}/.ssh/authorized_keys && chmod 700 ${HOME}/.ssh'\
  || exit $?
     set +x
 
