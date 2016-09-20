@@ -10,7 +10,7 @@ ETC = $(PREFIX)/etc
 
 CFLAGS = -g
 
-HOSTNAME = $(shell hostname)
+HOSTNAME = $(shell hostname -s)
 
 hy_getRootWidth_LFLAGS = -lX11
 hy_getRootHeight_LFLAGS = -lX11
