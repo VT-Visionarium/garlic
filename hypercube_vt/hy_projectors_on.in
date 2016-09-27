@@ -232,9 +232,21 @@ sendToName('DESK', 'FB')
 # No BARCO splash logo
 send('SPLH0')
 
+# Full lamp power (range 0-350). Make floor slightly dimmer to match walls
+# These should not change
+#sendToName('LPW1350', 'LT')
+#sendToName('LPW1350', 'LB')
+#sendToName('LPW1350', 'CT')
+#sendToName('LPW1350', 'CB')
+#sendToName('LPW1350', 'RT')
+#sendToName('LPW1350', 'RB')
+    
+#sendToName('LPW1280', 'FT')
+#sendToName('LPW1280', 'FB')
+
+
 
 if $stereo
-
 
     # 3D 
     # stereo on (1=frame sequential, 2=side-by-side, 3=dual-head)
@@ -249,20 +261,6 @@ if $stereo
     send('IABS17 0')
     # set right eye to display port 2
     send('IABS18 1')
-
-
-    # Full lamp power (range 0-350). Make floor slightly dimmer to match walls
-    # These should not change
-    #sendToName('LPW1350', 'LT')
-    #sendToName('LPW1350', 'LB')
-    #sendToName('LPW1350', 'CT')
-    #sendToName('LPW1350', 'CB')
-    #sendToName('LPW1350', 'RT')
-    #sendToName('LPW1350', 'RB')
-    
-    #sendToName('LPW1280', 'FT')
-    #sendToName('LPW1280', 'FB')
-
 
 else # mono
 

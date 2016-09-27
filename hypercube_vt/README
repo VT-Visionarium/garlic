@@ -2,6 +2,8 @@ We call this project HyperCube VT for hyper cube at Virginia Tech.  It
 contains programs that are specific to the Virginia Tech Hyper Cube or
 VisCube or CAVE, whatever you call it.
 
+See general cube OS installation notes in ../Admin/README_cube.
+
 All CAVE's are different.  They have different projection systems,
 tracking systems, computer systems, and the Virginia Tech CAVE has a 6
 degree-of-freedom motion platform.  They also run different mixtures of
@@ -21,78 +23,6 @@ To install on the VT hyperCube:
 
    then (CAUTION: 'make install' will run 'sudo'):
 
+      make
       make install
-
-
-
-Notes on starting X session from an ssh session on cube, because it has no
-monitor.
-
-service lightdm stop
-mv /etc/init/lightdm.conf /etc/init/lightdm.conf.disabled
-
-doing a 'apt-get purge lightdm' is not what we want, that will
-cause another service to be installed to replace lightdm, yes
-ubuntu sucks.
-
-
-#edit /etc/X11/Xwrapper.config
-from:
-allowed_users=console
-to:
-allowed_users=anybody
-
-
-apt-get purge light-locker xfce4-panel xfce4-power-manager
-
-apt-get autoremove
-
-Then a user can just run 'startx' to have a X session.
-
-startx
-
-Just stop startx with Crl-C or signal it to stop it.
-This method of stopping the X session works but only
-if a signal can propagate to the x-session-manager
-which seems to be thing thing that starts a proper X
-session shutdown, or X session logout.
-So we wrote to wrapper scripts hy_startx and hy_stopx
-that "do the right things" for starting and ending a
-user X session, as it is done via the windowing GUIs
-but without the GUIs.
-
-
-# disable screen blanking through X11 one time by:
-xset s off
-# but it does not work because other things are happening.
-
-
-The next two things seem to do the trick:
-
-edit /etc/kbd/config
-change 3 lines to:
-BLANK_DPMS=off
-POWERDOWN_TIME=0
-BLANK_TIME=0
-
-
-
-edit /etc/X11/xorg.conf
-added lines to Section "ServerLayout"
-
-Option          "BlankTime"     "0"
-Option          "StandbyTime"   "0"
-Option          "SuspendTime"   "0"
-Option          "OffTime"       "0"
-
-
-
-
-
-References:
-
-  Projectors user guide:
-
-  https://www.barco.com/tde/%280052102360800021%29/TDE6605/00/Barco_UserGuide_TDE6605_00__GP9-platform-LAN-RS232-communication-protocol.pdf
-
 
