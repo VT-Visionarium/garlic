@@ -60,8 +60,8 @@ sudo_install:
 	chown root:root $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
 	chmod u+s $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
 	cp xorg.conf.cube_1920x1200 xorg.conf.cube_2560x1600 /etc/X11/
-	if [ ! -f dot_xinit.OLD ] ; then mv /etc/X11/xinit/xinitrc dot_xinit.OLD ; echo ; fi
-	cp dot_xinitrc /etc/X11/xinit/xinitrc
+	if [ ! -f xinitrc.OLD ] ; then mv /etc/X11/xinit/xinitrc xinitrc.OLD ; echo ; fi
+	cp xinitrc /etc/X11/xinit/xinitrc
 
 install: build
 ifeq ($(HOSTNAME),cube)
