@@ -26,7 +26,12 @@ inst_files = $(sort\
  $(filter-out %.in,$(wildcard hy_*) $(built_files))\
  nv-control-blend-visbox encap.exclude)
 else
-inst_files = hy_demoRunner hy_console_logout
+inst_files =\
+ hy_demoRunner\
+ hy_console_logout\
+ hy_projectors_on\
+ hy_projectors_off\
+ hy_projectors_common.rb
 endif
 
 build: $(built_files)
