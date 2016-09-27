@@ -7,14 +7,14 @@
 # window size
 # if we do edge blending is X root windows pixel resolution
 # high res
-#res="2560 1600"
+res="2560 1600"
 # low res
 #res="1920 1200"
 
 # if we do not do edge blending it is smaller in y
 # by half the overlapping edge
 # high res
-res="2560 1280" # 1280 = 1600 - 320
+#res="2560 1280" # 1280 = 1600 - 320
 # low res
 #res="1920 960" # 960 = 1200 - 240
 
@@ -23,7 +23,7 @@ res="2560 1280" # 1280 = 1600 - 320
 # ypos is a constant for a given X window
 # configuration.
 #if we use edge blending
-#ypos=0
+ypos=0
 
 # if we do not do edge blending
 # ypos is half of the overlapping pixels
@@ -31,7 +31,7 @@ res="2560 1280" # 1280 = 1600 - 320
 # in the y direction.
 # 
 # for high res 2560x1600 overlap 640
-ypos=320
+#ypos=320
 # for low res 1920x1200 overlap 480
 #ypos=240
 
@@ -40,10 +40,10 @@ ypos=320
 # (not root) in meters
 #
 # if using edge blending
-#yoverlap="0.381"
+yoverlap="0.381"
 #
 # if not using edge blending we do not overlap windows
-yoverlap=0
+#yoverlap=0
 
 
 #########################################################

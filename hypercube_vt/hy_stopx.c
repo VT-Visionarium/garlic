@@ -28,20 +28,16 @@ int main(int argc, char **argv)
     //   -e  Require  an exact match for very long names.
     //   -w  wait for all killed processes to die. 
     
-    ret = system("/usr/bin/killall -ew x-session-manager");
+    ret = system("/usr/bin/killall -ew xfce4-session");
 
     if(ret == 0)
     {
-        // success we signaled the x-session-manager (or more)
+        // success we signaled the xfce4-session (zero or more)
         // so X should have been running.
 
         // We do the following so that we free-up the DISPLAY numbers
         // that the X server uses, before we start another X server
         // using DISPLAY numbers that are not in our scripts.
-
-        // TODO: make smarter hy_* scripts that find the X display
-        // numbers automatically, instead of hard coding them into the
-        // scripts.
 
         // Now wait for X to no longer be running via signal
         // CONT.   This could hang forever if something went wrong.

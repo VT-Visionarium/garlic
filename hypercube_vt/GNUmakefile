@@ -61,18 +61,24 @@ hy_edgeBlend_on hy_edgeBlend_off: %:%.in
 	sed $^ -e 's!@BIN@!$(BIN)!g' >> $@
 	chmod 755 $@
 
+sudo_install:
+	chown root:root $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
+	chmod u+s $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
+	cp xorg.conf.cube_1920x1200 xorg.conf.cube_2560x1600 /etc/X11/
+	if [ ! -f xinitrc.OLD ] ; then mv /etc/X11/xinit/xinitrc xinitrc.OLD ; echo ; fi
+	cp xinitrc /etc/X11/xinit/xinitrc
 
 install: build
+ifeq ($(HOSTNAME),cube)
+	sudo rm -f $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
+endif
 	mkdir -p $(BIN) $(ETC)
 	cp $(inst_files) $(BIN)
 	cp cave_128x128.png $(ETC)
 ifeq ($(HOSTNAME),cube)
-	@echo
-	sudo chown root:root $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
-	sudo chmod u+s $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
-	sudo cp xorg.conf.cube_1920x1200 xorg.conf.cube_2560x1600 /etc/X11/
-	@echo
+	sudo $(MAKE) sudo_install
 endif
+
 
 clean:
 	rm -f $(built_files) *.o

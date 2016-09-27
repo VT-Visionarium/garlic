@@ -1,11 +1,19 @@
-We got the source as binary packages:
-
-
-  ftp://ftp.igd.fraunhofer.de/outgoing/irbuild/Ubuntu-x86_64/
-
-for example:
-
-
-  wget ftp://ftp.igd.fraunhofer.de/outgoing/irbuild/Ubuntu-x86_64/InstantReality-Ubuntu-14.04-x64-2.6.0.31240.deb
+We got the source as binary packages.  For example:
 
   wget ftp://ftp.igd.fraunhofer.de/outgoing/irbuild/Ubuntu-x86_64/InstantReality-Ubuntu-14.04-x64-2.6.0.31123.deb
+
+  or
+
+  wget ftp://ftp.igd.fraunhofer.de/outgoing/irbuild/RedHat-7-x86_64/InstantReality-RedHat-7-x64-2.8.0.38807.rpm
+
+  or
+
+  firefox ftp://ftp.igd.fraunhofer.de/outgoing/irbuild/
+
+
+   To install on CentOS 7:
+
+        yum install InstantReality-RedHat-7-*.rpm
+        cp 2016_IR-license.xml /opt/instantReality/bin/license.xml
+
+
