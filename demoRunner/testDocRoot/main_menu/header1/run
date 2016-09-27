@@ -1,3 +1,0 @@
-#!/bin/bash
-
-exec xclock -geometry 130x254+0+591 -bg blue -fg pink
