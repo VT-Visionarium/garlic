@@ -1,0 +1,150 @@
+This is just notes on getting the computer cube to run Finding an OS and
+configuration that works.
+
+Star Date: Fri Sep 23 09:45:51 EDT 2016
+
+CentOS 7  usb stick installing
+
+From Available environment groups (we picked):\
+   * minimal
+
+
+yum update
+
+reboot
+
+
+vim /etc/ssh/sshd_config
+add lines:
+Port 22
+Port 4444
+RSAAuthentication yes
+PubkeyAuthentication yes
+PermitRootLogin no
+AllowUsers lance
+
+service sshd restart
+
+yum remove firewalld
+
+yum list all > /root/yum_list_all.1
+
+# edit sudoers
+visudo
+
+add 1 line for now, remove later
+lance ALL=(ALL) NOPASSWD: ALL
+
+Add a firewall via iptables
+[root@cube ~]# vim FireWall.bash
+#!/bin/bash -x
+
+iptables -F
+
+# DROP all incomming traffic
+iptables -P INPUT DROP
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD DROP
+
+# Keep current connections working
+iptables -A INPUT -m state --state NEW,ESTABLISHED -j ACCEPT
+
+# open some incoming (INPUT)
+#ssh
+iptables -A INPUT -m state --state NEW -p tcp --dport 22 -j ACCEPT
+iptables -A INPUT -m state --state NEW -p tcp --dport 4444 -j ACCEPT
+#webLauncher
+iptables -A INPUT -m state --state NEW -p tcp --dport 8383 -j ACCEPT
+
+iptables-save
+#next time the system boots, the iptables init script reapplies the rules saved
+############################## end of FireWall.bash
+
+
+Start installing garlic
+it's the /usr/local software
+We do it as a regular user in /usr/local/src and /usr/local/encap
+which root has symlinks to, from /usr/local/bin/*, /usr/local/lib/*
+and so on.  See details in https://github.com/VT-Visionarium/garlic
+
+chown lance:lance /usr/local/src
+mkdir /usr/local/encap
+chown lance:lance /usr/local/encap
+
+
+yum list all > /root/yum_list_all_2.0
+
+scp /home/lance/yum_list_all_2.0 console:/usr/local/Admin/
+
+
+installed encap, garlicGeneralPrograms from in /usr/local/src
+
+yum install csh\
+ gtk3-devel\
+ htop\
+ cmake\
+ nmap-ncat\
+ gvim\
+ ruby\
+ libsndfile-devel\
+ gcc\
+ g++\
+ kernel-devel\
+ xorg-x11-apps\
+ net-tools\
+ xmlstarlet\
+ gtk+-devel\
+ gtk2-devel
+
+install stuff from /usr/local/src/hypercube_vt/
+
+
+rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+
+yum install nvidia-detect
+
+
+yum groupinstall "X Window System"
+yum install epel-release
+yum groupinstall XFCE
+
+yum list kmod-nvidia --showduplicates
+
+edited /etc/yum.conf
+added line
+exclude=kmod-nvidia-367.35 kmod-nvidia-367.44
+
+These versions seem to show the CT left eye projector at the wrong
+resolution.
+
+# Now this will not install versions 367.35 or 367.44
+yum install kmod-nvidia
+
+
+service gdm start
+
+# It fuch'n worked!  I didn't even know gdm was installed.  Just a wild
+# guess.
+
+hy_edgeBlend_on # worked fine in this case
+
+
+
+yum install ntfs-3g
+
+mkdir /NTFS
+
+# add this next line to /etc/fstab
+/dev/sdb4  /NTFS   ntfs-3g  rw,umask=0000,defaults 0 0
+
+
+mount -a
+
+
+
+
+
+
+
+
