@@ -202,7 +202,9 @@ trap catch SIGINT SIGTERM SIGQUIT
 echo "passcode=$passcode"
 
 set -x
-firefox -no-remote https://$host:8383/?passcode=${passcode} &
+# -no-remote option is broken
+#firefox -no-remote https://$host:8383/?passcode=${passcode} &
+firefox https://$host:8383/?passcode=${passcode} &
 set +x
 
 
