@@ -54,7 +54,7 @@ function catch()
     echo "caught signal, sending QUIT request"
     set -x
     # We tell the server with this passcode to QUIT.
-    if ! wget --no-check-certificate --tries=1\
+    if ! wget --no-check-certificate --timeout=5 --tries=1\
  https://$host:8383/QUIT?passcode=${passcode}\
  -O - > /dev/null ; then
         exit
@@ -81,7 +81,7 @@ function runServer()
     if nc -z $host 8383 ; then
         # If there is an old server running tell it to quit.
         set -x
-        ssh $host wget --tries=1\
+        ssh $host wget --timeout=5 --tries=1\
  http://localhost:8080/QUIT?foo=bar -O -
         # I hate doing this (sleep), but we have no way to know
         # how long it takes the server to shut down
@@ -179,7 +179,7 @@ count=0
 # wait for server to be working via a wget request
 # We tried netcat but that was connecting before
 # the server was working.
-while ! wget --no-check-certificate --tries=1\
+while ! wget --no-check-certificate --timeout=5 --tries=1\
  https://$host:8383/?passcode=${passcode}\
  -O - > /dev/null ; do
     sleep 0.6
@@ -216,7 +216,8 @@ while wait $waitPid ; do
     # in this loop.
     # TODO: make a less expensive wget ping
     # this gets many files.
-    if ! wget --no-check-certificate --tries=1 https://$host:8383/?passcode=${passcode} -O - > /dev/null ; then
+    if ! wget --no-check-certificate --timeout=5 --tries=1\
+ https://$host:8383/?passcode=${passcode} -O - > /dev/null ; then
         echo "Server is unreachable"
         sleep 5 # let the user see the spew
         exit

@@ -48,8 +48,8 @@ done
 
 # The server may not be running, but in any case if this
 # fails we have no other recourse.
-# A bug in the server requires there be a query in the URL.
-wget http://localhost:8080/QUIT -O -
+# --timeout=10 is 10 seconds
+wget --timeout=10 http://localhost:8080/QUIT -O -
 
 Run hy_kill_dtk-server
 Run hy_projectors_off
