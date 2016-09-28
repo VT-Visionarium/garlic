@@ -119,10 +119,10 @@ yum list kmod-nvidia --showduplicates
 
 edited /etc/yum.conf
 added line
-exclude=kmod-nvidia-367.35 kmod-nvidia-367.44
+exclude=kmod-nvidia-367.35 kmod-nvidia-367.44 nvidia-x11-drv-367.35 nvidia-x11-drv-367.44
 
 These versions seem to show the CT left eye projector at the wrong
-resolution.
+resolution.  We don't know why it just does.
 
 # Now this will not install versions 367.35 or 367.44
 yum install kmod-nvidia
