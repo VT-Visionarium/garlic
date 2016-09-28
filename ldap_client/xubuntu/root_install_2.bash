@@ -35,7 +35,7 @@ set -x
 if [ ! -f vt-cachain.pem ] ; then
     # wget the server's public key thingy with:
     wget --no-check-certificate\
- http://www.middleware.vt.edu/pubs/vt-cachain.pema || Fail
+ http://www.middleware.vt.edu/pubs/vt-cachain.pem || Fail
 fi
 
 cp vt-cachain.pem /etc/ca-certificates/vt-cachain.pem || exit $?
