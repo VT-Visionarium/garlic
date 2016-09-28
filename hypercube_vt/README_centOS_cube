@@ -98,7 +98,9 @@ yum install csh\
  net-tools\
  xmlstarlet\
  gtk+-devel\
- gtk2-devel
+ gtk2-devel\
+ wget\
+ firefox
 
 install stuff from /usr/local/src/hypercube_vt/
 

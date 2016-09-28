@@ -13,7 +13,7 @@ function usage()
   Runs the following 4 programs:
       
        # to shutdown the demoRunner server
-       wget http://localhost:8080/QUIT?foo=bar -O -
+       wget http://localhost:8080/QUIT -O -
 
        # If the demoRunner server was running it may have
        # ran these for us already, but if not we do this
@@ -49,11 +49,10 @@ done
 # The server may not be running, but in any case if this
 # fails we have no other recourse.
 # A bug in the server requires there be a query in the URL.
-wget http://localhost:8080/QUIT?foo=bar -O -
+wget http://localhost:8080/QUIT -O -
 
 Run hy_kill_dtk-server
 Run hy_projectors_off
-killall hy_blackEdge
 Run hy_stopx
 
 echo "$0 finished with return status $ret"
