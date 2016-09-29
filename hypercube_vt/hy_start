@@ -75,6 +75,27 @@ Run hy_projectors_on $mono
 Run hy_startx
 displaySave="$DISPLAY"
 
+# We check that we are running xfce4-session and we can connect
+# to the X server and then check that xfce4-session is
+# still running.  This is not fool proof, but it's not
+# likely that these 3 checks pass and things are not okay
+# with running the XFCE X11 session.
+
+# wait for xfce4-session to be running
+count=0
+sleep 0.5
+while ! killall -CONT xfce4-session ; do
+	sleep 1
+	let count=$count+1
+    if [ $count = 40 ] ; then
+        cat <<EOF
+ Failed ($count seconds) to find xfce4-session
+
+EOF
+	exit 1
+    fi
+done
+
 # test that a particular X server is running
 # startx may have failed or not finished starting yet
 # so we test it here with xset
@@ -94,10 +115,27 @@ EOF
     fi
     sleep 1
 done
-
+# We confirmed that we can connect to this X server.
 echo "found a good X server at DISPLAY=$display"
-
 [ -n "$displaySave" ] && export DISPLAY="$displaySave"
+
+# Make sure that the xfce4-session is still running. We have seen xfce4-session
+# fail to be running at this point; strange but true: The check above could be
+# a different session.
+count=0
+while ! killall -CONT xfce4-session ; do
+	sleep 1
+	let count=$count+1
+    if [ $count = 40 ] ; then
+        cat <<EOF
+ Failed ($count seconds) to find xfce4-session
+
+EOF
+	exit 1
+    fi
+done
+
+
 
 # TODO: We will not get an error check here until nvidia fixes
 # the return status value from the nvidia-settings program
