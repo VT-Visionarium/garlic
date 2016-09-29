@@ -173,7 +173,7 @@ yum remove xfce4-power-manager
 # network interfaces, add static address 192.168.0.10/24
 nmtui
 
-
+# ref: https://www.centos.org/docs/5/html/Installation_Guide-en-US/s1-s390info-addnetdevice.html
 edit /etc/sysconfig/network-scripts/ifcfg-eno2
 and set ONBOOT=yes
 
