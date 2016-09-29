@@ -62,6 +62,9 @@ while [ -n "$1" ] ; do
 done
 
 # first kill any old user X sessions
+# This also wait for many X programs to not
+# be running anymore and so this could hang
+# forever.
 Run hy_stopx
 # then kill any old DTK servers
 Run hy_kill_dtk-server
@@ -81,15 +84,15 @@ displaySave="$DISPLAY"
 # likely that these 3 checks pass and things are not okay
 # with running the XFCE X11 session.
 
-# wait for xfce4-session to be running
+# wait for xfwm4 to be running
 count=0
 sleep 0.5
-while ! killall -CONT xfce4-session ; do
+while ! killall -CONT xfwm4 ; do
 	sleep 1
 	let count=$count+1
     if [ $count = 40 ] ; then
         cat <<EOF
- Failed ($count seconds) to find xfce4-session
+ Failed ($count seconds) to find xfwm4 running
 
 EOF
 	exit 1
@@ -120,15 +123,14 @@ echo "found a good X server at DISPLAY=$display"
 [ -n "$displaySave" ] && export DISPLAY="$displaySave"
 
 # Make sure that the xfce4-session is still running. We have seen xfce4-session
-# fail to be running at this point; strange but true: The check above could be
-# a different session.
+# fail to be running at this point; strange but true.
 count=0
 while ! killall -CONT xfce4-session ; do
 	sleep 1
 	let count=$count+1
     if [ $count = 40 ] ; then
         cat <<EOF
- Failed ($count seconds) to find xfce4-session
+ Failed ($count seconds) to find xfce4-session running
 
 EOF
 	exit 1

@@ -48,6 +48,8 @@ int main(int argc, char **argv)
 	// and wait for xfce4-session to exit 
 	system("/usr/bin/killall -ew -s CONT xfce4-session");
 
+	system("/usr/bin/killall -ew -s CONT xfwm4");
+
         // TODO: check if that failed and why.
         // At this point there not much we'd do about it anyway.
     }
