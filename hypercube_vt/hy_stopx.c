@@ -50,6 +50,16 @@ int main(int argc, char **argv)
 
 	system("/usr/bin/killall -ew -s CONT xfwm4");
 
+        // At this point no X11 related programs should be running.
+
+        // Now remove the X11 temp files, if they exist from a X11 crash.
+        // If these files did exist at X11 startup we'd not get display
+        // number 0.  These rm() calls should fail given these files do
+        // not exist unless X11 failed to shutdown correctly.  Given the
+        // buggy NVIDIA drivers, that will happen all the time.
+        unlink("/tmp/.X0-lock");
+        unlink("/tmp/.X11-unix/X0");
+
         // TODO: check if that failed and why.
         // At this point there not much we'd do about it anyway.
     }
@@ -63,6 +73,4 @@ int main(int argc, char **argv)
 
     return 0; // success
 }
-
-
 
