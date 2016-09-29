@@ -49,7 +49,7 @@ done
 # The server may not be running, but in any case if this
 # fails we have no other recourse.
 # --timeout=10 is 10 seconds
-wget --timeout=10 http://localhost:8080/QUIT -O -
+wget --timeout=10 --tries=1 http://localhost:8080/QUIT -O -
 
 Run hy_kill_dtk-server
 Run hy_projectors_off
