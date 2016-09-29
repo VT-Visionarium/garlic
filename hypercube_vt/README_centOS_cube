@@ -178,3 +178,11 @@ edit /etc/sysconfig/network-scripts/ifcfg-eno2
 and set ONBOOT=yes
 
 
+On removing xfce-panel:
+Xfce-panel can break fullscreen windows so we must make it so it does not
+run.  Xfce-panel is interdependent on xfcedestop so un-installing it is
+not easy.  So we edit /etc/xdg/xfce4/xinitrc and remove the code that
+runs xfce4-panel, so users will not have a panel when they first run
+the X desktop.  If they add a panel that will be their problem.
+
+
