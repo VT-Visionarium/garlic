@@ -142,7 +142,16 @@ yum install ntfs-3g
 mkdir /NTFS
 
 # add this next line to /etc/fstab
+# and remove any conflicting /home mounts
+
 /dev/sdb4  /NTFS   ntfs-3g  rw,umask=0000,defaults 0 0
+/dev/mapper/homevg-lvhome /home           ext4    defaults        0       2
+
+
+
+# make the volume group "homevg" active
+vgscan
+vgchange -a y
 
 
 mount -a
@@ -158,4 +167,6 @@ yum remove xfce4-power-manager
 
 
 # Now install LDAP client via ../ldap_client
+
+
 
