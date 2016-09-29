@@ -100,6 +100,7 @@ yum install csh\
  gtk+-devel\
  gtk2-devel\
  wget\
+ ntfs-3g\
  firefox
 
 install stuff from /usr/local/src/hypercube_vt/
@@ -137,8 +138,6 @@ service gdm start
 hy_edgeBlend_on # worked fine in this case
 
 
-yum install ntfs-3g
-
 mkdir /NTFS
 
 # add this next line to /etc/fstab
@@ -168,5 +167,14 @@ yum remove xfce4-power-manager
 
 # Now install LDAP client via ../ldap_client
 
+# Add a network interface to the projectors switch
+
+# as root run: nmtui is a cursors based GUI to setup
+# network interfaces, add static address 192.168.0.10/24
+nmtui
+
+
+edit /etc/sysconfig/network-scripts/ifcfg-eno2
+and set ONBOOT=yes
 
 
