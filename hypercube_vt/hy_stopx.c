@@ -41,9 +41,12 @@ int main(int argc, char **argv)
 
         // Now wait for X to no longer be running via signal
         // CONT.   This could hang forever if something went wrong.
+        // Which is a fine way to show that error case.
         system("/usr/bin/killall -ew -s CONT /usr/bin/X");
         // and wait for xinit to exit ?
         system("/usr/bin/killall -ew -s CONT xinit");
+	// and wait for xfce4-session to exit 
+	system("/usr/bin/killall -ew -s CONT xfce4-session");
 
         // TODO: check if that failed and why.
         // At this point there not much we'd do about it anyway.
