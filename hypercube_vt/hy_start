@@ -128,7 +128,9 @@ done
 displaySave="$DISPLAY"
 
 # Check all 16 X displays.  Sometimes just one fails.
-for i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 ; do
+# We check 15 first because it is the last to display
+# at X startup.
+for i in 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0 ; do
     export DISPLAY=:0.$i
     echo "DISPLAY=:0.$i xset -q"
     xset -q > /dev/null ||\
@@ -137,7 +139,8 @@ done
 
 # Check all 16 X displays.  Sometimes just one fails.
 for i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 ; do
-    # This checks and waits for X to draw a widget with a GTK+ window.
+    # This checks and waits for X to draw a widget with
+    # a GTK+ window and then exits.
     export DISPLAY=:0.$i
     echo "DISPLAY=:0.$i hy_checkXRunning --sync"
     hy_checkXRunning --sync ||\
