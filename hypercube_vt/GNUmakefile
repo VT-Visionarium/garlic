@@ -14,16 +14,16 @@ HOSTNAME = $(shell hostname -s)
 
 hy_getRootWidth_LFLAGS = -lX11
 hy_getRootHeight_LFLAGS = -lX11
-hy_blackEdge.o_CFLAGS = $(shell pkg-config gtk+-3.0 --cflags)
-hy_blackEdge_CFLAGS = $(shell pkg-config gtk+-3.0 --cflags)
-hy_blackEdge_LFLAGS = $(shell pkg-config gtk+-3.0 --libs)
+hy_checkXRunning.o_CFLAGS = $(shell pkg-config gtk+-3.0 --cflags)
+hy_checkXRunning_CFLAGS = $(shell pkg-config gtk+-3.0 --cflags)
+hy_checkXRunning_LFLAGS = $(shell pkg-config gtk+-3.0 --libs)
 
 cbinaries = $(patsubst %.c,%,$(wildcard *.c))
 built_files = $(patsubst %.in,%,$(wildcard hy_*.in)) $(cbinaries)
 
 ifeq ($(HOSTNAME),cube)
 inst_files = $(sort\
- $(filter-out %.in,$(wildcard hy_*) $(built_files))\
+ $(filter-out %.in %.c %.o %_OLD %~,$(wildcard hy_*) $(built_files))\
  nv-control-blend-visbox encap.exclude)
 else
 inst_files =\
@@ -34,7 +34,15 @@ inst_files =\
  hy_projectors_common.rb
 endif
 
+
 build: $(built_files)
+
+check:
+	@echo "inst_files=$(inst_files)"
+	@echo
+	@echo "cbinaries=$(cbinaries)"
+	@echo
+	@echo "built_files=$(built_files)"
 
 
 $(cbinaries): %: %.o
