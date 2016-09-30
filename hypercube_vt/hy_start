@@ -130,12 +130,14 @@ displaySave="$DISPLAY"
 # Check all 16 X displays.  Sometimes just one fails.
 for i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 ; do
     # This checks and waits for X to draw a widget with a GTK+ window.
+    export DISPLAY=:0.$i
     echo "DISPLAY=:0.$i hy_checkXRunning --sync"
-    DISPLAY=:0.$i hy_checkXRunning --sync ||\
+    hy_checkXRunning --sync ||\
  Fail "cannot run GTK+ program on DISPLAY=:0.$i"
 done
 
-# We confirmed that we can connect to this X server.
+# We confirmed that we can connect to this X server
+# on all 16 display screens
 echo "found a good X server at DISPLAY=$display"
 [ -n "$displaySave" ] && export DISPLAY="$displaySave"
 
