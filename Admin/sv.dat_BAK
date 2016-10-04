@@ -44,8 +44,8 @@ cube.sv.vt.edu:128.173.49.145::::::Cave,QTY_7,TORG.3090.TP04B
 moog.sv.vt.edu:128.173.49.146::::::Not_On
 yakko.sv.vt.edu:128.173.49.147::::::Nathan,TORG.3030E.TP03B
 console.sv.vt.edu:128.173.49.149::::::Cave,QTY_7,TORG.3090.TP04B
-polaris.sv.vt.edu:128.173.49.150::dads1.sv.vt.edu::::Cave,QTY_7,TORG.3090.TP04B
-thuban.sv.vt.edu:128.173.49.151::dads2.sv.vt.edu::::Cave,QTY_7,TORG.3090.TP04B
-sirius.sv.vt.edu:128.173.49.152::dads3.sv.vt.edu::::Cave,QTY_7,TORG.3090.TP04B
-leo.sv.vt.edu:128.173.49.153::dads4.sv.vt.edu::::Cave,QTY_7,TORG.3090.TP04B
+dads1.sv.vt.edu:128.173.49.150::::::Cave,QTY_7,TORG.3090.TP04B
+dads2.sv.vt.edu:128.173.49.151::::::Cave,QTY_7,TORG.3090.TP04B
+dads3.sv.vt.edu:128.173.49.152::::::Cave,QTY_7,TORG.3090.TP04B
+dads4.sv.vt.edu:128.173.49.153::::::Cave,QTY_7,TORG.3090.TP04B
 polys.sv.vt.edu:128.173.49.157::::::Nicholas_Polys,TORG.3030B.TP01B
