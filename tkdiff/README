@@ -1,7 +1,13 @@
+CentOS had no tkdiff package so we used the source.
 
 find the source tarball somewhere from:
 
 https://sourceforge.net/projects/tkdiff
 
+#untar it to make dir tkdiff-*
+
+mkdir -p /usr/local/encap/tkdiff/bin/
+cp tkdiff-*/tkdiff /usr/local/encap/tkdiff/bin/
+sudo /usr/local/sbin/encap
 
 
