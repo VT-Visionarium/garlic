@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# I have no idea if this script will work.
-# So think of it as notes.
+# I have no idea if this script will work;
+# so think of it as just notes.
 exit 1
 
 scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
@@ -19,7 +19,7 @@ function Fail()
 
 set -x
 
-# alias cp='cp -i' brings on the pain!!!
+# alias cp='cp -i' is a pain.
 unalias cp
 unalias ln
 
@@ -86,4 +86,9 @@ groupadd -r nslcd
 service nslcd start
 service nscd start
 service sshd start
+
+# making GNOME desktop manager
+# If using gdm (GNOME) edit /etc/sysconfig/authconfig
+# and make the line with FORCELEGACY be
+FORCELEGACY=yes
 
