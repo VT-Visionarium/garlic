@@ -1,8 +1,9 @@
 #%PAM-1.0
 # This file is auto-generated.
 # User changes will be destroyed the next time authconfig is run.
-auth        required      pam_group.so use_first_pass
 auth        required      pam_env.so
+auth        [success=1 default=ignore] pam_succeed_if.so service notin login:gdm:xdm:kdm:xscreensaver:gnome-screensaver:kscreensaver quiet use_uid
+auth        [success=done authinfo_unavail=ignore ignore=ignore default=die] pam_pkcs11.so nodebug
 auth        sufficient    pam_unix.so nullok try_first_pass
 auth        requisite     pam_succeed_if.so uid >= 1000 quiet_success
 auth        sufficient    pam_ldap.so use_first_pass
