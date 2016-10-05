@@ -42,7 +42,7 @@ git clone https://github.com/VT-Visionarium/garlic.git
 Now move this git src tree to /usr/local/src/ and that's it, now just
 keep pushing it and /usr/local/src/ will not suffer from bit-root.
 
-The main idea is that when I get hit by a bus someone can just looks at
+The main idea is that when I get hit by a bus someone can just look at
 the scripts and notes here-in to do my job in a semi-automated fashion;
 put another way, I'm writing code to replace myself.
 
