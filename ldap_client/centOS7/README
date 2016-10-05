@@ -1,3 +1,4 @@
 This is to install and configure the computers in our lab as
 LDAP clients, that use the local LDAP server for logging in.
 
+See notes in ./root_install.bash

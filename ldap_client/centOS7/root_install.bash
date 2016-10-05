@@ -87,8 +87,14 @@ service nslcd start
 service nscd start
 service sshd start
 
+
+
+
+# ref: http://blog.zwiegnet.com/linux-server/configure-centos-7-ldap-client/
 # making GNOME desktop manager
 # If using gdm (GNOME) edit /etc/sysconfig/authconfig
 # and make the line with FORCELEGACY be
 FORCELEGACY=yes
+
+reboot, and re-run authconfig-tui
 
