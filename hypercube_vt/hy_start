@@ -162,7 +162,7 @@ Run hy_edgeBlend_on
 # all 2 are nvidia driver scripts.
 
 #This on is broken?  We'll see...
-Run hy_frameLock_on
+#Run hy_frameLock_on
 
 Run hy_syncToVBlank_on
 
