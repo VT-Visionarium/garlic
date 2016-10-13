@@ -24,6 +24,9 @@ int main(int argc, char **argv)
     if(argc > 1)
         return usage(argv[0]);
 
+    // xfce4-session-logout does not work for our case
+    // we get and error and it fails.
+
     // killall options used:
     //   -e  Require  an exact match for very long names.
     //   -w  wait for all killed processes to die. 

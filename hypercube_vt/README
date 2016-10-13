@@ -21,7 +21,10 @@ To install on the VT hyperCube:
    edit hy_startx and select you default resolution by
    picking a value for XORGCONFIG
 
-   then (CAUTION: 'make install' will run 'sudo'):
+   then (CAUTION: 'make install' will run 'sudo') we
+   are just letting you know here, just so you know.
+   If you want to see why it calls sudo than look at
+   the file GNUmakefile and see why.  It install run:
 
       make
       make install
