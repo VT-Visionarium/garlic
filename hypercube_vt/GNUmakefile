@@ -75,6 +75,7 @@ sudo_install:
 	cp xorg.conf.cube_1920x1200 xorg.conf.cube_2560x1600 /etc/X11/
 	if [ ! -f xinitrc.OLD ] ; then mv /etc/X11/xinit/xinitrc xinitrc.OLD ; echo ; fi
 	cp xinitrc /etc/X11/xinit/xinitrc
+	cp _hy_checkX11Session.desktop /etc/xdg/autostart/hy_checkX11Session.desktop
 
 install: build
 ifeq ($(HOSTNAME),cube)

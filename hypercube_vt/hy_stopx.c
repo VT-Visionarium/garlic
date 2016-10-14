@@ -62,6 +62,11 @@ int main(int argc, char **argv)
         // buggy NVIDIA drivers, that will happen all the time.
         unlink("/tmp/.X0-lock");
         unlink("/tmp/.X11-unix/X0");
+        // We may have used this file to let use know that a XFCE session
+        // started via /etc/xdg/autostart/hy_checkX11Session.desktop
+        // which is a copy of _hy_checkX11Session.desktop.
+        // A hack to see if the xfce session is ready.
+        unlink("/tmp/XzzX_hy_xsessionCheck");
 
         // TODO: check if that failed and why.
         // At this point there not much we'd do about it anyway.

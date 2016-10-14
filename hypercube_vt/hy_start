@@ -15,7 +15,7 @@ function usage()
     hy_projectors_on [--mono]  turn on projects
     hy_startx                  start a user login X session
     hy_edgeBlend_on            fade the edges of overlapping root windows
-    hy_frameLock_on            turn on nvidia frame locking (BROKEN??)
+    #hy_frameLock_on (removed) turn on nvidia frame locking (BROKEN??)
     hy_syncToVBlank_on         turn on nvidia sync to verticle refresh
 
   By default we turn on the projector for stereo display, not --mono.
@@ -89,41 +89,62 @@ Run hy_projectors_on $mono
 
 Run hy_startx
 
-# We check that we are running xfce4-session and we can connect
-# to the X server and then check that xfce4-session is
-# still running.  This is not fool proof, but it's not
-# likely that these 3 checks pass and things are not okay
-# with running the XFCE X11 session.
 
-# wait for xfwm4 to be running
-count=0
-sleep 0.5
-while ! killall -CONT xfwm4 ; do
-	sleep 1
-	let count=$count+1
-    if [ $count = 40 ] ; then
-        cat <<EOF
- Failed ($count seconds) to find xfwm4 running
+function WaitForXProgramsToBeRunning()
+{
+    for prog in xfwm4 xfce4-session xfdesktop ; do
+        count=0
+        while ! killall -CONT xfwm4 ; do
+            echo "Waiting ($count seconds) for $prog to be running"
+	    sleep 1
+	    let count=$count+1
+            if [ $count = 40 ] ; then
+                cat <<EOF
+ Failed ($count seconds) to find $prog running
 
 EOF
-	exit 1
-    fi
-done
+	        exit 1
+            fi
+        done
+        echo "$prog is now running"
+    done
+}
 
-# Make sure that the xfce4-session is still running. We have seen xfce4-session
-# fail to be running at this point; strange but true.
+# The programs xfwm4 xfce4-session and xfdesktop maybe running but the
+# dummies that wrote them do not provide a way to tell if they are ready
+# to be used yet.  We note that starting some X11 programs too soon after
+# these programs start will make things brake.
+
+
+# Free resources so maybe these stupid programs can start soon.
+# Yes, sleep a short time may help do that:
+sleep 0.6
+
+
+WaitForXProgramsToBeRunning
+
+
+# Interesting idea, but it fails to
+# this must be the same file as in hy_startx.c
+tmpfile=/tmp/XzzX_hy_xsessionCheck
 count=0
-while ! killall -CONT xfce4-session ; do
-	sleep 1
-	let count=$count+1
+# We installed /etc/xdg/autostart/hy_checkX11Session.desktop as a signaler
+# which we hope to have create $tmpfile when the xfce session is
+# started.
+while [ ! -e $tmpfile ] ; do
+    echo "Waiting ($count seconds) for $tmpfile to exist"
+    sleep 1
+    let count=$count+1
     if [ $count = 40 ] ; then
-        cat <<EOF
- Failed ($count seconds) to find xfce4-session running
+                cat <<EOF
+ Failed ($count seconds) to find $prog running
 
 EOF
-	exit 1
+        exit 1
     fi
 done
+echo "Found file $tmpfile"
+
 
 displaySave="$DISPLAY"
 
@@ -137,20 +158,45 @@ for i in 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0 ; do
  Fail "cannot run xset -q on DISPLAY=:0.$i"
 done
 
-# Check all 16 X displays.  Sometimes just one fails.
+# At this point it has been shown that running GTK+ program can get in a
+# hung state.  A kill -9 can kill it, but kill -INT will not kill it.  The
+# program just runs like all it's input is stopped.  It gets stuck in a
+# blocking _poll() call.  It's a GTK+, X11 and/or XFCE bug for sure.
+# There is no easy way to tell when the XFCE session can start being used
+# and using it too soon can cause the program using it to hang in a bad
+# way.   I give up.  I hate to do this but I must somehow wait for the
+# XFCE session to be ready, so until I find a better way I'll sleep.
+
+# Maybe /etc/xdg/autostart/hy_checkX11Session.desktop will fix the need
+# for this sleep.
+
+echo "sleeping 5 secs because XFCE sucks!"
+sleep 5
+
+# If XFCE X11 session is ready this next test will make it through,
+# otherwise this will hang this script indefinitely. Check all 16 X
+# displays. ... And sometimes just one fails.  Other peoples code sucks!
+# We would rather fail here then when running the hy_edgeBlend_on, because
+# hy_edgeBlend_on can brake the hardware, or so it seems.
 for i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 ; do
     # This checks and waits for X to draw a widget with
     # a GTK+ window and then exits.
     export DISPLAY=:0.$i
     echo "DISPLAY=:0.$i hy_checkXRunning --sync"
+    # Will this hang?
     hy_checkXRunning --sync ||\
  Fail "cannot run GTK+ program on DISPLAY=:0.$i"
 done
+
 
 # We confirmed that we can connect to this X server
 # on all 16 display screens
 echo "found a good X server at all 16 screens"
 [ -n "$displaySave" ] && export DISPLAY="$displaySave"
+
+
+# Double check because I'm still debugging this script:
+WaitForXProgramsToBeRunning
 
 
 
@@ -159,7 +205,6 @@ echo "found a good X server at all 16 screens"
 # in hy_syncToVBlank_on
 
 Run hy_edgeBlend_on
-# all 2 are nvidia driver scripts.
 
 #This on is broken?  We'll see...
 #Run hy_frameLock_on
