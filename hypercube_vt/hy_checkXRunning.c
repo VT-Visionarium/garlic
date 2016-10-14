@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <gtk/gtk.h>
@@ -66,7 +67,7 @@ int getRootHeight(void)
      return gdk_window_get_height(gdk_get_default_root_window());
 }
 
-static inline runGtk(void)
+static inline void runGtk(void)
 {
     GtkWidget *window;
     GtkWidget *da;
@@ -75,7 +76,7 @@ static inline runGtk(void)
             8*getRootWidth()/9, 7*getRootHeight()/8);
     gtk_window_move(GTK_WINDOW(window), 0, 0);
     //gtk_window_fullscreen(GTK_WINDOW(window));
-    gtk_window_set_has_resize_grip(GTK_WINDOW(window), FALSE);
+    //gtk_window_set_has_resize_grip(GTK_WINDOW(window), FALSE);
     g_signal_connect(window, "destroy", gtk_main_quit, NULL);
     //g_signal_connect(window, "focus",  G_CALLBACK(focus), NULL);
     da = gtk_drawing_area_new();
