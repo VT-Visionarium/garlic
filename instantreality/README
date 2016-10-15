@@ -1,8 +1,18 @@
 We got the source as binary packages.  For example:
 
+On Ubuntu based system:
+
   wget ftp://ftp.igd.fraunhofer.de/outgoing/irbuild/Ubuntu-x86_64/InstantReality-Ubuntu-14.04-x64-2.6.0.31123.deb
 
+
+  and run: 'gdebi InstantReality-Ubuntu-14.04-x64-2.6.0.31123.deb'
+
+
+
   or
+
+On redhat (centOS) based system:
+
 
   wget ftp://ftp.igd.fraunhofer.de/outgoing/irbuild/RedHat-7-x86_64/InstantReality-RedHat-7-x64-2.8.0.38807.rpm
 
