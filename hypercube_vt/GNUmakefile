@@ -8,7 +8,7 @@ PREFIX := /usr/local/encap/hypercube_vt-0.2
 BIN = $(PREFIX)/bin
 ETC = $(PREFIX)/etc
 
-CFLAGS = -g
+CFLAGS = -g -Werror
 
 HOSTNAME = $(shell hostname -s)
 
