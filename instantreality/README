@@ -23,7 +23,26 @@ On redhat (centOS) based system:
 
    To install on CentOS 7:
 
+
+   You may need to remove the old version via:
+
+
+        yum remove InstantReality-bla-bla
+
+
+
+
         yum install InstantReality-RedHat-7-*.rpm
+
+If if complains about an older version being in the way run:
+
+        yum remove "OLDER_VERSION_THAT_YUM_INSTALL_SHOWED"
+
+And try yum install again:
+
+
+than:
+
         cp 2016_IR-license.xml /opt/instantReality/bin/license.xml
 
 
