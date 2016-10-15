@@ -122,6 +122,18 @@ edited /etc/yum.conf
 added line
 exclude=kmod-nvidia-367.35 kmod-nvidia-367.44 nvidia-x11-drv-367.35 nvidia-x11-drv-367.44
 
+Notes on upgrading Nvidia drivers
+
+
+# run: yum list kmod-nvidia --showduplicates
+# run: yum list nvidia-x11-drv --showduplicates
+# run: yum downgrade kmod-nvidia nvidia-x11-drv
+exclude=kmod-nvidia-367.35 kmod-nvidia-367.44 kmod-nvidia-367.57 nvidia-x11-drv-367.35 nvidia-x11-drv-367.44 nvidia-x11-drv-367.57
+
+
+
+
+
 These versions seem to show the CT left eye projector at the wrong
 resolution.  We don't know why it just does.
 
