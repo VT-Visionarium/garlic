@@ -78,17 +78,6 @@ function runServer()
 
     local exe=
 
-    if nc -z $host 8383 ; then
-        # If there is an old server running tell it to quit.
-        set -x
-        ssh $host wget --timeout=5 --tries=1\
- http://localhost:8080/QUIT?foo=bar -O -
-        # I hate doing this (sleep), but we have no way to know
-        # how long it takes the server to shut down
-        sleep 2
-        set +x
-    fi
-
     if [ -n "$just_server" ] ; then
         exe="exec "
     fi
@@ -164,6 +153,20 @@ if [ "$host" != "$rhost" ] ; then
     fi
 fi
 
+set -x
+# netcat with timeout 2 seconds
+if nc -z -w 2 $host 8383 ; then
+    # If there is an old server running tell it to quit.
+    ssh $host wget --timeout=5 --tries=1\
+ http://localhost:8080/QUIT?foo=bar -O -
+    sleep 1.5
+    while nc -z -w 2 $host 8383 ; do
+        set +x
+        echo "waiting for old server to shutdown"
+        sleep 1.5
+    done
+fi
+set +x
 
 if [ -n "$just_server" ] ; then
     runServer
@@ -176,22 +179,29 @@ waitPid=$!
 
 
 count=0
+
+# This sleep may help get the web server going.
+sleep 0.4
+
 # wait for server to be working via a wget request
 # We tried netcat but that was connecting before
 # the server was working.
+set -x
 while ! wget --no-check-certificate --timeout=5 --tries=1\
  https://$host:8383/?passcode=${passcode}\
  -O - > /dev/null ; do
-    sleep 0.6
+    set +x
     echo "waiting for server to start"
+    sleep 1
     let count=$count+1
     if [ "$count" = "20" ] ; then
         echo "Failed to connect to server"
         sleep 10
         exit 1
     fi
+    set -x
 done
-
+set +x
 
 echo "server is running"
 
@@ -216,11 +226,16 @@ while wait $waitPid ; do
     # in this loop.
     # TODO: make a less expensive wget ping
     # this gets many files.
-    if ! wget --no-check-certificate --timeout=5 --tries=1\
+    if ! wget --no-check-certificate --timeout=1 --tries=1\
  https://$host:8383/?passcode=${passcode} -O - > /dev/null ; then
         echo "Server is unreachable"
         sleep 5 # let the user see the spew
-        exit
+        break
     fi
 done
+
+# We keep this script from killing the browser.
+# Stupid xdg-open sees it's parent is gone and
+# kills the browser.
+while true ; do sleep 100 ; done
 
