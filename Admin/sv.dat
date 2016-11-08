@@ -40,6 +40,7 @@ replicator.sv.vt.edu:128.173.49.127::::::Mac_Pro,TORG.3030D.TP06C
 rock.sv.vt.edu:128.173.49.130::::::xubuntu10.04,TORG.3030D.TP01C
 anvil.sv.vt.edu:128.173.49.135::vis.arc.vt.edu,visualization.arc.vt.edu,visionarium.arc.vt.edu,visionarium.sv.vt.edu,vis.sv.vt.edu,www.sv.vt.edu,sv.vt.edu::::Cave,QTY_7,TORG.3090.TP04B
 glyph.sv.vt.edu:128.173.49.137::::::Soumik,TORG.3030.TP01A
+cube10.sv.vt.edu:128.173.49.144::::::Cave,10GigB,TORG.3090A.B11_4000
 cube.sv.vt.edu:128.173.49.145::::::Cave,QTY_7,TORG.3090.TP04B
 moog.sv.vt.edu:128.173.49.146::::::Not_On
 yakko.sv.vt.edu:128.173.49.147::::::Nathan,TORG.3030E.TP03B
