@@ -14,7 +14,7 @@
     leaving the stuff (child nodes) in them, or if they are not selected,
     they are used to remove the tags (branches) they enclose.
 
-    Ya, okay, it's a quick hack that, but we do not have need to make
+    Ya, okay, it's a quick hack, but we do not have big need to make
     or use another language.  We just need to make this code manageable.
     Without this <IF*> stuff (or like thing) this would be about 16 times
     more lines of code.
@@ -27,9 +27,9 @@
 <X3D>
     <Engine>
         <RenderJob DEF='render'>
-            <WindowGroup>
 
-                <IFdesktopStereoSideBySide>
+            <IFdesktopStereoSideBySide>
+                <WindowGroup>
                     <LocalWindow position='0 0' size='1000 500'
                         fullScreen='FALSE' pipe=':0.0' border='TRUE'
                         drawCursor='TRUE' drawToolBar='TRUE'>
@@ -54,9 +54,11 @@
                             </ProjectionViewModifier>
                         </Viewarea>
                     </LocalWindow>
-                </IFdesktopStereoSideBySide>
+                </WindowGroup>
+            </IFdesktopStereoSideBySide>
 
-                <IFdesktopMono>
+            <IFdesktopMono>
+                <WindowGroup>
                     <LocalWindow position='0 0' size='900 900'
                         fullScreen='FALSE' border='TRUE'
                         drawCursor='TRUE' drawToolBar='TRUE'>
@@ -72,14 +74,17 @@
                                 </ProjectionViewModifier>
                         </Viewarea>
                     </LocalWindow>
-                </IFdesktopMono>
+                </WindowGroup>
+            </IFdesktopMono>
 
 
 
 
-                <IFcaveWalls>
+            <IFcaveWalls>
 
-                    <!-- LEFT WALL -->
+                <!-- LEFT WALL -->
+
+                <WindowGroup>
                     <LocalWindow position='0 0' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.0' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
@@ -111,8 +116,10 @@
                             </IFcaveMono>
                         </Viewarea>
                     </LocalWindow>
+                </WindowGroup>
 
-                    <IFcaveStereo>
+                <IFcaveStereo>
+                    <WindowGroup>
                         <LocalWindow position='0 0' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.1' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
@@ -132,8 +139,10 @@
                                 </ProjectionViewModifier>
                             </Viewarea>
                         </LocalWindow>
-                    </IFcaveStereo>
+                    </WindowGroup>
+                </IFcaveStereo>
 
+                <WindowGroup>
                     <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.2' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
@@ -165,8 +174,10 @@
                             </IFcaveMono>
                         </Viewarea>
                     </LocalWindow>
+                </WindowGroup>
 
-                    <IFcaveStereo>
+                <IFcaveStereo>
+                    <WindowGroup>
                         <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.3' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
@@ -186,11 +197,15 @@
                                 </ProjectionViewModifier>
                             </Viewarea>
                         </LocalWindow>
-                    </IFcaveStereo>
-                    <!-- END LEFT WALL -->
+                    </WindowGroup>
+                </IFcaveStereo>
+
+                <!-- END LEFT WALL -->
 
 
-                    <!-- CENTER WALL -->
+                <!-- CENTER WALL -->
+
+                <WindowGroup>
                     <LocalWindow position='0 0' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.4' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
@@ -222,8 +237,10 @@
                             </IFcaveMono>
                         </Viewarea>
                     </LocalWindow>
+                </WindowGroup>
 
-                    <IFcaveStereo>
+                <IFcaveStereo>
+                    <WindowGroup>
                         <LocalWindow position='0 0' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.5' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
@@ -243,9 +260,11 @@
                                 </ProjectionViewModifier>
                             </Viewarea>
                         </LocalWindow>
-                    </IFcaveStereo>
+                    </WindowGroup>
+                </IFcaveStereo>
 
 
+                <WindowGroup>
                     <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.6' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
@@ -277,8 +296,10 @@
                             </IFcaveMono>
                         </Viewarea>
                     </LocalWindow>
+                </WindowGroup>
 
-                    <IFcaveStereo>
+                <IFcaveStereo>
+                    <WindowGroup>
                         <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.7' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
@@ -298,11 +319,15 @@
                                 </ProjectionViewModifier>
                             </Viewarea>
                         </LocalWindow>
-                    </IFcaveStereo>
-                    <!-- END CENTER WALL -->
+                    </WindowGroup>
+                </IFcaveStereo>
+                
+                <!-- END CENTER WALL -->
 
 
-                    <!-- RIGHT WALL -->
+                <!-- RIGHT WALL -->
+
+                <WindowGroup>
                     <LocalWindow position='0 0' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.8' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
@@ -334,8 +359,10 @@
                             </IFcaveMono>
                         </Viewarea>
                     </LocalWindow>
+                </WindowGroup>
 
-                    <IFcaveStereo>
+                <IFcaveStereo>
+                    <WindowGroup>
                         <LocalWindow position='0 0' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.9' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
@@ -355,9 +382,11 @@
                                 </ProjectionViewModifier>
                             </Viewarea>
                         </LocalWindow>
-                    </IFcaveStereo>
+                    </WindowGroup>
+                </IFcaveStereo>
 
 
+                <WindowGroup>
                     <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.10' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
@@ -389,8 +418,10 @@
                             </IFcaveMono>
                         </Viewarea>
                     </LocalWindow>
+                </WindowGroup>
 
-                    <IFcaveStereo>
+                <IFcaveStereo>
+                    <WindowGroup>
                         <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.11' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
@@ -410,10 +441,15 @@
                                 </ProjectionViewModifier>
                             </Viewarea>
                         </LocalWindow>
-                    </IFcaveStereo>
-                    <!-- END RIGHT WALL -->
+                    </WindowGroup>
+                </IFcaveStereo>
 
-                    <!-- FLOOR WALL -->
+                <!-- END RIGHT WALL -->
+
+
+                <!-- FLOOR WALL -->
+                
+                <WindowGroup>
                     <LocalWindow position='0 0' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.12' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
@@ -445,8 +481,10 @@
                             </IFcaveMono>
                         </Viewarea>
                     </LocalWindow>
+                </WindowGroup>
 
-                    <IFcaveStereo>
+                <IFcaveStereo>
+                    <WindowGroup>
                         <LocalWindow position='0 0' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.13' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
@@ -466,9 +504,11 @@
                                 </ProjectionViewModifier>
                             </Viewarea>
                         </LocalWindow>
-                    </IFcaveStereo>
+                    </WindowGroup>
+                </IFcaveStereo>
 
-
+ 
+                <WindowGroup>
                     <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                         fullScreen='FALSE' pipe=':0.14' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
@@ -500,8 +540,10 @@
                             </IFcaveMono>
                         </Viewarea>
                     </LocalWindow>
+                </WindowGroup>
 
-                    <IFcaveStereo>
+                <IFcaveStereo>
+                    <WindowGroup>
                         <LocalWindow position='0 @WIN_YPOS@' size='@WIN_RES@'
                             fullScreen='FALSE' pipe=':0.15' border='FALSE'
                             drawCursor='TRUE' drawToolBar='FALSE'>
@@ -521,16 +563,18 @@
                                 </ProjectionViewModifier>
                             </Viewarea>
                         </LocalWindow>
-                    </IFcaveStereo>
-                    <!-- END FLOOR WALL -->
+                </WindowGroup>
+            </IFcaveStereo>
 
-                </IFcaveWalls>
+            <!-- END FLOOR WALL -->
+
+            </IFcaveWalls>
 
 
 
-                <!-- DEEPSIX DISPLAY -->
-                <IFdeepsixDisplay>
-
+            <!-- DEEPSIX DISPLAY TODO split into more windowGroups -->
+            <IFdeepsixDisplay>
+                <WindowGroup>
                     <LocalWindow position='0 0' size='7680 3200'
                         fullScreen='FALSE' pipe=':0.0' border='FALSE'
                         drawCursor='TRUE' drawToolBar='FALSE'>
@@ -607,18 +651,20 @@
                             </ProjectionViewModifier>
                         </Viewarea>
                     </LocalWindow>
+                </WindowGroup>
 
-                </IFdeepsixDisplay>
-                <!-- END DEEPSIX DISPLAY -->
+            </IFdeepsixDisplay>
+            <!-- END DEEPSIX DISPLAY -->
 
 
-                <IFtwoDifferentX11Screens>
+            <IFtwoDifferentX11Screens>
+                <WindowGroup>
                     <LocalWindow pipe=':0.1' />
                     <LocalWindow pipe=':0.1' />
-                </IFtwoDifferentX11Screens>
+                </WindowGroup>
+            </IFtwoDifferentX11Screens>
 
  
-            </WindowGroup>
         </RenderJob>
 
 
