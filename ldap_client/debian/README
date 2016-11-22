@@ -1,0 +1,14 @@
+this is for use on debain not Xubuntu or CentOS.
+
+This is to install and configure the computers in our lab as LDAP
+clients, that use the VT LDAP server for logging in.
+
+READ root_install?.bash before you just run them.
+
+Run them in the order (1 2)
+root_install_1.bash root_install_2.bash
+
+It can't be just one script because you may need to reboot or run tests at
+some points in the process.  The root_install_?.bash scripts are
+interactive.
+
