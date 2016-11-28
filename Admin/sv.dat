@@ -26,6 +26,7 @@
 bkmac.sv.vt.edu:128.173.49.101::::::Router,TORG.3030D.TP01B
 lion.sv.vt.edu:128.173.49.102::::::Extra1
 spock.sv.vt.edu:128.173.49.103::::::Extra2
+datakiosk.sv.vt.edu:128.173.49.104::::::Data_Kiosk,TORG.3030
 thor.sv.vt.edu:128.173.49.108::::::James_Mcclure,TORG.3030C.TP01B
 guppy.sv.vt.edu:128.173.49.110::::::Srijith_Rajamohan,TORG.3030F.TP01B
 viz1.sv.vt.edu:128.173.49.111::::::Faiz_Router,not_in_use,TORG.3030D.TP01B
