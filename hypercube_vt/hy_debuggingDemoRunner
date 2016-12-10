@@ -7,7 +7,7 @@ require 'find'
 #################################################
 
 # directory that has demos with run files
-$demoRoot = '/NTFS/Shared/demos'
+$demoRoot = '/home/demo'
 
 # demos to run are named:
 $runDemoName = 'run'
