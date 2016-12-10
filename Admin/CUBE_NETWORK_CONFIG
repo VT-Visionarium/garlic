@@ -1,0 +1,14 @@
+# Bring down the network
+sudo ifdown network_name
+
+# Bring up the network
+sudo ifup network_name
+
+# Network file to edit for the 10G line
+/etc/sysconfig/network-scripts/ifcfg-10gig
+
+# Network file to edit for the 1G line
+/etc/sysconfig/network-scripts/ifcfg-eno1
+
+# Flag to make the network NOT add a gateway
+Add "DEFROUTE=no" in /etc/sysconfig/network-scripts/network_name

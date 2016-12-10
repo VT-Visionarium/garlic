@@ -1,0 +1,9 @@
+# NVidia CUDA
+
+# got RPM from https://developer.nvidia.com/
+
+wget https://developer.nvidia.com/compute/cuda/8.0/prod/local_installers/cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64-rpm
+
+sudo rpm -i cuda-repo-rhel7-8-0-local-8.0.44-1.x86_64.rpm 
+sudo yum clean all
+sudo yum install cuda

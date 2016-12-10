@@ -38,6 +38,8 @@ if [ ! -f vt-cachain.pem ] ; then
  http://www.middleware.vt.edu/pubs/vt-cachain.pem || Fail
 fi
 
+mkdir -p /etc/ca-certificates/ || exit $?
+chmod 755 /etc/ca-certificates
 cp vt-cachain.pem /etc/ca-certificates/vt-cachain.pem || exit $?
 chmod 644 /etc/ca-certificates/vt-cachain.pem || exit $?
 
@@ -51,7 +53,7 @@ cp adduser.conf /etc/adduser.conf || exit $?
 chmod 640 /etc/adduser.conf || exit $?
 
 
-apt-get install ssh || exit $?
+apt-get install ssh nscd || exit $?
 
 date="$(date)" || exit $?
 
@@ -103,8 +105,8 @@ vim $tmp || exit $?
 
 Prompt "SAVE this edit as /etc/pam.d/common-auth"
 set -x
-mv $tmp /etc/pam.d/common-auth
-chmod 644 /etc/pam.d/common-auth
+mv $tmp /etc/pam.d/common-auth || exit $?
+chmod 644 /etc/pam.d/common-auth || exit $?
 
 ####################### change /etc/security/group.conf" ######################
 
