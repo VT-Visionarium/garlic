@@ -16,7 +16,7 @@ function usage()
 {
     cat << EOF || exit $?
 
-  Usage: $prog TO_HOST [FROM_HOST]
+   Usage: $prog TO_HOST [-f FROM_HOST] [ssh_options]
 
     Generate ssh public/private rsa key pair (if needed) and put
     the public key on the machine at TO_HOST, so that you may ssh to
@@ -24,7 +24,12 @@ function usage()
 
     If FROM_HOST is not given the output of 'hostname -s' will be
     used as the host name we ssh from.
-    
+
+    If ssh_options are given they will be the first arguments to the
+    ssh calls.  Example:
+
+               $prog workhorse -f rider -p 4554
+ 
 
   References:
 
@@ -44,28 +49,37 @@ function usage()
 
         unset SSH_AUTH_SOCK
 
+    Security-Enhanced Linux (SELinux) can do a good job of keeping
+    sshing with keys from working by limiting access to .ssh/ files.
+
 
 EOF
 
     exit 1
 }
 
-tohost=
-fromhost="$(hostname -s)" || exit 1
+[ -z "$1" ] && usage
 
+tohost=
+sshoptions=" "
+fromhost="$(hostname -s)" || exit 1
 who="$(whoami)"
 
-[ -z "$1" ] && usage
-[ -n "$3" ] && usage
-
 tohost="$1"
-
-[ -z "$2" ] || fromhost="$3"
+shift 1
 
 while [ -n "$1" ] ; do
     case "$1" in
-        -*)
-            usage
+        --help|-h)
+	    usage
+	    ;;
+	-f)
+	    shift 1
+ 	    [ -z "$1" ] && usage
+	    fromhost="$1"
+	    ;;
+        *)
+            sshoptions="${sshoptions}$1 "
             ;;
     esac
     shift 1
@@ -105,7 +119,7 @@ function success()
 function checkWorksAlready()
 {
     set -x
-    if ssh -o 'StrictHostKeyChecking no' -o\
+    if ssh ${sshoptions}-o 'StrictHostKeyChecking no' -o\
         'PreferredAuthentications=publickey' $1\
         echo -e "\\\\nLooks like you can ssh to $1 without password already\\\\n" ; then
         success
@@ -125,7 +139,7 @@ function rmHostFromKnown()
 function pushPublicKeyToHyHost()
 {
     set -x
-    cat ${HOME}/.ssh/id_rsa.pub | ssh -o 'StrictHostKeyChecking no' $1\
+    cat ${HOME}/.ssh/id_rsa.pub | ssh ${sshoptions}-o 'StrictHostKeyChecking no' $1\
  'mkdir -p ${HOME}/.ssh && cat >> ${HOME}/.ssh/authorized_keys && chmod 600 ${HOME}/.ssh/authorized_keys && chmod 700 ${HOME}/.ssh'\
  || exit $?
     set +x
