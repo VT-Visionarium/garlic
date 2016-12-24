@@ -1,0 +1,1 @@
+../nodejs-v6.5.0/install.bash
