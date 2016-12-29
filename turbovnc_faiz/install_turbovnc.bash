@@ -72,6 +72,7 @@ cmake -G"Unix Makefiles"\
     -DTJPEG_INCLUDE_DIR=/usr/local/include \
     -DTJPEG_JAR=/usr/local/share/classes/turbojpeg.jar \
     -DTJPEG_JNILIBRARY=/usr/local/lib/libturbojpeg.so \
+    -DTVNC_USETLS=0 \
     ../../turbovnc
 
 # Set encoding to UTF8 else the make may fail complaining of non-ASCII
