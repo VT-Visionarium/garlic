@@ -1,0 +1,7 @@
+libjpeg-turbo SDK is a dependency of TurboVNC. Refer to
+install_libjpeg_turbo.bash, which has more comments as needed
+
+git clone https://github.com/libjpeg-turbo/libjpeg-turbo
+
+http://libjpeg-turbo.virtualgl.org/
+

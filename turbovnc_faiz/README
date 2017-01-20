@@ -1,0 +1,8 @@
+TurboVNC depends on libjpeg-turbo SDK. Please run install_libjpeg_turbo.bash
+before running this script. Refer to
+install_libjpeg_turbo.bash, which has more comments as needed
+
+git clone https://github.com/TurboVNC/turbovnc.git
+
+http://www.turbovnc.org/
+
