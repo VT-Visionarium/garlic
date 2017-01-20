@@ -51,7 +51,8 @@ done
 # --timeout=10 is 10 seconds
 wget --timeout=10 --tries=1 http://localhost:8080/QUIT -O -
 
-Run hy_kill_dtk-server
+#Run hy_kill_dtk-server
+Run dtk-shutdownServer
 Run hy_projectors_off
 Run hy_stopx
 
