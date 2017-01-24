@@ -1,7 +1,7 @@
 # encap
 a fork of The Encapsulated Software Manager by jwessel@uiuc.edu
 
-This package depends on csh: apt-get install csh
+This package depends on csh: apt-get install csh.
 If you use CentOS, use yum install csh
 
 ## install
