@@ -140,6 +140,9 @@ resolution.  We don't know why it just does.
 # Now this will not install versions 367.35 or 367.44
 yum install kmod-nvidia
 
+# Blacklist nouveau
+Open /etc/modprobe.d/blacklist.conf and type "blacklist nouveau"
+
 
 service gdm start
 
