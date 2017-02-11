@@ -1,0 +1,9 @@
+The ParaView we want to install has MPI, Python, VRPN, and QT
+as dependencies.
+
+We are installing v5.2.0.
+
+git clone https://github.com/Kitware/ParaView.git
+
+http://www.paraview.org/
+
