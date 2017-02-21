@@ -18,6 +18,57 @@ FILES:
 
   sv.dat_submitted
 
-      Submitted but not accepted yet.  See sv.dat.
+      Submitted but not accepted yet.  See sv.dat
 
+
+
+    Scientific Visualization
+    Lance Arsenault lanceman@vt.edu
+
+
+ default gateway: 128.173.48.1
+         Netmask: 255.255.248.0
+         DNS: 198.82.247.66, 198.82.247.98, 198.82.247.34
+         seach domains: sv.vt.edu,arc.vt.edu
+
+
+ ref: http://groupw.cns.vt.edu/~benchoff/dnl-draft/
+
+ email this to: hostmaster@vt.edu
+  with subject: sv.vt.edu
+
+
+Systems
+Tue Feb 21 14:58:27 EST 2017
+
+debian,   datakiosk
+ubuntu,   viz1 faiz
+windows7  viz2 full disk
+ubuntu    viz3 lance
+windows7  viz4 LargeTV
+windows10 potter Jags old machine
+windows10 deepsix
+ubuntu    deepsix
+pse       centOS
+tricorder OSX
+windows10 tricorder Peter
+ubuntu metagrid2
+centOS rock
+ubuntu anvil
+centOS cube
+conference room OSX
+ubuntu console
+centOS polaris dads1
+none thuban dads2
+none sirius dads3
+none leo dads4
+
+1 debian
+6 ubuntu
+4 centOS
+2 OSX
+2 windows7
+3 windows10
+
+deepsix is dual boot
 
