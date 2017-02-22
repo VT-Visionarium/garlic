@@ -1,0 +1,68 @@
+NAME,IP_ADDRESS,MX,ALIAS,COMMENT
+#
+# CNS DNS data file.
+#
+# This file is a modified CSV format.  You may edit it as-is with
+# a text editor.  You can add your own comment lines beginning
+# with #. If  you want to use it as a spread sheet you will need
+# to delete the comment lines first.
+#
+# The first line contains the column names.  Do not delete it.
+# You may add your own columns with names beginning with MY_.
+#
+# Begin converted data.
+#    Scientific Visualization
+#    Lance Arsenault lanceman@vt.edu
+#
+#    sv.dat
+#
+# default gateway: 128.173.48.1
+#         Netmask: 255.255.248.0
+#         DNS: 198.82.247.66, 198.82.247.98, 198.82.247.34
+#         seach domains: sv.vt.edu,arc.vt.edu
+#
+#
+# I have been told that this reference document is no longer up to
+# date but there is no replacement for it.  (WTF)
+# ref: http://groupw.cns.vt.edu/~benchoff/dnl-draft/
+#
+# email this to: hostmaster@vt.edu
+#  with subject: sv.vt.edu
+#
+# We replaced most spaces with _ so email clients do not add newlines.
+# Lines shorter than 78 characters, like this one, do not require this.
+#
+# OLD FORMAT
+# hostname:ip:mxhost(,mxhost...):alias(,alias...):hw:os:mac:comment
+# To check number of entries run:
+#  sed sv.dat -e 's/[^:]//g'
+#
+bkmac.sv.vt.edu,128.173.49.101,,,"Router,TORG.3030D.TP01B"
+lion.sv.vt.edu,128.173.49.102,,,Extra1
+spock.sv.vt.edu,128.173.49.103,,,Extra2
+datakiosk.sv.vt.edu,128.173.49.104,,,"Data_Kiosk,TORG.3030"
+thor.sv.vt.edu,128.173.49.108,,,"James_Mcclure,TORG.3030C.TP01B"
+guppy.sv.vt.edu,128.173.49.110,,,"Srijith_Rajamohan,TORG.3030F.TP01B"
+viz1.sv.vt.edu,128.173.49.111,,,"Faiz_Router,not_in_use,TORG.3030D.TP01B"
+viz2.sv.vt.edu,128.173.49.112,,,"Windoz,TORG.3030D.TP06A"
+viz3.sv.vt.edu,128.173.49.113,,,"Lance_Arsenault,TORG.3030D.TP03B"
+viz4.sv.vt.edu,128.173.49.114,,,"LargeTV,TORG.3030D.TP06B"
+potter.sv.vt.edu,128.173.49.115,,,"Jagathshree,plugged_into_router,not_used,TORG.3030D.TP01C"
+deepsix.sv.vt.edu,128.173.49.121,,,TORG.3030D.TP05A
+tricorder.sv.vt.edu,128.173.49.124,,,"Peter,TORG.3030D.TP04B"
+lw2.sv.vt.edu,"128.173.49.125,2001:468:C80:C111:223:7DFF:FE92:82F6",,lab-lw.sv.vt.edu,"HP_Color_Printer,TORG.3030.TP02B"
+replicator.sv.vt.edu,128.173.49.127,,,"Mac_Pro,TORG.3030D.TP06C"
+rock.sv.vt.edu,128.173.49.130,,,"xubuntu10.04,TORG.3030D.TP01C"
+anvil.sv.vt.edu,128.173.49.135,,"vis.arc.vt.edu,visualization.arc.vt.edu,visionarium.arc.vt.edu,visionarium.sv.vt.edu,vis.sv.vt.edu,www.sv.vt.edu,sv.vt.edu","Cave,QTY_7,TORG.3090.TP04B"
+glyph.sv.vt.edu,128.173.49.137,,,"Soumik,TORG.3030.TP01A"
+cube10.sv.vt.edu,128.173.49.144,,,"Cave,10GigB,TORG.3090A.B11_4000"
+cube.sv.vt.edu,128.173.49.145,,,"Cave,QTY_7,TORG.3090.TP04B"
+moog.sv.vt.edu,128.173.49.146,,,Not_On
+yakko.sv.vt.edu,128.173.49.147,,,"Nathan,TORG.3030E.TP03B"
+console.sv.vt.edu,128.173.49.149,,,"Cave,QTY_7,TORG.3090.TP04B"
+polaris.sv.vt.edu,128.173.49.150,,dads1.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
+thuban.sv.vt.edu,128.173.49.151,,dads2.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
+sirius.sv.vt.edu,128.173.49.152,,dads3.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
+leo.sv.vt.edu,128.173.49.153,,dads4.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
+polys.sv.vt.edu,128.173.49.157,,,"Nicholas_Polys,TORG.3030B.TP01B"
+# End converted data.
