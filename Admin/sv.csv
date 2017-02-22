@@ -22,8 +22,8 @@ NAME,IP_ADDRESS,MX,ALIAS,COMMENT
 #         seach domains: sv.vt.edu,arc.vt.edu
 #
 #
-# I have been told that this reference document is no longer up to
-# date but there is no replacement for it.  (WTF)
+# The reference document is no longer up to
+# date and there is no replacement for it.  (WTF)
 # ref: http://groupw.cns.vt.edu/~benchoff/dnl-draft/
 #
 # email this to: hostmaster@vt.edu
@@ -32,10 +32,16 @@ NAME,IP_ADDRESS,MX,ALIAS,COMMENT
 # We replaced most spaces with _ so email clients do not add newlines.
 # Lines shorter than 78 characters, like this one, do not require this.
 #
+#
+# This sed may be able to show you the number of commas (columns)
+#
+#    sed sv.csv -e 's/#.*$//g' -e 's/[^(\,|")]//g' -e 's/"\,*"//g'
+#
+#
 # OLD FORMAT
 # hostname:ip:mxhost(,mxhost...):alias(,alias...):hw:os:mac:comment
-# To check number of entries run:
-#  sed sv.dat -e 's/[^:]//g'
+#
+# The new format is what you see below:
 #
 bkmac.sv.vt.edu,128.173.49.101,,,"Router,TORG.3030D.TP01B"
 lion.sv.vt.edu,128.173.49.102,,,Extra1
@@ -65,4 +71,3 @@ thuban.sv.vt.edu,128.173.49.151,,dads2.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
 sirius.sv.vt.edu,128.173.49.152,,dads3.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
 leo.sv.vt.edu,128.173.49.153,,dads4.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
 polys.sv.vt.edu,128.173.49.157,,,"Nicholas_Polys,TORG.3030B.TP01B"
-# End converted data.
