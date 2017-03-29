@@ -41,25 +41,29 @@ NAME,IP_ADDRESS,MX,ALIAS,COMMENT
 # OLD FORMAT
 # hostname:ip:mxhost(,mxhost...):alias(,alias...):hw:os:mac:comment
 #
-# The new format is what you see below:
+# The new format is CSV, what you see below:
 #
 bkmac.sv.vt.edu,128.173.49.101,,,"Router,TORG.3030D.TP01B"
-lion.sv.vt.edu,128.173.49.102,,,Extra1
-spock.sv.vt.edu,128.173.49.103,,,Extra2
-datakiosk.sv.vt.edu,128.173.49.104,,,"Data_Kiosk,TORG.3030"
+deepsix.sv.vt.edu,128.173.49.102,,,TORG.3030D.TP05A
+spock.sv.vt.edu,128.173.49.103,,,Extra1
+gumby.sv.vt.edu,128.173.49.104,,,Extra2_NPolys_desktop
+saturn.sv.vt.edu,128.173.49.105,,,Extra3
+pluto.sv.vt.edu,128.173.49.106,,,Extra4
+potato.sv.vt.edu,128.173.49.107,,,Extra5
 thor.sv.vt.edu,128.173.49.108,,,"James_Mcclure,TORG.3030C.TP01B"
+woody.sv.vt.edu,128.173.49.109,,,Extra6
 guppy.sv.vt.edu,128.173.49.110,,,"Srijith_Rajamohan,TORG.3030F.TP01B"
 viz1.sv.vt.edu,128.173.49.111,,,"Faiz_Router,not_in_use,TORG.3030D.TP01B"
 viz2.sv.vt.edu,128.173.49.112,,,"Windoz,TORG.3030D.TP06A"
 viz3.sv.vt.edu,128.173.49.113,,,"Lance_Arsenault,TORG.3030D.TP03B"
 viz4.sv.vt.edu,128.173.49.114,,,"LargeTV,TORG.3030D.TP06B"
 potter.sv.vt.edu,128.173.49.115,,,"Jagathshree,plugged_into_router,not_used,TORG.3030D.TP01C"
-deepsix.sv.vt.edu,128.173.49.121,,,TORG.3030D.TP05A
+#deepsix.sv.vt.edu,128.173.49.121,,,TORG.3030D.TP05ASomeoneKeepsTakingThisIP
 tricorder.sv.vt.edu,128.173.49.124,,,"Peter,TORG.3030D.TP04B"
 lw2.sv.vt.edu,"128.173.49.125,2001:468:C80:C111:223:7DFF:FE92:82F6",,lab-lw.sv.vt.edu,"HP_Color_Printer,TORG.3030.TP02B"
 replicator.sv.vt.edu,128.173.49.127,,,"Mac_Pro,TORG.3030D.TP06C"
 rock.sv.vt.edu,128.173.49.130,,,"xubuntu10.04,TORG.3030D.TP01C"
-anvil.sv.vt.edu,128.173.49.135,,"vis.arc.vt.edu,visualization.arc.vt.edu,visionarium.arc.vt.edu,visionarium.sv.vt.edu,vis.sv.vt.edu,www.sv.vt.edu,sv.vt.edu","Cave,QTY_7,TORG.3090.TP04B"
+anvil.sv.vt.edu,128.173.49.135,,"vis.arc.vt.edu,snoid.sv.vt.edu,visualization.arc.vt.edu,visionarium.arc.vt.edu,visionarium.sv.vt.edu,vis.sv.vt.edu,www.sv.vt.edu,sv.vt.edu","Cave,QTY_7,TORG.3090.TP04B"
 glyph.sv.vt.edu,128.173.49.137,,,"Soumik,TORG.3030.TP01A"
 cube10.sv.vt.edu,128.173.49.144,,,"Cave,10GigB,TORG.3090A.B11_4000"
 cube.sv.vt.edu,128.173.49.145,,,"Cave,QTY_7,TORG.3090.TP04B"
@@ -71,3 +75,4 @@ thuban.sv.vt.edu,128.173.49.151,,dads2.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
 sirius.sv.vt.edu,128.173.49.152,,dads3.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
 leo.sv.vt.edu,128.173.49.153,,dads4.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
 polys.sv.vt.edu,128.173.49.157,,,"Nicholas_Polys,TORG.3030B.TP01B"
+# end
