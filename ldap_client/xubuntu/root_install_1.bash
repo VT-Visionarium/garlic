@@ -57,7 +57,7 @@ cat << EOF
   Okay now run some lib Open LDAP tests like:
 
 
-  ldapsearch -H ldap://authn.directory.vt.edu\
+  ldapsearch -H ldap://login.directory.vt.edu\
  -x -Z -b ou=People,dc=vt,dc=edu '(uupid=fabidi89)'
 
 

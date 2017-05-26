@@ -66,7 +66,7 @@ apt-get install nslcd
 
 >cursers interface pops up:  Configuring nslcd
 >LDAP server URI:
-ldap://authn.directory.vt.edu
+ldap://login.directory.vt.edu
 
 
 Name services to configure:
@@ -89,7 +89,7 @@ Name services to configure:
 # We then edited /etc/ldap/ldap.conf to be
 
 base ou=People,dc=vt,dc=edu
-uri ldap://authn.directory.vt.edu
+uri ldap://login.directory.vt.edu
 ldap_version 3
 pam_login_attribute uupid
 ssl start_tls
@@ -102,11 +102,11 @@ tls_reqcert never
 
 # then we should be able to test it with:
 
-ldapsearch -H ldap://authn.directory.vt.edu -x -Z -b ou=People,dc=vt,dc=edu '(uupid=fabidi89)'
+ldapsearch -H ldap://login.directory.vt.edu -x -Z -b ou=People,dc=vt,dc=edu '(uupid=fabidi89)'
 
 # and it spewed a good bit of stuff, 34 lines
 
-strace ldapsearch -H ldap://authn.directory.vt.edu -x -Z\
+strace ldapsearch -H ldap://login.directory.vt.edu -x -Z\
  -b ou=People,dc=vt,dc=edu '(uupid=fabidi89)'\
  2>&1 >/dev/null | grep ldap.conf 
 
@@ -148,7 +148,7 @@ session required         pam_mkhomedir.so  skel=/etc/skel  umask=0022
 uid nslcd
 gid nslcd
 
-uri ldap://authn.directory.vt.edu
+uri ldap://login.directory.vt.edu
 base dc=vt,dc=edu
 ssl start_tls
 tls_cacertdir /etc/ca-certificates
