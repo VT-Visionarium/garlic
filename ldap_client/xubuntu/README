@@ -1,5 +1,18 @@
+
+
 This is to install and configure the computers in our lab as LDAP
 clients, that use the local LDAP server for logging in.
+
+
+Last test of these scripts was Thu May 25 16:47:50 EDT 2017 on
+$ lsb_release -a
+No LSB modules are available.
+Distributor ID:	Ubuntu
+Description:	Ubuntu 16.04.2 LTS
+Release:	16.04
+Codename:	xenial
+
+
 
 READ root_install?.bash before you just run them.
 Run them in the order (0 1 2)
