@@ -46,10 +46,10 @@ NAME,IP_ADDRESS,MX,ALIAS,COMMENT
 bkmac.sv.vt.edu,128.173.49.101,,,"Router,TORG.3030D.TP01B"
 deepsix.sv.vt.edu,128.173.49.102,,,TORG.3030D.TP05A
 spock.sv.vt.edu,128.173.49.103,,,Extra1
-gumby.sv.vt.edu,128.173.49.104,,,Extra2_NPolys_desktop
-saturn.sv.vt.edu,128.173.49.105,,,Extra3
-pluto.sv.vt.edu,128.173.49.106,,,Extra4
-potato.sv.vt.edu,128.173.49.107,,,Extra5
+gumby.sv.vt.edu,128.173.49.104,,,"NPolys_desktop"
+saturn.sv.vt.edu,128.173.49.105,,,"Dell Printer"
+pluto.sv.vt.edu,128.173.49.106,,,"Srijith_Rajamohan server"
+potato.sv.vt.edu,128.173.49.107,,,"Windows 10,Torg.3030D"
 thor.sv.vt.edu,128.173.49.108,,,"James_Mcclure,TORG.3030C.TP01B"
 woody.sv.vt.edu,128.173.49.109,,,Extra6
 guppy.sv.vt.edu,128.173.49.110,,,"Srijith_Rajamohan,TORG.3030F.TP01B"
