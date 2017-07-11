@@ -43,15 +43,16 @@ NAME,IP_ADDRESS,MX,ALIAS,COMMENT
 #
 # The new format is CSV, what you see below:
 #
+zap.sv.vt.edu,128.173.49.100,,,"Extra1"
 bkmac.sv.vt.edu,128.173.49.101,,,"Router,TORG.3030D.TP01B"
-deepsix.sv.vt.edu,128.173.49.102,,,TORG.3030D.TP05A
-spock.sv.vt.edu,128.173.49.103,,,Extra1
+deepsix.sv.vt.edu,128.173.49.102,,,"TORG.3030D.TP05A"
+spock.sv.vt.edu,128.173.49.103,,,"Cave,QTY_7,TORG.3090.TP04B"
 gumby.sv.vt.edu,128.173.49.104,,,"NPolys_desktop"
-saturn.sv.vt.edu,128.173.49.105,,,"Dell Printer"
+saturn.sv.vt.edu,128.173.49.105,,,"Dell_Printer"
 pluto.sv.vt.edu,128.173.49.106,,,"Srijith_Rajamohan server"
 potato.sv.vt.edu,128.173.49.107,,,"Windows 10,Torg.3030D"
 thor.sv.vt.edu,128.173.49.108,,,"James_Mcclure,TORG.3030C.TP01B"
-woody.sv.vt.edu,128.173.49.109,,,Extra6
+woody.sv.vt.edu,128.173.49.109,,,"LAMP_server_in_cube_rack_Cave,QTY_7,TORG.3090.TP04B"
 guppy.sv.vt.edu,128.173.49.110,,,"Srijith_Rajamohan,TORG.3030F.TP01B"
 viz1.sv.vt.edu,128.173.49.111,,,"Faiz_Router,not_in_use,TORG.3030D.TP01B"
 viz2.sv.vt.edu,128.173.49.112,,,"Windoz,TORG.3030D.TP06A"
@@ -71,8 +72,8 @@ moog.sv.vt.edu,128.173.49.146,,,Not_On
 yakko.sv.vt.edu,128.173.49.147,,,"Nathan,TORG.3030E.TP03B"
 console.sv.vt.edu,128.173.49.149,,,"Cave,QTY_7,TORG.3090.TP04B"
 polaris.sv.vt.edu,128.173.49.150,,dads1.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
-thuban.sv.vt.edu,128.173.49.151,,dads2.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
-sirius.sv.vt.edu,128.173.49.152,,dads3.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
-leo.sv.vt.edu,128.173.49.153,,dads4.sv.vt.edu,"Cave,QTY_7,TORG.3090.TP04B"
+thuban.sv.vt.edu,128.173.49.151,,dads2.sv.vt.edu,"Extra2"
+sirius.sv.vt.edu,128.173.49.152,,dads3.sv.vt.edu,"Extra3"
+leo.sv.vt.edu,128.173.49.153,,dads4.sv.vt.edu,"Extra4"
 polys.sv.vt.edu,128.173.49.157,,,"Nicholas_Polys,TORG.3030B.TP01B"
 # end
