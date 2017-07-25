@@ -1,0 +1,14 @@
+Start the vrpn server: "vrpn_server". Make sure the vrpn.cfg file in the
+the same location
+
+To check if it is actually working, try "vrpn_print_devices
+Wand0@localhost" and try doing something with the Wand button. You should
+see some changes on the terminal.
+
+open the ParaView client and in the VR pannel, load the file
+"VRPluginState.pvvr" and click start. You may want to tweak this file for
+different interactions.
+
+You can read more about it here - https://www.paraview.org/Wiki/Immersive_ParaView#Loading_the_VR_plugin_in_ParaView
+
+That's it! 

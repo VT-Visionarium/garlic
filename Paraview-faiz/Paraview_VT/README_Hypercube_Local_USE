@@ -1,0 +1,27 @@
+Log onto the console or any machine that has TurboVNC installed.
+
+Check if a X server is running: "ps -ef | grep X". If running, kill it
+
+ssh to Hypercube and start a x session: "startx &"
+
+Start the Hypercube in mono mode: "hy_projectors_on --mono"
+
+Do edge blending: "hy_edgeBlend_on"
+
+Start a TVNC server on Hypercube on port 9. This is the server to which you'll
+log on: "vncserver :9". You may need to export your LD_LIBRARY_PATH to
+/usr/local/lib
+
+Start a session on your local laptop and connect to the last TVNC server
+you started on Hypercube on port 9
+
+Start 8 TVNC servers on Hypercube: "./start_vncservers_8.bash cube.sv.vt.edu"
+
+Start 8 TVNC viewers in CAVE: "start_vncviewrers.bash". 
+
+Start the Paraview servers (8) on Hypercube: "start_paraview_server.bash 8"
+
+Open Paraview client on Hypercube and connect to the servers: "vglrun
+paraview"
+
+Voila! 

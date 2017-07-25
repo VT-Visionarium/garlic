@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<pvx>
+    <Process Type="client" />
+    <Process Type="server">
+        
+    <Machine Name="CT"
+           Environment="DISPLAY=:3.0"
+           Geometry="2560x1600+0+0"
+           FullScreen="0"
+           ShowBorders="0"
+           LowerLeft="-1.524  -0.381  -1.524"
+           LowerRight="1.524    -0.381  -1.524"
+           UpperRight="1.524    1.524   -1.524"/>
+   
+   <Machine Name="CB"
+           Environment="DISPLAY=:4.0"
+           Geometry="2560x1600+0+0"
+           FullScreen="0"
+           ShowBorders="0"
+           LowerLeft="-1.524    -1.524  -1.524"
+           LowerRight="1.524    -1.524  -1.524"
+           UpperRight="1.524    0.381   -1.524"/>
+       
+    <Machine Name="LT"
+           Environment="DISPLAY=:1.0"
+           Geometry="2560x1600+0+0"
+           LowerLeft="-1.524    -0.381  1.524"
+           LowerRight="-1.524   -0.381  -1.524"
+		   UpperRight="-1.524   1.524   -1.524"/>
+
+    <Machine Name="LB"
+           Environment="DISPLAY=:2.0"
+		   Geometry="2560x1600+0+0"
+           LowerLeft="-1.524    -1.524  1.524"
+           LowerRight="-1.524   -1.524  -1.524"
+           UpperRight="-1.524   0.381   -1.524"/>
+
+    <Machine Name="RT"
+           Environment="DISPLAY=:5.0"
+		   Geometry="2560x1600+0+0"
+           LowerLeft="1.524 -0.381  -1.524"
+           LowerRight="1.524    -0.381  1.524"
+           UpperRight="1.524    1.524   1.524"/>
+    <Machine Name="RB"
+           Environment="DISPLAY=:6.0"
+		   Geometry="2560x1600+0+0"
+           LowerLeft="1.524 -1.524  -1.524"
+           LowerRight="1.524    -1.524  1.524"
+           UpperRight="1.524    0.381   1.524"/>
+
+    <Machine Name="FT"
+           Environment="DISPLAY=:7.0"
+		   Geometry="2560x1600+0+0"
+           LowerLeft="-1.524    -1.524  0.381"
+           LowerRight="1.524    -1.524  0.381"
+           UpperRight="1.524    -1.524  -1.524"/>
+   
+   <Machine Name="FB"
+           Environment="DISPLAY=:8.0"
+		   Geometry="2560x1600+0+0"
+           LowerLeft="-1.524    -1.524  1.524"
+           LowerRight="1.524    -1.524  1.524"
+           UpperRight="1.524    -1.524  0.381"/>
+    </Process>
+</pvx>

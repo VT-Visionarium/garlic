@@ -1,0 +1,29 @@
+<VRPluginState>
+  <VRConnectionManager>
+    <VRPNConnection name="vrpnwand" address="Wand0@cube.sv.vt.edu">
+      <Button id="0" name="button0"/>
+      <Button id="1" name="button1"/>
+      <Button id="2" name="button2"/>
+      <Button id="3" name="button3"/>
+      <Button id="4" name="button4"/>
+      <Button id="5" name="button5"/>
+      <Analog id="0" name="analog0"/>
+      <Tracker id="0" name="wand"/>
+    </VRPNConnection>
+    <VRPNConnection name="vrpnhead" address="Tracker0@cube.sv.vt.edu">
+      <Tracker id="0" name="head"/>
+      <TrackerTransform value="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 "/>
+    </VRPNConnection>
+  </VRConnectionManager>
+  <VRInteractorStyles>
+    <Style class="vtkVRTrackStyle" proxyName="RenderView1" proxy="3680" property="EyeTransformMatrix">
+      <Tracker role="Tracker" name="vrpnhead.head"/>
+    </Style>
+    <Style class="vtkVRGrabWorldStyle" proxyName="RenderView1" proxy="3680" property="ModelTransformMatrix">
+      <Button role="Reset world" name="vrpnwand.button1"/>
+      <Button role="Rotate world" name="vrpnwand.button0"/>
+      <Button role="Translate world" name="vrpnwand.button2"/>
+      <Tracker role="Tracker" name="vrpnhead.head"/>
+    </Style>
+  </VRInteractorStyles>
+</VRPluginState>
