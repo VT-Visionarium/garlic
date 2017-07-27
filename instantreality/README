@@ -31,10 +31,9 @@ On redhat (centOS) based system:
    You may need to remove the old version via:
 
 
+        yum list | grep InstantReality
+
         yum remove InstantReality-bla-bla
-
-
-
 
         yum install InstantReality-RedHat-7-*.rpm
 
