@@ -11,7 +11,7 @@ authentication.
 
 Notice: If you see this file in /usr/local/src/ this could be working
 clone of a git repository, you should see a .git directory here too; run
-'cat .get/config' to see the source origin.
+'cat .git/config' to see the source origin.
 
 It's called garlic because the name potato was already taken by another
 software project.
