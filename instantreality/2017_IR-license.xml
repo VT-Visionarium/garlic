@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<licenses>
+ <license expiredate="01.06.2018" name="Avalon" version="2.00" zkey="kwADAgAUN6xDbe6RtV53we7rpAO20GfzZRkAFIad7oe4pBaJfxdelw6d7vkewSgD">
+  <comment>Created by JB</comment>
+  <comment>Host License for VT</comment>
+  <user>
+   <organization>Fraunhofer IGD</organization>
+   <street>Fraunhoferstr. 5</street>
+   <city>64283 Darmstadt</city>
+  </user>
+  <hosts>
+   <host id="ANY" logoText="IRF-2.0.0" name="IRF-2.0.0"/>
+   <host id="TxFOb/TAKqeyaRZUZHkzRyXZxSk=mj+szdxZ+cmznCAULc46XSYw33Q=E4isEkuISIYQgMnkAB9Jh+59ixA=cdVSkIPlA/4j2I02cVdjMbQSvEo=kKlvNS31I+CvfM5pClZbFSTSN+c=" name="cube.sv.vt.edu/Linux"/>
+   <host id="TxFOb/TAKqeyaRZUZHkzRyXZxSk=" name="cube.sv.vt.edu/Linux"/>
+   <host id="mj+szdxZ+cmznCAULc46XSYw33Q=" name="cube.sv.vt.edu/Linux"/>
+   <host id="E4isEkuISIYQgMnkAB9Jh+59ixA=" name="cube.sv.vt.edu/Linux"/>
+   <host id="cdVSkIPlA/4j2I02cVdjMbQSvEo=" name="cube.sv.vt.edu/Linux"/>
+   <host id="kKlvNS31I+CvfM5pClZbFSTSN+c=" name="cube.sv.vt.edu/Linux"/>
+  </hosts>
+  <features>
+   <feature name="ANY"/>
+  </features>
+ </license>
+</licenses>
