@@ -28,4 +28,12 @@ from file /lib/x86_64-linux-gnu/libpng12.so.0.54.0
 we found that by running 'locate libpng12'
 
 
+Calibration run 'DTrack2' which was in my path, notice that
+it creates the .ART/ directory in your home directory.
+
+
+Set the L-calibration stick in the center of the CAVE on the
+floor with the +X coordinate toward the right projection wall
+and the +Y coordinate at the center projection wall.
+
 
