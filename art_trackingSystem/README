@@ -1,0 +1,31 @@
+lance@woody:~/git/garlic/art_trackingSystem$ lsb_release -a
+No LSB modules are available.
+Distributor ID:	Debian
+Description:	Debian GNU/Linux 9.2 (stretch)
+Release:	9.2
+Codename:	stretch
+
+
+You need to get the DTrack2 sofware from ART 
+(Advanced Realtime Tracking) a German Company:
+http://www.ar-tracking.com/support/
+I had to wait a day to get the confirmation email
+that gave me access to their web servers to get
+the software. They don't use HTTP over TLS (https).
+
+Got 2 tarballs:
+  DTrack2CLI_v1.0.0_linux64.tar.gz
+  DTrack2_v2.13.0_linux64.tar.gz
+
+
+We installed it by running  ./install_DTrack2.bash
+which installs the DTrack2_v2.13.0
+
+we found that an old version of libpng12.so.0 was needed
+This debain 9 system had a new version 
+we copied a libpng12.so.0.54.0 from a xubuntu 16.04 system
+from file /lib/x86_64-linux-gnu/libpng12.so.0.54.0
+we found that by running 'locate libpng12'
+
+
+

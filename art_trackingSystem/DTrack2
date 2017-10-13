@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -ex
+
+f=$(realpath --physical ${BASH_SOURCE[0]})
+d=$(dirname $f)
+cd $d
+cd ..
+cwd=$PWD
+echo "PWD=$PWD"
+if [ -n "$LD_LIBRARY_PATH" ] ; then
+    export LD_LIBRARY_PATH="$cwd/libs:$LD_LIBRARY_PATH"
+else
+    export LD_LIBRARY_PATH=$cwd/libs
+fi
+
+exec ./bin/DTrack2.bin
