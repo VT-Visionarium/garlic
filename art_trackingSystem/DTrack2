@@ -14,4 +14,4 @@ else
     export LD_LIBRARY_PATH=$cwd/libs
 fi
 
-exec ./bin/DTrack2.bin
+exec ./bin/DTrack2.bin $*
