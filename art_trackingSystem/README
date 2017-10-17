@@ -36,4 +36,28 @@ Set the L-calibration stick in the center of the CAVE on the
 floor with the +X coordinate toward the right projection wall
 and the +Y coordinate at the center projection wall.
 
+After setting up channel that writes to "this machine" port 5000
+in the GUI DTrack2 program we can test by running:
+
+DTrack2CLI 192.168.0.1 -meastart
+
+# Test listener netcat program
+nc -ulp 5000
+
+
+
+
+We can setup this machine as a proxy server using netcat like so:
+
+1. First on the receiving machine (to_address) run netcat or other
+listening UDP/IP server like so:
+
+nc -ulp 5000
+
+2. Then run on the machine that has network access to the
+ART tracker UDP/IP data:
+
+nc -ulp 5000 | nc -u to_address 5000
+
+
 
