@@ -1,10 +1,38 @@
-// To test run:
-//
-// make &&   InstantPlayer readUDP.x3d
-//
+/* To get the format of the UDP data we read the document which
+ * is not freely available:
+ *
+ *  http://www.ar-tracking.com/support/
+ *
+ * We had to register; enter email and password and wait for
+ * email from them to get account.
+ */
 
-#define PORT 5000
-#define BIND_ADDRESS "0.0.0.0" // Any Address == "0.0.0.0"
+// This code will only work for a very particular ART controller
+// configuration.  That's all we needed.
+//
+// To read art UDP data try running this netcat command:
+//
+//   nc -ulp 5000
+//
+// With that you can see the UDP data is in a simple ascii format.
+
+#define PORT  (5000)
+#define BIND_ADDRESS "192.168.0.10"
+
+// Marks the start of valid head position data
+#define HEAD_START "6d 1 [0 1.000]["
+#define HEAD_END   "]["
+#define HEAD_MIN_LEN   10
+#define HEAD_MAX_LEN   300
+
+// Marks the start of valid wand data
+#define WAND_START_ALL     "6df2 1 1 [0 1.000 6 2]["
+// We will receive this with just the buttons and joystick
+// and the positions and rotation will be zeros.
+#define WAND_START_BUTTONS "6df2 1 1 [0 -1.000 6 2]["
+#define WAND_END   "]\n"
+#define WAND_MIN_LEN   10
+#define WAND_MAX_LEN   300
 
 //#define NDEBUG
 #include <assert.h>
@@ -35,28 +63,27 @@
   << " " <<  __func__ << "()" << std::endl
 
 
-
 namespace InstantIO
 {
 
 template <class T> class OutSlot;
-class ReadUDP : public ThreadedNode
+class ReadArtTracker : public ThreadedNode
 {
 public:
-    ReadUDP();
-    virtual ~ReadUDP();
+    ReadArtTracker();
+    virtual ~ReadArtTracker();
 
-    // Factory method to create an instance of ReadUDP.
+    // Factory method to create an instance of ReadArtTracker.
     static Node *create();
   
-    // Factory method to return the type of ReadUDP.
+    // Factory method to return the type of ReadArtTracker.
     virtual NodeType *type() const;
   
 protected:
-    // Gets called when the ReadUDP is enabled.
+    // Gets called when the ReadArtTracker is enabled.
     virtual void initialize();
   
-    // Gets called when the ReadUDP is disabled.
+    // Gets called when the ReadArtTracker is disabled.
     virtual void shutdown();
   
     // thread method to send/receive data.
@@ -72,17 +99,17 @@ private:
 };
 
 
-NodeType ReadUDP::type_(
-    "readUDP" /*typeName must be the same as plugin filename */,
+NodeType ReadArtTracker::type_(
+    "readARTTrackerUDP" /*typeName must be the same as plugin filename */,
     &create,
-    "read UDP data from a bound PORT" /*shortDescription*/,
+    "head and wand Tracker to InstantIO" /*shortDescription*/,
     /*longDescription*/
-    "Test Plug-in to read UDP data from a bound PORT",
+    "head and wand Tracker to InstantIO",
     "lance"/*author*/,
     0/*fields*/,
     0/sizeof(Field));
 
-ReadUDP::ReadUDP():
+ReadArtTracker::ReadArtTracker():
     ThreadedNode()
 {
     SPEW();
@@ -117,26 +144,18 @@ ReadUDP::ReadUDP():
     SPEW();
 }
 
-ReadUDP::~ReadUDP()
+ReadArtTracker::~ReadArtTracker()
 {
-    SPEW();
-
-    if(fd >= 0)
-    {
-        close(fd);
-    }
-
-
     SPEW();
 }
 
-Node *ReadUDP::create()
+Node *ReadArtTracker::create()
 {
     SPEW();
 
-    ReadUDP *ht;
+    ReadArtTracker *ht;
 
-    ht = new ReadUDP;
+    ht = new ReadArtTracker;
 
     if(ht->fd == -1)
     {
@@ -153,16 +172,16 @@ Node *ReadUDP::create()
     return ht;
 }
 
-NodeType *ReadUDP::type() const
+NodeType *ReadArtTracker::type() const
 {
     SPEW();  
     return &type_;
 }
 
-void ReadUDP::initialize()
+void ReadArtTracker::initialize()
 {
-    SPEW();
-
+    SPEW();  
+    
     // handle state and namespace updates
     Node::initialize();
 
@@ -173,8 +192,15 @@ void ReadUDP::initialize()
     addOutSlot("head", viewPointOutSlot_);
 }
 
-void ReadUDP::shutdown()
+void ReadArtTracker::shutdown()
 {
+    // handle state and namespace updates
+    Node::shutdown();
+
+    SPEW();  
+
+    if(fd >= 0) close(fd);
+
     assert(viewPointOutSlot_);
 
     if(viewPointOutSlot_)
@@ -183,12 +209,6 @@ void ReadUDP::shutdown()
         delete viewPointOutSlot_;
         viewPointOutSlot_ = 0;
     }
-
-    // handle state and namespace updates
-    Node::shutdown();
-
-    SPEW();  
-
 }
 
 static void die(void)
@@ -200,7 +220,7 @@ static void die(void)
 
 // Thread method which gets automatically started as soon as a slot is
 // connected
-int ReadUDP::processData()
+int ReadArtTracker::processData()
 {
     SPEW(); 
 
@@ -208,6 +228,10 @@ int ReadUDP::processData()
 
     assert(viewPointOutSlot_);
 
+    // It would appear that someone decided that
+    // model units are in meters so a model with
+    // some length equal to 1 corresponds to 1 meter.
+    //
     while(waitThread(0))
     {
         const size_t BUFLEN = 1024;
@@ -229,8 +253,29 @@ int ReadUDP::processData()
         buf[ret] = '\0';
 
         printf("read(%zd bytes) = %s\n", ret, buf);
+
+        // Find the head
+
+
+
         Matrix4f tracker_mat;
 
+        Vec3f tracker_pos;
+        tracker_pos[0] = 0; tracker_pos[1] = 0; tracker_pos[2] = 0;
+        Rotation tracker_rot;
+        tracker_rot[0] = 0;  tracker_rot[1] = 0;
+        tracker_rot[2] = 0;  tracker_rot[3] = 0;
+#if 1
+std::cerr << "head (" << 
+    tracker_pos[0] << " " << tracker_pos[1] << " " << tracker_pos[2] <<
+    ") (" <<
+    tracker_rot[0] << " " << tracker_rot[1] << " " <<
+    tracker_rot[2] << " " << tracker_rot[3] <<
+    ")" << std::endl;
+
+#endif
+
+        tracker_mat.setTransform( tracker_pos, tracker_rot);
 
         viewPointOutSlot_->push(tracker_mat);
     }
