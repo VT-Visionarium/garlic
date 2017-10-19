@@ -61,3 +61,7 @@ nc -ulp 5000 | nc -u to_address 5000
 
 
 
+Running InstantReality on Debian was a bust...
+
+
+

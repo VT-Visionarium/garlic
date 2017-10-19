@@ -1,3 +1,6 @@
+// Just an example/test to have InstantPlayer read UDP/IP
+// from a bound port.  "A listening UDP reader"
+//
 // To test run:
 //
 // make &&   InstantPlayer readUDP.x3d
@@ -66,6 +69,10 @@ private:
 
     int fd; // socket file descriptor
 
+
+    // We never use this out slot, but instant reality needs us to set it
+    // up otherwise instant reality will not call our action callback
+    // ReadUDP::processData().  Put another way: no slots == no service.
     OutSlot<Matrix4f> *viewPointOutSlot_;
   
     static NodeType type_;
@@ -122,10 +129,7 @@ ReadUDP::~ReadUDP()
     SPEW();
 
     if(fd >= 0)
-    {
         close(fd);
-    }
-
 
     SPEW();
 }
@@ -143,10 +147,13 @@ Node *ReadUDP::create()
         delete ht;
         // TODO: this will make stupid sax segfault.
         // You'd think that they at least check the return value
-        // from a factory function.
+        // from a factory function. Fuck no.
         //
-        // We do not know how else to make sax fail and exit.
-        // Calling exit() does not work.
+        // We do not know how else to make sax fail and exit.  Calling
+        // exit() does not work.  Returning a null pointer is the obvious
+        // way to do it, but instant reality is not obvious.  Why make
+        // anything obvious?  Oh I get it, the people who wrote instant
+        // reality are stupid.  I like to rant.
         return 0;
     }
 
@@ -175,6 +182,8 @@ void ReadUDP::initialize()
 
 void ReadUDP::shutdown()
 {
+    // handle state and namespace updates
+    Node::shutdown();
     assert(viewPointOutSlot_);
 
     if(viewPointOutSlot_)
@@ -184,17 +193,7 @@ void ReadUDP::shutdown()
         viewPointOutSlot_ = 0;
     }
 
-    // handle state and namespace updates
-    Node::shutdown();
-
     SPEW();  
-
-}
-
-static void die(void)
-{
-    printf("Forcing exit the hard way\n");
-    kill(getpid(), SIGKILL);
 }
 
 
@@ -205,8 +204,6 @@ int ReadUDP::processData()
     SPEW(); 
 
     setState(NODE_RUNNING);
-
-    assert(viewPointOutSlot_);
 
     while(waitThread(0))
     {
@@ -223,16 +220,11 @@ int ReadUDP::processData()
                 errno, strerror_r(errno, errStr, 256));
             close(fd);
             fd = -1;
-            die();
         }
 
         buf[ret] = '\0';
 
         printf("read(%zd bytes) = %s\n", ret, buf);
-        Matrix4f tracker_mat;
-
-
-        viewPointOutSlot_->push(tracker_mat);
     }
 
     // Thread finished

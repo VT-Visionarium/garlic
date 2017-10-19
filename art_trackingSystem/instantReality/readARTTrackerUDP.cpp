@@ -1,7 +1,26 @@
+// Prerequisite: Get your ART tracker writing data to your computer
+// on a port that you choose.
+
+// Disclaimer: this code is only setup to parse a particular ART tracking
+// data configuration, that is one 6DOF head and one fly stick 2.  There
+// is a more generic ART tracking IOSensor code built into instant
+// reality, but we could not get it to work in two days of trying.  We
+// know that we can read UDP sockets with C++ code and it beats working
+// with a fucking black box with no reasonable documentation.  We have to
+// write custom code for our CAVE anyway, so what just a little more
+// code to get is started.
+
+// Test this by running:
+//
+//  sax --num-aspects 4 readARTTrackerUDP.x3d 
+
+
 /* To get the format of the UDP data we read the document which
  * is not freely available:
  *
  *  http://www.ar-tracking.com/support/
+ *
+ *  The file was named: DTrack2_User-Manual.v2.13.pdf
  *
  * We had to register; enter email and password and wait for
  * email from them to get account.
@@ -10,11 +29,16 @@
 // This code will only work for a very particular ART controller
 // configuration.  That's all we needed.
 //
-// To read art UDP data try running this netcat command:
+// To read art UDP data try running this netcat command (from a bash
+// shell):
 //
 //   nc -ulp 5000
 //
-// With that you can see the UDP data is in a simple ascii format.
+//
+// NetCat rocks.
+//
+// With that you can see that the UDP data is in a simple ascii format.
+// This format is explained in Appendix B of the above mentioned manual.
 
 #define PORT  (5000)
 #define BIND_ADDRESS "192.168.0.10"
@@ -63,6 +87,8 @@
   << " " <<  __func__ << "()" << std::endl
 
 
+#define WITH_POS_ROT
+
 namespace InstantIO
 {
 
@@ -94,6 +120,10 @@ private:
     int fd; // socket file descriptor
 
     OutSlot<Matrix4f> *viewPointOutSlot_;
+#ifdef WITH_POS_ROT
+    OutSlot<Vec3f> *posOutSlot_;
+    OutSlot<Rotation> *rotOutSlot_;
+#endif
   
     static NodeType type_;
 };
@@ -146,6 +176,7 @@ ReadArtTracker::ReadArtTracker():
 
 ReadArtTracker::~ReadArtTracker()
 {
+    if(fd >= 0) close(fd);
     SPEW();
 }
 
@@ -185,11 +216,22 @@ void ReadArtTracker::initialize()
     // handle state and namespace updates
     Node::initialize();
 
-    viewPointOutSlot_ = new OutSlot<Matrix4f>(
-        "changing frustum view points", Matrix4f());
+    viewPointOutSlot_ = new OutSlot<Matrix4f>("head", Matrix4f());
     assert(viewPointOutSlot_);
     viewPointOutSlot_->addListener(*this);
     addOutSlot("head", viewPointOutSlot_);
+
+#ifdef WITH_POS_ROT
+    posOutSlot_ = new OutSlot<Vec3f>("headpos", Vec3f());
+    assert(posOutSlot_);
+    posOutSlot_->addListener(*this);
+    addOutSlot("headpos", posOutSlot_);
+
+    rotOutSlot_ = new OutSlot<Rotation>("headrot", Rotation());
+    assert(rotOutSlot_);
+    rotOutSlot_->addListener(*this);
+    addOutSlot("headrot", rotOutSlot_);
+#endif
 }
 
 void ReadArtTracker::shutdown()
@@ -199,8 +241,6 @@ void ReadArtTracker::shutdown()
 
     SPEW();  
 
-    if(fd >= 0) close(fd);
-
     assert(viewPointOutSlot_);
 
     if(viewPointOutSlot_)
@@ -209,12 +249,27 @@ void ReadArtTracker::shutdown()
         delete viewPointOutSlot_;
         viewPointOutSlot_ = 0;
     }
-}
 
-static void die(void)
-{
-    printf("Forcing exit the hard way\n");
-    kill(getpid(), SIGKILL);
+#ifdef WITH_POS_ROT
+    assert(posOutSlot_);
+
+    if(posOutSlot_)
+    {
+        removeOutSlot("headpos", posOutSlot_);
+        delete posOutSlot_;
+        posOutSlot_ = 0;
+    }
+
+    assert(rotOutSlot_);
+
+    if(rotOutSlot_)
+    {
+        removeOutSlot("headrot", rotOutSlot_);
+        delete rotOutSlot_;
+        rotOutSlot_ = 0;
+    }
+#endif
+
 }
 
 
@@ -222,15 +277,37 @@ static void die(void)
 // connected
 int ReadArtTracker::processData()
 {
-    SPEW(); 
+    SPEW();
+
+#define MOVE
+#ifdef MOVE
+    float direction = 1.0F;
+    const float x_max = 1.0F;
+    const float x_min = -1.0F;
+    float x = x_min;
+
+    const float rot_max = M_PI * 2.0F;
+    const float rot_min = 0.0F;
+    float rot_val = rot_min;
+#endif
+
 
     setState(NODE_RUNNING);
 
     assert(viewPointOutSlot_);
+    assert(posOutSlot_);
+    assert(rotOutSlot_);
 
     // It would appear that someone decided that
     // model units are in meters so a model with
     // some length equal to 1 corresponds to 1 meter.
+    //
+    // waitThread() seems to be the hook that lets instant reality know
+    // when we are starting/ending a cycle and we can continue running.
+    // By it's name it's clear that they are catering to stupid
+    // programmers that put sleeps in their code, and don't know that the
+    // OS has other blocking calls, besides sleep, that handle system
+    // resources very efficiently. 
     //
     while(waitThread(0))
     {
@@ -238,7 +315,10 @@ int ReadArtTracker::processData()
         char buf[BUFLEN+1];
         errno = 0;
 
-        // This should block until there is data to read.
+        // This should block until there is data to read.  Which is a very
+        // efficient to get the data as soon as possible; but for all we
+        // know the writer of instant reality fucked this up, and made this
+        // block other threads too.
         ssize_t ret = recv(fd, buf, BUFLEN, 0);
         if(ret <= 0)
         {
@@ -247,37 +327,86 @@ int ReadArtTracker::processData()
                 errno, strerror_r(errno, errStr, 256));
             close(fd);
             fd = -1;
-            die();
         }
 
         buf[ret] = '\0';
 
         printf("read(%zd bytes) = %s\n", ret, buf);
 
-        // Find the head
+#if 0
+        char *s;
+        size_t len = strlen(
+        // Set s to the start of the rotation part
+        for(s = buf;
+#endif
+
+        Matrix4f mat;
+        int i;
+        for(i=0; i<16; ++i)
+            mat[i] = 0.0F;
+
+        // Set the diagonal to 1
+        for(i=0; i<13; i+=5)
+            mat[i] = 1.0F;
+
+        mat[i] = 1.0F;
+
+#ifdef MOVE
+        if(x > x_max)
+            direction = -1.0F;
+        else if(x < x_min)
+            direction = 1.0F;
+        x += direction * 0.02;
+
+        rot_val += 0.03;
+        if(rot_val > rot_max)
+            rot_val = rot_min;
 
 
+        mat[3] = x;
+#endif
 
-        Matrix4f tracker_mat;
 
-        Vec3f tracker_pos;
-        tracker_pos[0] = 0; tracker_pos[1] = 0; tracker_pos[2] = 0;
-        Rotation tracker_rot;
-        tracker_rot[0] = 0;  tracker_rot[1] = 0;
-        tracker_rot[2] = 0;  tracker_rot[3] = 0;
+#if 0
+        // Get the rotation part of the 4x4 matrix
+        for(i=0; i<9; ++i)
+#endif
+
+
+        Vec3f pos;
+        pos[0] = 0; pos[1] = 0; pos[2] = 0;
+        Rotation rot;
+        rot[0] = 0;  rot[1] = rot_val;
+        rot[2] = 0;  rot[3] = rot_val;
+
+        // Normalize this rotation??
+        float mag = 0;
+        for(i=0; i<4; ++i)
+            mag += rot[i]*rot[i];
+        mag = sqrtf(mag);
+        for(i=0; i<4; ++i)
+            rot[i] /= mag;
+
 #if 1
-std::cerr << "head (" << 
-    tracker_pos[0] << " " << tracker_pos[1] << " " << tracker_pos[2] <<
-    ") (" <<
-    tracker_rot[0] << " " << tracker_rot[1] << " " <<
-    tracker_rot[2] << " " << tracker_rot[3] <<
-    ")" << std::endl;
+    std::cout << "------- head " << rot_val << "-------" << std::endl;
+    int j;
+    for(j=0;j<4;++j)
+    {
+        for(i=0; i<4; ++i)
+            std::cout << mat[i+4*j] << "  ";
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+
 
 #endif
 
-        tracker_mat.setTransform( tracker_pos, tracker_rot);
+        //mat.setTransform(pos, rot);
 
-        viewPointOutSlot_->push(tracker_mat);
+        viewPointOutSlot_->push(mat);
+        posOutSlot_->push(pos);
+        rotOutSlot_->push(rot);
     }
 
     // Thread finished

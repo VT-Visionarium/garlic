@@ -1,8 +1,77 @@
 <X3D>
+
+    <Engine>
+        <RenderJob DEF='render'>
+
+
+<WindowGroup>
+<LocalWindow border="FALSE" drawCursor="TRUE" drawToolBar="FALSE"
+fullScreen="FALSE" pipe=":0.0" position="0 0" size="2560 1600">
+<Viewarea leftBuffer="TRUE" lowerLeft="0 0" rightBuffer="FALSE" upperRight="2560 1600">
+<ProjectionViewModifier DEF="caveStereoLT_leftEye" eyeSeparation="0.065"
+leftEye="TRUE" mono="FALSE" rightEye="FALSE"
+surface="-1.524 -0.381 1.524, -1.524 -0.381 -1.524, -1.524 1.524 -1.524, -1.524 1.524 1.524">
+</ProjectionViewModifier>
+</Viewarea>
+</LocalWindow>
+</WindowGroup>
+<WindowGroup>
+<LocalWindow border="FALSE" drawCursor="TRUE" drawToolBar="FALSE"
+fullScreen="FALSE" pipe=":0.1" position="0 0" size="2560 1600">
+<Viewarea leftBuffer="FALSE" lowerLeft="0 0" rightBuffer="TRUE" upperRight="2560 1600">
+<ProjectionViewModifier DEF="caveStereoLT_rightEye" eyeSeparation="0.065"
+leftEye="FALSE" mono="FALSE" rightEye="TRUE"
+surface="-1.524 -0.381 1.524, -1.524 -0.381 -1.524, -1.524 1.524 -1.524, -1.524 1.524 1.524">
+</ProjectionViewModifier>
+</Viewarea>
+</LocalWindow>
+</WindowGroup>
+
+        </RenderJob>
+
+
+    </Engine>
+
     <scene>
+
         <IOSensor DEF='readARTTrackerUDP' type='readARTTrackerUDP'>
             <field accessType='outputOnly' name='head' type='SFMatrix4f'/>
+            <field accessType='outputOnly' name='headpos' type='SFVec3f'/>
+            <field accessType='outputOnly' name='headrot' type='SFRotation'/>
         </IOSensor>
+
+ 
+        <Viewpoint position='4 0 0' description='viewpoint0'/>
+
+        <transform DEF="transhead">
+        <transform DEF="rothead">
+            <shape>
+                <appearance>
+                    <material diffuseColor='1 0 0'/>
+                </appearance>
+                <teapot />
+            </shape>
+
+        </transform>
+        </transform>
+
         <inline url='../axes.x3d' />
+
+
+        <!-- <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+            toNode='caveStereoLT_leftEye' toField='set_eyeTransform'/>
+         <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+            toNode='caveStereoLT_rightEye' toField='set_eyeTransform'/>
+            -->
+
+
+        <ROUTE fromNode='readARTTrackerUDP' fromField='headpos'
+            toNode='transhead' toField='set_translation'/>
+      
+        <ROUTE fromNode='readARTTrackerUDP' fromField='headrot'
+            toNode='rothead' toField='rotation'/>
+
     </scene>
+
+
 </X3D>
