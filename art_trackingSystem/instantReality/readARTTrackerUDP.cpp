@@ -441,7 +441,13 @@ void  ReadArtTracker::sendWand(const char *buf, size_t len)
 
     //std::cout << buttons << "  " << xjoy << "," << yjoy << std::endl << std::endl;
 
-    if(!havePos) return;
+
+    // Joystick and Buttons
+
+    // TODO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+
+
+    if(!havePos) return; // We have no position/orientation
 
     // This completes that rotation "T" as defined above.
     r20 *= -1.0F;
