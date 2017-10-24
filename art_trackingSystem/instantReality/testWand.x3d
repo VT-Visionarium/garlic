@@ -35,41 +35,27 @@ surface="-1.524 -0.381 1.524, -1.524 -0.381 -1.524, -1.524 1.524 -1.524, -1.524 
     <scene>
 
         <IOSensor DEF='readARTTrackerUDP' type='readARTTrackerUDP'>
-            <field accessType='outputOnly' name='head' type='SFMatrix4f'/>
-            <field accessType='outputOnly' name='headpos' type='SFVec3f'/>
-            <field accessType='outputOnly' name='headrot' type='SFRotation'/>
+            <field accessType='outputOnly' name='wandmatrix' type='SFMatrix4f'/>
         </IOSensor>
 
  
         <Viewpoint position='4 0 0' description='viewpoint0'/>
 
-        <transform DEF="transhead">
-        <transform DEF="rothead">
-            <shape>
-                <appearance>
-                    <material diffuseColor='1 0 0'/>
-                </appearance>
-                <teapot />
-            </shape>
+        <MatrixTransform DEF="transhead">
+            <inline url='axes.x3d' />
+         </MatrixTransform>
 
-        </transform>
+
+            <inline url='axes.x3d' />
+        <transform scale='3.048 3.048 3.048'>
+            <inline url='cubeFrame.x3d' />
         </transform>
 
-        <inline url='../axes.x3d' />
 
 
-        <!-- <ROUTE fromNode='readARTTrackerUDP' fromField='head'
-            toNode='caveStereoLT_leftEye' toField='set_eyeTransform'/>
-         <ROUTE fromNode='readARTTrackerUDP' fromField='head'
-            toNode='caveStereoLT_rightEye' toField='set_eyeTransform'/>
-            -->
 
-
-        <ROUTE fromNode='readARTTrackerUDP' fromField='headpos'
-            toNode='transhead' toField='set_translation'/>
-      
-        <ROUTE fromNode='readARTTrackerUDP' fromField='headrot'
-            toNode='rothead' toField='rotation'/>
+        <ROUTE fromNode='readARTTrackerUDP' fromField='wandmatrix'
+            toNode='transhead' toField='matrix'/>
 
     </scene>
 
