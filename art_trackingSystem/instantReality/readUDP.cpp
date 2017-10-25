@@ -1,9 +1,16 @@
 // Just an example/test to have InstantPlayer read UDP/IP
 // from a bound port.  "A listening UDP reader"
 //
-// To test run:
+// To test some of these:
 //
-// make &&   InstantPlayer readUDP.x3d
+// make
+//
+// DISPLAY=:0.0 InstantPlayer readUDP.x3d
+//
+//
+// DISPLAY=:0.0 sax readUDP.x3d
+//
+//
 //
 
 #define PORT 5000

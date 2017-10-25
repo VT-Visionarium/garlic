@@ -1,5 +1,9 @@
-// Prerequisite: Get your ART tracker writing data to your computer
-// on a port that you choose.
+// Prerequisite: Get your ART tracker writing data to your computer on a
+// port that you choose.  It will be a UDP/IP port.  The receiver program
+// will have a listening bound port.  The ART DTrack2 and/or DTrack2CLI
+// programs will control the ART control box that should be writing to
+// your selected addresses and ports as a simple unbound socket UDP/IP
+// writer.
 
 // Disclaimer: this code is only setup to parse a particular ART tracking
 // data configuration, that is one 6DOF head and one fly stick 2.  There
@@ -44,14 +48,25 @@
 //
 // With that you can see that the UDP data is in a simple ascii format.
 // This format is explained in Appendix B of the above mentioned manual.
+/* an actual frame sample looks like so:
+fr 24981717
+6d 1 [0 1.000][-475.292 -567.632 -53.704 135.5743 5.7618 -3.3069][0.993291 0.111352 0.031199 0.057393 -0.708916 0.702954 0.100393 -0.696447 -0.710551]
+6df2 1 1 [0 1.000 6 2][-48.603 -122.146 -389.220][0.175884 0.118374 -0.977268 0.887803 0.409816 0.209422 0.425290 -0.904455 -0.033013][0 0.00 0.00]
+*/
+// All frame as encoded in ASCII not binary
 
+// We read data via UDP/IP from:
 #define PORT  (5000)
 #define BIND_ADDRESS "192.168.0.10"
+// We bind a socket to that address and port
 
+
+#define MIN_LEN   30
+
+//
 // Marks the start of valid head position data
 #define HEAD_START "6d 1 [0 1.000]["
 #define HEAD_END   "]["
-#define HEAD_MIN_LEN   10
 
 // Marks the start of valid wand data  "6df2 1 1 [0 1.000 6 2]["
 //    or if just buttons and joystick  "6df2 1 1 [0 -1.000 6 2]["
@@ -59,10 +74,10 @@
 #define WAND_CHECKCHR      '1'
 #define WAND_START_ANY     "6df2 1 1 [0 " // the next char is '-' or '1'
 #define WAND_CHECKSTR      "1.000 6 2]["
+
 /// We will receive this with just the buttons and joystick
+// "6df2 1 1 [0 -1.000 6 2]["
 // and the positions and rotation will be zeros.
-#define WAND_END   "]\n"
-#define WAND_MIN_LEN   30
 
 //#define NDEBUG
 #include <assert.h>
@@ -146,7 +161,6 @@ private:
     int fd; // socket file descriptor
 
     OutSlot<Matrix4f> *head_matrix;
- 
     OutSlot<Matrix4f>* wand_matrix;
     OutSlot<Rotation>* wand_rotation;
     OutSlot<Vec3f>* wand_position;
@@ -161,11 +175,11 @@ private:
     OutSlot<bool>* button_7;
     OutSlot<bool>* button_8;
  
-    static NodeType type_;
+    static NodeType _type;
 };
 
 
-NodeType ReadArtTracker::type_(
+NodeType ReadArtTracker::_type(
     "readARTTrackerUDP" /*typeName must be the same as plugin filename */,
     &create,
     "head and wand Tracker to InstantIO" /*shortDescription*/,
@@ -192,6 +206,7 @@ ReadArtTracker::ReadArtTracker(): head_start_LEN(strlen(HEAD_START)),
             errno, strerror_r(errno, errStr, 256));
         return;
     }
+
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
@@ -244,7 +259,7 @@ Node *ReadArtTracker::create()
 NodeType *ReadArtTracker::type() const
 {
     SPEW();  
-    return &type_;
+    return &_type;
 }
 
 template <class T>
@@ -262,11 +277,8 @@ template <class T>
 void ReadArtTracker::removeSlot(T *slot, const char *name)
 {
     assert(slot);
-    if(slot)
-    {
-        removeOutSlot(name, slot);
-        delete slot;
-    }
+    removeOutSlot(name, slot);
+    delete slot;
 }
 
 void ReadArtTracker::initialize()
@@ -289,7 +301,6 @@ void ReadArtTracker::initialize()
     button_2 = getSlot<bool>("Button 2", "button_2");
     button_3 = getSlot<bool>("Button 3", "button_3");
     button_4 = getSlot<bool>("Button 4", "button_4");
-
     button_5 = getSlot<bool>("Button 5", "button_5");
     button_6 = getSlot<bool>("Button 6", "button_6");
     button_7 = getSlot<bool>("Button 7", "button_7");
@@ -308,8 +319,6 @@ void ReadArtTracker::shutdown()
 
     removeSlot(wand_rotation, "wandrotation");
     removeSlot(wand_position, "wandposition");
-        removeSlot(button_1, "button_1");
-
 
     removeSlot(joystick_x_axis, "joystick_x_axis");
     removeSlot(joystick_y_axis, "joystick_y_axis");
@@ -402,7 +411,7 @@ void  ReadArtTracker::sendWand(const char *buf, size_t len)
         if(!strncmp(buf, WAND_START_ANY, wand_start_any_LEN))
             break;
     buf += wand_start_any_LEN;
-    if(end <= buf + WAND_MIN_LEN)
+    if(end <= buf + MIN_LEN)
         // We did not get flystick tracker frame.  We assume that the
         // tracker is out range.
         return;
@@ -430,6 +439,7 @@ void  ReadArtTracker::sendWand(const char *buf, size_t len)
             // and here they are with the transformation applied
             // but without some minus signs:
             &r00, &r20, &r10, &r01, &r21, &r11, &r02, &r22, &r12,
+            // buttons and joystick
             &buttons, &xjoy, &yjoy);
     if(n != 15)
         // We did not get head tracker frame. This time we got more data,
@@ -444,8 +454,17 @@ void  ReadArtTracker::sendWand(const char *buf, size_t len)
 
     // Joystick and Buttons
 
-    // TODO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+    joystick_x_axis->push(xjoy);
+    joystick_y_axis->push(yjoy);
 
+    button_1->push((01   ) & buttons);
+    button_2->push((01<<1) & buttons);
+    button_3->push((01<<2) & buttons);
+    button_4->push((01<<3) & buttons);
+    button_5->push((01<<4) & buttons);
+    button_6->push((01<<5) & buttons);
+    button_7->push((01<<6) & buttons);
+    button_8->push((01<<7) & buttons);
 
     if(!havePos) return; // We have no position/orientation
 
@@ -470,7 +489,6 @@ void  ReadArtTracker::sendWand(const char *buf, size_t len)
     mat[8] = r20; mat[9] = r21; mat[10] = r22; mat[11] = z * scale + z_offset;
     mat[12] = mat[13] = mat[14] = 0.0F; mat[15] = 1.0F;
 
-
     // multiple  mult() or multLeft() which is it.  There documentation
     // does not explain it.  We want  mat = wandCal * mat.
     mat.mult(wandCal);
@@ -481,10 +499,11 @@ void  ReadArtTracker::sendWand(const char *buf, size_t len)
 
     mat.getTransform(pos, rot, s);
 
-
     wand_matrix->push(mat);
     wand_position->push(pos);
     wand_rotation->push(rot);
+
+    std::cout << mat << std::endl;
 }
 
 
@@ -496,7 +515,7 @@ void  ReadArtTracker::sendHead(const char *buf, size_t len)
         if(!strncmp(buf, HEAD_START, head_start_LEN))
             break;
     buf += head_start_LEN;
-    if(end <= buf + HEAD_MIN_LEN)
+    if(end <= buf + MIN_LEN)
         // We did not get head tracker frame.  We assume that the
         // tracker is out range.
         return;
@@ -522,29 +541,12 @@ void  ReadArtTracker::sendHead(const char *buf, size_t len)
     r22 *= -1.0F;
     z *= -1.0F;
 
-    // We notice that there needs to be some finer calibration.
-
-
-#if 0
-    static uint32_t count = 0;
-    ++count;
-
-    fprintf(file, "%u %f %f %f %f %f %f %f %f %f\n", count,
-            r00, r01, r02,  r10, r11, r12,  r20, r21, r22);
-
-    printf("IN = %f %f %f,  %f %f %f\n\n"
-            "   %f %f %f\n"
-            "   %f %f %f\n"
-            "   %f %f %f\n\n",
-            x, y, z,
-            rx, ry, rz, r00, r01, r02, r10, r11, r12, r20, r21, r22);
-#endif
-
-    // scale millimeters in and meters out:
+    // scale: ART Tracker millimeters in and InstantReality meters out:
     const float scale = 0.001F;
     // We can add the following calibration offset to x, y, z Instant
     // Reality positions in meters
-    const float
+    //
+    const float // A little more calibration here:
         x_offset = 0.07F/*meters*/,
         y_offset = 0.03175F/*meters*/,
         z_offset = 0.0F/*meters*/;
@@ -555,48 +557,15 @@ void  ReadArtTracker::sendHead(const char *buf, size_t len)
     mat[8] = r20; mat[9] = r21; mat[10] = r22; mat[11] = z * scale + z_offset;
     mat[12] = mat[13] = mat[14] = 0.0F; mat[15] = 1.0F;
 
-  
+
     // multiple  mult() or multLeft() which is it.  There documentation
     // does not explain it.  We want  mat = headCal * mat.
     mat.mult(headCal);
 
-#if 0
-
-    int i;
-    for(i=1; i<15; ++i)
-        mat[i] = 0;
-    for(i=0; i<16; i += 5)
-        mat[i] = 1.0F;
-#endif
-
-    //printf("xyz = %f %f %f\n\n", mat[3], mat[7], mat[11]);
-
     head_matrix->push(mat);
+
+    std::cout << mat << std::endl;
 }
-
-static inline void setWandCalibration(Matrix4f &m)
-{
-    //////////////////////////////////////////////////////////////////
-    //         Calibrate the wand using this constant 4 x 4 matrix
-    //////////////////////////////////////////////////////////////////
-    
-    // See comments in setHeadCalibration()
-
-    // Rotations heading (h), pitch (p), and roll (r) as explained above.
-    const float h = 0, p = 0, r = 0,
-        ch = cosf(h), sh = sinf(h),
-        sp = sinf(p), cp = cosf(p),
-        sr = sinf(r), cr = cosf(r),
-        s = 1.0F;
-
-    m[0] = (ch*cr - sh*sp*sr)*s;   m[1] = -sh*cp*s;   m[2] = (ch*sr + sh*sp*cr)*s;  m[3] = 0;
-    m[4] = (sh*cr + ch*sp*sr)*s;   m[5] =  ch*cp*s;   m[6] = (sh*sr - ch*sp*cr)*s;  m[7] = 0;
-    m[8] = -cp*sr*s;               m[9] = sp*s;       m[10]= cp*cr*s;               m[11]= 0;
-    m[12]= 0;                      m[13]= 0;          m[14]= 0;                     m[15]= 1.0F;
-}
-
-
-
 
 static inline void setHeadCalibration(Matrix4f &m)
 {
@@ -656,9 +625,31 @@ T H P R Scale =  |                                                              
         sr = sinf(r), cr = cosf(r),
         s = 1.0F;
 
-    m[0] = (ch*cr - sh*sp*sr)*s;   m[1] = -sh*cp*s;   m[2] = (ch*sr + sh*sp*cr)*s;  m[3] = 0;
-    m[4] = (sh*cr + ch*sp*sr)*s;   m[5] =  ch*cp*s;   m[6] = (sh*sr - ch*sp*cr)*s;  m[7] = 0;
-    m[8] = -cp*sr*s;               m[9] = sp*s;       m[10]= cp*cr*s;               m[11]= 0;
+    m[0] = (ch*cr - sh*sp*sr)*s;   m[1] = -sh*cp*s;   m[2] = (ch*sr + sh*sp*cr)*s;  m[3] = 0;// tx
+    m[4] = (sh*cr + ch*sp*sr)*s;   m[5] =  ch*cp*s;   m[6] = (sh*sr - ch*sp*cr)*s;  m[7] = 0;// ty
+    m[8] = -cp*sr*s;               m[9] = sp*s;       m[10]= cp*cr*s;               m[11]= 0;// tz
+    m[12]= 0;                      m[13]= 0;          m[14]= 0;                     m[15]= 1.0F;
+}
+
+
+static inline void setWandCalibration(Matrix4f &m)
+{
+    //////////////////////////////////////////////////////////////////
+    //         Calibrate the wand using this constant 4 x 4 matrix
+    //////////////////////////////////////////////////////////////////
+    
+    // See comments in setHeadCalibration()
+
+    // Rotations heading (h), pitch (p), and roll (r) as explained above.
+    const float h = 0, p = 0, r = 0,
+        ch = cosf(h), sh = sinf(h),
+        sp = sinf(p), cp = cosf(p),
+        sr = sinf(r), cr = cosf(r),
+        s = 1.0F;
+
+    m[0] = (ch*cr - sh*sp*sr)*s;   m[1] = -sh*cp*s;   m[2] = (ch*sr + sh*sp*cr)*s;  m[3] = 0;// tx
+    m[4] = (sh*cr + ch*sp*sr)*s;   m[5] =  ch*cp*s;   m[6] = (sh*sr - ch*sp*cr)*s;  m[7] = 0;// ty
+    m[8] = -cp*sr*s;               m[9] = sp*s;       m[10]= cp*cr*s;               m[11]= 0;// tz
     m[12]= 0;                      m[13]= 0;          m[14]= 0;                     m[15]= 1.0F;
 }
 
@@ -672,17 +663,12 @@ int ReadArtTracker::processData()
     setHeadCalibration(headCal);
     setWandCalibration(wandCal);
 
-
     setState(NODE_RUNNING);
 
-    assert(head_matrix);
-
-    // It would appear that someone decided that
-    // model units are in meters so a model with
-    // some length equal to 1 corresponds to 1 meter.
     //
     // waitThread() seems to be the hook that lets instant reality know
-    // when we are starting/ending a cycle and we can continue running.
+    // when we are starting/ending a cycle and we can continue running
+    // if it returns true.
     // By it's name it's clear that they are catering to stupid
     // programmers that put sleeps in their code, and don't know that the
     // OS has other blocking calls, besides sleep, that handle system
@@ -695,9 +681,7 @@ int ReadArtTracker::processData()
         errno = 0;
 
         // This should block until there is data to read.  Which is a very
-        // efficient to get the data as soon as possible; but for all we
-        // know the writer of instant reality fucked this up, and made this
-        // block other threads too.
+        // efficient to get the data as soon as possible.
         ssize_t ret = recv(fd, buf, BUFLEN, 0);
         if(ret <= 0)
         {
@@ -713,13 +697,11 @@ int ReadArtTracker::processData()
 
         printf("read(%zd bytes) = %s\n", ret, buf);
 
-        if(ret > HEAD_MIN_LEN)
+        if(ret > MIN_LEN)
         {
             sendHead(buf, ret);
             sendWand(buf, ret);
         }
-
-
 
     }
     

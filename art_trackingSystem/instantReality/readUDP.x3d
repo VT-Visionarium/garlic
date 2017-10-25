@@ -3,6 +3,6 @@
         <IOSensor DEF='readUDP' type='readUDP'>
             <field accessType='outputOnly' name='head' type='SFMatrix4f'/>
         </IOSensor>
-        <inline url='../axes.x3d' />
+        <inline url='axes.x3d' />
     </scene>
 </X3D>
