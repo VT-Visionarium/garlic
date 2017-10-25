@@ -1,11 +1,7 @@
 #X3D V3.0 utf8
 
 DEF iowand IOSensor {
-	type "dtkInstantIOWand"
-	initializeOnly SFString dtkShmWandName "wand"
-	initializeOnly SFString dtkShmJoystickName "joystick"
-	initializeOnly SFString dtkShmButtonsName "buttons"
-	initializeOnly SFFloat meterRatio 1.524
+	type "readARTTrackerUDP"
 	eventOut SFMatrix4f wandmatrix
 	eventOut SFRotation wandrotation
 	eventOut SFVec3f wandposition

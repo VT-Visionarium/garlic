@@ -669,8 +669,8 @@
 
 
         <IFhead>
-            <IOSensor DEF='readARTTrackerUDP'
-                type='readARTTrackerUDP'
+            <IOSensor DEF='dtkInstantIOHead'
+                type='dtkInstantIOHead'
                 isActive='TRUE'>
                 <field accessType='outputOnly' name='head' type='SFMatrix4f'/>
             </IOSensor>
@@ -678,10 +678,10 @@
 
         <IFhead>
             <IFdesktopStereoSideBySide>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='desktopStereoSideBySide_leftEye'
                     toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='desktopStereoSideBySide_rightEye'
                     toField='set_eyeTransform'/>
             </IFdesktopStereoSideBySide>
@@ -690,40 +690,40 @@
         <IFhead>
             <IFcaveStereo>
                 <!-- LEFT WALL -->
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoLT_leftEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoLT_rightEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoLB_leftEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoLB_rightEye' toField='set_eyeTransform'/>
                 <!-- CENTER WALL -->
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoCT_leftEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoCT_rightEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoCB_leftEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoCB_rightEye' toField='set_eyeTransform'/>
                 <!-- RIGHT WALL -->
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoRT_leftEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoRT_rightEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoRB_leftEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoRB_rightEye' toField='set_eyeTransform'/>
                 <!-- FLOOR WALL -->
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoFT_leftEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoFT_rightEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoFB_leftEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveStereoFB_rightEye' toField='set_eyeTransform'/>
             </IFcaveStereo>
         </IFhead>
@@ -731,31 +731,31 @@
         <IFhead>
             <IFcaveMono>
                 <!-- LEFT WALL -->
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveMonoLT_oneEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveMonoLB_oneEye' toField='set_eyeTransform'/>
                 <!-- CENTER WALL -->
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveMonoCT_oneEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveMonoCB_oneEye' toField='set_eyeTransform'/>
                 <!-- RIGHT WALL -->
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveMonoRT_oneEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveMonoRB_oneEye' toField='set_eyeTransform'/>
                 <!-- FLOOR WALL -->
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveMonoFT_oneEye' toField='set_eyeTransform'/>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='caveMonoFB_oneEye' toField='set_eyeTransform'/>
             </IFcaveMono>
         </IFhead>
 
         <IFhead>
             <IFdesktopMono>
-                <ROUTE fromNode='readARTTrackerUDP' fromField='head'
+                <ROUTE fromNode='dtkInstantIOHead' fromField='head'
                     toNode='desktopMono_oneEye' toField='set_eyeTransform'/>
             </IFdesktopMono>
         </IFhead>

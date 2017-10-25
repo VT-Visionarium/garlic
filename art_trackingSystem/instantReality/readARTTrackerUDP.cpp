@@ -1,18 +1,3 @@
-// Prerequisite: Get your ART tracker writing data to your computer on a
-// port that you choose.  It will be a UDP/IP port.  The receiver program
-// will have a listening bound port.  The ART DTrack2 and/or DTrack2CLI
-// programs will control the ART control box that should be writing to
-// your selected addresses and ports as a simple unbound socket UDP/IP
-// writer.
-
-// Disclaimer: this code is only setup to parse a particular ART tracking
-// data configuration, that is one 6DOF head and one fly stick 2.  There
-// is a more generic ART tracking IOSensor code built into instant
-// reality, but we could not get it to work in two days of trying.  We
-// know that we can read UDP sockets with C++ code and it beats working
-// with a fucking black box with no reasonable documentation.  We have to
-// write custom code for our CAVE anyway, so what just a little more
-// code to get is started.
 
 // Test this by running:
 //
@@ -20,8 +5,6 @@
 //
 //  sax --num-aspects 4 testWand.x3d
 //
-//  sax --num-aspects 4 moveTeapot.x3d 
-
 
 
 /* To get the format of the UDP data we read the document which
@@ -54,6 +37,11 @@ fr 24981717
 6df2 1 1 [0 1.000 6 2][-48.603 -122.146 -389.220][0.175884 0.118374 -0.977268 0.887803 0.409816 0.209422 0.425290 -0.904455 -0.033013][0 0.00 0.00]
 */
 // All frame as encoded in ASCII not binary
+
+
+// define DEBUG_SPEW to have this spew every frame to stdout
+//#define DEBUG_SPEW
+
 
 // We read data via UDP/IP from:
 #define PORT  (5000)
@@ -104,8 +92,12 @@ fr 24981717
 #include <InstantIO/Matrix4.h>
 
 
-#define SPEW()   std::cerr << __BASE_FILE__ << ":" << __LINE__\
+#ifdef DEBUG_SPEW
+#  define SPEW()   std::cerr << __BASE_FILE__ << ":" << __LINE__\
   << " " <<  __func__ << "()" << std::endl
+#else
+#  define SPEW()  /*empty macro*/
+#endif
 
 
 #define WITH_POS_ROT
@@ -158,7 +150,7 @@ private:
     Matrix4f wandCal; // Calibration matrix
 
 
-    int fd; // socket file descriptor
+    int fd; // UDP/IP socket file descriptor
 
     OutSlot<Matrix4f> *head_matrix;
     OutSlot<Matrix4f>* wand_matrix;
@@ -215,12 +207,27 @@ ReadArtTracker::ReadArtTracker(): head_start_LEN(strlen(HEAD_START)),
 
     if(bind(fd, (struct sockaddr *) &addr, sizeof(addr)) == -1)
     {
+        close(fd);
+        fd = -1;
         char errStr[256];
         printf("bind() to address \""
                 BIND_ADDRESS":%d\" failed: errno=%d: %s\n",
             PORT, errno, strerror_r(errno, errStr, 256));
-        close(fd);
-        fd = -1;
+        if(errno == 98/*"Address already in use"*/)
+        {
+            // We are guessing the there is another one of these programs
+            // running and taking the UDP/IP address and port.
+            //
+            // This will get seen if they ran something like 'ssh cube -X'
+            // to start the program.
+            system("xmessage \"There may be another HyperCube InstantReality program already running\n"
+                    "\nYou need to try to find and kill that program.\n"
+                    "\nMaybe try running:   ssh cube killall -9 sax\n\" &");
+            // This is more likely to be seen:
+            printf("\n\nThere may be another HyperCube InstantReality program already running\n"
+                    "\nYou need to try to find and kill that program.\n"
+                    "\nMaybe try running:   ssh cube killall -9 sax\n\n\n");
+        }
         return;
     }
 
@@ -503,7 +510,9 @@ void  ReadArtTracker::sendWand(const char *buf, size_t len)
     wand_position->push(pos);
     wand_rotation->push(rot);
 
+#ifdef DEBUG_SPEW
     std::cout << mat << std::endl;
+#endif
 }
 
 
@@ -564,7 +573,9 @@ void  ReadArtTracker::sendHead(const char *buf, size_t len)
 
     head_matrix->push(mat);
 
+#ifdef DEBUG_SPEW
     std::cout << mat << std::endl;
+#endif
 }
 
 static inline void setHeadCalibration(Matrix4f &m)
@@ -695,7 +706,9 @@ int ReadArtTracker::processData()
         // terminate the string.
         buf[ret] = '\0';
 
+#ifdef DEBUG_SPEW
         printf("read(%zd bytes) = %s\n", ret, buf);
+#endif
 
         if(ret > MIN_LEN)
         {

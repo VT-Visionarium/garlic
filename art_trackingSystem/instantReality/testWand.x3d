@@ -51,9 +51,6 @@ surface="-1.524 -0.381 1.524, -1.524 -0.381 -1.524, -1.524 1.524 -1.524, -1.524 
             <inline url='cubeFrame.x3d' />
         </transform>
 
-
-
-
         <ROUTE fromNode='readARTTrackerUDP' fromField='wandmatrix'
             toNode='transhead' toField='matrix'/>
 
