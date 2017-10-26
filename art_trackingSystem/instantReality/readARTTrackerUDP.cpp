@@ -40,7 +40,7 @@ fr 24981717
 
 
 // define DEBUG_SPEW to have this spew every frame to stdout
-//#define DEBUG_SPEW
+#define DEBUG_SPEW
 
 
 // We read data via UDP/IP from:
@@ -109,15 +109,12 @@ template <class T> class OutSlot;
 class ReadArtTracker : public ThreadedNode
 {
 public:
-    ReadArtTracker();
-    virtual ~ReadArtTracker();
-
     // Factory method to create an instance of ReadArtTracker.
     static Node *create();
-  
+
     // Factory method to return the type of ReadArtTracker.
-    virtual NodeType *type() const;
-  
+    //virtual NodeType *type() const;
+
 protected:
     // Gets called when the ReadArtTracker is enabled.
     virtual void initialize();
@@ -129,6 +126,9 @@ protected:
     virtual int processData ();
   
 private:
+
+    ReadArtTracker(bool isDummy = false);
+    virtual ~ReadArtTracker();
 
     template <class T>
     OutSlot<T> *getSlot(const char *desc, const char *name);
@@ -143,12 +143,10 @@ private:
     const size_t wand_start_any_LEN;
     const size_t wand_checkstr_LEN;
 
-
     // A constant calibration which we multiple by the
     // tracker head viewpoint matrix.
     Matrix4f headCal; // Calibration matrix
     Matrix4f wandCal; // Calibration matrix
-
 
     int fd; // UDP/IP socket file descriptor
 
@@ -166,14 +164,19 @@ private:
     OutSlot<bool>* button_6;
     OutSlot<bool>* button_7;
     OutSlot<bool>* button_8;
- 
-    static NodeType _type;
+
+    static bool isLoaded;
 };
 
 
-NodeType ReadArtTracker::_type(
+bool ReadArtTracker::isLoaded = false;
+
+
+// Somehow InstantReality reads this data structure
+// no matter what it's called.
+static NodeType _type_InstantReality_stupid_data(
     "readARTTrackerUDP" /*typeName must be the same as plugin filename */,
-    &create,
+    &ReadArtTracker::create,
     "head and wand Tracker to InstantIO" /*shortDescription*/,
     /*longDescription*/
     "head and wand Tracker to InstantIO",
@@ -181,13 +184,17 @@ NodeType ReadArtTracker::_type(
     0/*fields*/,
     0/sizeof(Field));
 
-ReadArtTracker::ReadArtTracker(): head_start_LEN(strlen(HEAD_START)),
+
+ReadArtTracker::ReadArtTracker(bool isDummy): head_start_LEN(strlen(HEAD_START)),
     wand_start_any_LEN(strlen(WAND_START_ANY)),
-    wand_checkstr_LEN(strlen(WAND_CHECKSTR))
+    wand_checkstr_LEN(strlen(WAND_CHECKSTR)),
+    fd(-1)
 {
     SPEW();
     // Add external route
     addExternalRoute("*", "{NamespaceLabel}/{SlotLabel}");
+
+    if(isLoaded) return;
 
     errno = 0;
     fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -246,10 +253,11 @@ Node *ReadArtTracker::create()
 
     ReadArtTracker *ht;
 
-    ht = new ReadArtTracker;
+    ht = new ReadArtTracker(isLoaded);
 
-    if(ht->fd == -1)
+    if(ht->fd == -1 && !isLoaded)
     {   
+        isLoaded = true;
         delete ht;
         // TODO: this will make stupid sax segfault.
         // You'd think that they at least check the return value
@@ -260,14 +268,20 @@ Node *ReadArtTracker::create()
         return 0;
     }
 
+    if(!isLoaded)
+        isLoaded = true;
+
+
     return ht;
 }
 
+#if 0
 NodeType *ReadArtTracker::type() const
 {
-    SPEW();  
+    SPEW(); 
     return &_type;
 }
+#endif
 
 template <class T>
 OutSlot<T> *ReadArtTracker::getSlot(const char *desc, const char *name)
@@ -290,8 +304,10 @@ void ReadArtTracker::removeSlot(T *slot, const char *name)
 
 void ReadArtTracker::initialize()
 {
-    SPEW();  
-    
+    SPEW();
+
+    if(fd == -1) return;
+
     // handle state and namespace updates
     Node::initialize();
 
@@ -320,6 +336,8 @@ void ReadArtTracker::shutdown()
     Node::shutdown();
 
     SPEW();
+
+    if(fd == -1) return;
 
     removeSlot(head_matrix, "head");
     removeSlot(wand_matrix, "wandmatrix");
@@ -670,6 +688,15 @@ static inline void setWandCalibration(Matrix4f &m)
 int ReadArtTracker::processData()
 {
     SPEW();
+
+    if(fd == -1)
+    {
+        // Dummy service.
+        setState(NODE_SLEEPING);
+        while(waitThread(1000))
+            SPEW();
+        return 0;
+    }
 
     setHeadCalibration(headCal);
     setWandCalibration(wandCal);
