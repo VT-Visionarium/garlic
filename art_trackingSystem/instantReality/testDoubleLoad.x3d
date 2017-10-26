@@ -1,0 +1,28 @@
+<X3D>
+
+    <scene>
+
+        <IOSensor DEF='wand' type='readARTTrackerUDP'>
+            <field accessType='outputOnly' name='wandmatrix' type='SFMatrix4f'/>
+        </IOSensor>
+
+ 
+        <Viewpoint position='4 0 0' description='viewpoint0'/>
+
+        <MatrixTransform DEF="transhead">
+          <shape>
+            <appearance>
+              <material diffuseColor='1 0 0'/>
+            </appearance>
+            <teapot/>
+          </shape>
+        </MatrixTransform>
+
+
+        <ROUTE fromNode='wand' fromField='wandmatrix'
+            toNode='transhead' toField='matrix'/>
+
+    </scene>
+
+
+</X3D>
