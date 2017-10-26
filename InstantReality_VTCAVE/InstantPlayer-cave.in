@@ -95,7 +95,7 @@ wand="$default_wand"
 head=$default_head
 cwd=
 report=
-run="$player --num-aspects 10"
+run="$player "
 IR_args=
 nav_mode=$default_nav_mode
 
@@ -318,10 +318,10 @@ function ComposeCommand()
 
     case "$stereo" in
         with)
-            engine="${engine}cave_stereo"
+            engine="--num-aspects 18${engine}cave_stereo"
             ;;
         without)
-            engine="${engine}cave_mono"
+            engine="--num-aspects 10${engine}cave_mono"
             ;;
         *)
             echo "BAD code error stereo=$stereo"
@@ -342,7 +342,7 @@ function ComposeCommand()
             ;;
     esac
 
-    
+
 
 
     case "$wand" in
