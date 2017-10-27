@@ -86,8 +86,19 @@ private:
 };
 
 
+static char *getFileBaseName(void)
+{
+    static char name[128];
+    strncpy(name, __BASE_FILE__, 128);
+    name[127] = '\0';
+    // "Filename.cpp" -> "Filename"
+    name[strlen(name) - 4] = '\0';
+    return name;
+}
+
+
 NodeType ReadUDP::type_(
-    "readUDP" /*typeName must be the same as plugin filename */,
+    getFileBaseName()/*typeName must be the same as plugin filename */,
     &create,
     "read UDP data from a bound PORT" /*shortDescription*/,
     /*longDescription*/

@@ -1,12 +1,4 @@
 
-// Test this by running:
-//
-//  sax --num-aspects 4 testHead.x3d
-//
-//  sax --num-aspects 4 testWand.x3d
-//
-
-
 /* To get the format of the UDP data we read the document which
  * is not freely available:
  *
@@ -83,6 +75,7 @@ fr 24981717
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <signal.h>
+#include <pthread.h>
 
 #include <InstantIO/ThreadedNode.h>
 #include <InstantIO/NodeType.h>
@@ -90,6 +83,8 @@ fr 24981717
 #include <InstantIO/MFTypes.h>
 #include <InstantIO/Vec3.h>
 #include <InstantIO/Matrix4.h>
+
+#include "readARTCommon.h"
 
 
 #ifdef DEBUG_SPEW
@@ -99,8 +94,28 @@ fr 24981717
 #  define SPEW()  /*empty macro*/
 #endif
 
+//////////////////////////////////////////////////////////////////////////
+// We have two IOSensors which we connect with pthread condition signals:
+// one is in readARTHead.cpp and the other is in readARTWand.cpp.  It's a
+// work-around to not being able to figure-out how to get data across
+// namespaces between an <Engine> and a <Scene>.
+//
+//
+pthread_mutex_t art_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t art_cond = PTHREAD_COND_INITIALIZER;
 
-#define WITH_POS_ROT
+//////////////////////////////////////////////////////////////////////////
+//        SHARED DATA
+//////////////////////////////////////////////////////////////////////////
+Matrix4f art_wandMat;
+Vec3f    art_wandPosition
+Rotation art_wandRotation;
+float    art_wandXAxis,
+         art_wandYAxis;
+uint32_t art_buttons;
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
 
 namespace InstantIO
 {
@@ -108,12 +123,6 @@ namespace InstantIO
 template <class T> class OutSlot;
 class ReadArtTracker : public ThreadedNode
 {
-public:
-    // Factory method to create an instance of ReadArtTracker.
-    static Node *create();
-
-    // Factory method to return the type of ReadArtTracker.
-    //virtual NodeType *type() const;
 
 protected:
     // Gets called when the ReadArtTracker is enabled.
@@ -126,8 +135,10 @@ protected:
     virtual int processData ();
   
 private:
+    // Factory method to create an instance of ReadArtTracker.
+    static Node *create();
 
-    ReadArtTracker(bool isDummy = false);
+    ReadArtTracker();
     virtual ~ReadArtTracker();
 
     template <class T>
@@ -136,8 +147,8 @@ private:
     template <class T>
     void removeSlot(T *slot, const char *name);
 
-    void sendHead(const char *buf, size_t len);
-    void sendWand(const char *buf, size_t len);
+    void getHead(const char *buf, size_t len);
+    void getWand(const char *buf, size_t len);
 
     const size_t head_start_LEN;
     const size_t wand_start_any_LEN;
@@ -146,39 +157,18 @@ private:
     // A constant calibration which we multiple by the
     // tracker head viewpoint matrix.
     Matrix4f headCal; // Calibration matrix
-    Matrix4f wandCal; // Calibration matrix
 
     int fd; // UDP/IP socket file descriptor
-    uint32_t oldButtons;
-    float oldJoyX;
-    float oldJoyY;
-    
-    OutSlot<Matrix4f> *head_matrix;
-    OutSlot<Matrix4f> *wand_matrix;
-    OutSlot<Rotation> *wand_rotation;
-    OutSlot<Vec3f> *wand_position;
-    OutSlot<float> *joystick_x_axis;
-    OutSlot<float> *joystick_y_axis;
-    OutSlot<bool> *button_1;
-    OutSlot<bool> *button_2;
-    OutSlot<bool> *button_3;
-    OutSlot<bool> *button_4;
-    OutSlot<bool> *button_5;
-    OutSlot<bool> *button_6;
-    OutSlot<bool> *button_7;
-    OutSlot<bool> *button_8;
 
-    static bool isLoaded;
+    OutSlot<Matrix4f> *head_matrix;
 };
 
-
-bool ReadArtTracker::isLoaded = false;
 
 
 // Somehow InstantReality reads this data structure
 // no matter what it's called.
 static NodeType _type_InstantReality_stupid_data(
-    "readARTTrackerUDP" /*typeName must be the same as plugin filename */,
+    "readARTHead" /*typeName must be the same as plugin filename */,
     &ReadArtTracker::create,
     "head and wand Tracker to InstantIO" /*shortDescription*/,
     /*longDescription*/
@@ -188,7 +178,7 @@ static NodeType _type_InstantReality_stupid_data(
     0/sizeof(Field));
 
 
-ReadArtTracker::ReadArtTracker(bool isDummy): head_start_LEN(strlen(HEAD_START)),
+ReadArtTracker::ReadArtTracker(): head_start_LEN(strlen(HEAD_START)),
     wand_start_any_LEN(strlen(WAND_START_ANY)),
     wand_checkstr_LEN(strlen(WAND_CHECKSTR)),
     fd(-1), oldButtons(0)
@@ -196,8 +186,6 @@ ReadArtTracker::ReadArtTracker(bool isDummy): head_start_LEN(strlen(HEAD_START))
     SPEW();
     // Add external route
     addExternalRoute("*", "{NamespaceLabel}/{SlotLabel}");
-
-    if(isLoaded) return;
 
     errno = 0;
     fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -256,11 +244,10 @@ Node *ReadArtTracker::create()
 
     ReadArtTracker *ht;
 
-    ht = new ReadArtTracker(isLoaded);
+    ht = new ReadArtTracker;
 
-    if(ht->fd == -1 && !isLoaded)
+    if(ht->fd == -1)
     {   
-        isLoaded = true;
         delete ht;
         // TODO: this will make stupid sax segfault.
         // You'd think that they at least check the return value
@@ -270,10 +257,6 @@ Node *ReadArtTracker::create()
         // Calling exit() does not work.
         return 0;
     }
-
-    if(!isLoaded)
-        isLoaded = true;
-
 
     return ht;
 }
@@ -315,22 +298,6 @@ void ReadArtTracker::initialize()
     Node::initialize();
 
     head_matrix = getSlot<Matrix4f>("matrix of head", "head");
-    wand_matrix = getSlot<Matrix4f>("matrix of wand", "wandmatrix");
-    
-    wand_rotation = getSlot<Rotation>("Rotation of wand", "wandrotation");
-    wand_position = getSlot<Vec3f>( "Position of wand", "wandposition");
-    
-    joystick_x_axis = getSlot<float>("Joystick x axis", "joystick_x_axis");
-    joystick_y_axis = getSlot<float>("Joystick y axis", "joystick_y_axis");
-
-    button_1 = getSlot<bool>("Button 1", "button_1");
-    button_2 = getSlot<bool>("Button 2", "button_2");
-    button_3 = getSlot<bool>("Button 3", "button_3");
-    button_4 = getSlot<bool>("Button 4", "button_4");
-    button_5 = getSlot<bool>("Button 5", "button_5");
-    button_6 = getSlot<bool>("Button 6", "button_6");
-    button_7 = getSlot<bool>("Button 7", "button_7");
-    button_8 = getSlot<bool>("Button 8", "button_8");
 }
 
 void ReadArtTracker::shutdown()
@@ -343,23 +310,6 @@ void ReadArtTracker::shutdown()
     if(fd == -1) return;
 
     removeSlot(head_matrix, "head");
-    removeSlot(wand_matrix, "wandmatrix");
-
-    removeSlot(wand_rotation, "wandrotation");
-    removeSlot(wand_position, "wandposition");
-
-    removeSlot(joystick_x_axis, "joystick_x_axis");
-    removeSlot(joystick_y_axis, "joystick_y_axis");
-
-    removeSlot(button_1, "button_1");
-    removeSlot(button_2, "button_2");
-    removeSlot(button_3, "button_3");
-    removeSlot(button_4, "button_4");
-
-    removeSlot(button_5, "button_5");
-    removeSlot(button_6, "button_6");
-    removeSlot(button_7, "button_7");
-    removeSlot(button_8, "button_8");
 }
 
 
@@ -422,7 +372,7 @@ void ReadArtTracker::shutdown()
 //  position of the elements as they are read in the sscanf()
 //
 
-void  ReadArtTracker::sendWand(const char *buf, size_t len)
+void  ReadArtTracker::getWand(const char *buf, size_t len)
 {
     // We have 3 cases:
     //
@@ -482,23 +432,17 @@ void  ReadArtTracker::sendWand(const char *buf, size_t len)
 
     // Joystick and Buttons
 
-    joystick_x_axis->push(xjoy);
-    joystick_y_axis->push(yjoy);
+    int ret;
+    ret = pthread_mutex_lock(&art_mutex);
+    assert(ret == 0);
 
-    if(buttons != oldButtons)
-    {
-        oldButtons = buttons;
-        button_1->push((01   ) & buttons);
-        button_2->push((01<<1) & buttons);
-        button_3->push((01<<2) & buttons);
-        button_4->push((01<<3) & buttons);
-        button_5->push((01<<4) & buttons);
-        button_6->push((01<<5) & buttons);
-        button_7->push((01<<6) & buttons);
-        button_8->push((01<<7) & buttons);
-    }
+    art_wandXAxis = xjoy;
+    art_wandXAxis = xjoy;
+    art_buttons = buttons;
+    art_havePosRot = havePos;
 
-    if(!havePos) return; // We have no position/orientation
+    if(!havePos)
+        goto signal;
 
     // This completes that rotation "T" as defined above.
     r20 *= -1.0F;
@@ -515,33 +459,36 @@ void  ReadArtTracker::sendWand(const char *buf, size_t len)
         y_offset = 0.0F/*meters*/,
         z_offset = 0.0F/*meters*/;
 
-    Matrix4f mat;
-    mat[0] = r00; mat[1] = r01; mat[2]  = r02; mat[3]  = x * scale + x_offset;
-    mat[4] = r10; mat[5] = r11; mat[6]  = r12; mat[7]  = y * scale + y_offset;
-    mat[8] = r20; mat[9] = r21; mat[10] = r22; mat[11] = z * scale + z_offset;
-    mat[12] = mat[13] = mat[14] = 0.0F; mat[15] = 1.0F;
+    art_wandMat[0] = r00; art_wandMat[1] = r01; art_wandMat[2]  = r02; art_wandMat[3]  = x * scale + x_offset;
+    art_wandMat[4] = r10; art_wandMat[5] = r11; art_wandMat[6]  = r12; art_wandMat[7]  = y * scale + y_offset;
+    art_wandMat[8] = r20; art_wandMat[9] = r21; art_wandMat[10] = r22; art_wandMat[11] = z * scale + z_offset;
+    art_wandMat[12] = art_wandMat[13] = art_wandMat[14] = 0.0F; art_wandMat[15] = 1.0F;
 
     // multiple  mult() or multLeft() which is it.  There documentation
     // does not explain it.  We want  mat = wandCal * mat.
-    mat.mult(wandCal);
+    art_wandMat.mult(wandCal);
 
-    Vec3f pos;
-    Rotation rot;
     Vec3f s;
+    art_wandMat.getTransform(art_wandPosition, art_wandRotation, s);
 
-    mat.getTransform(pos, rot, s);
-
-    wand_matrix->push(mat);
-    wand_position->push(pos);
-    wand_rotation->push(rot);
+    ret = pthread_mutex_lock(&art_mutex);
+    assert(ret == 0);
+    ret = pthread_cond_signal(&art_cond, &art_mutex);
+    assert(ret == 0);
 
 #ifdef DEBUG_SPEW
     std::cout << mat << std::endl;
 #endif
+    
+signal:
+    ret = pthread_cond_signal(&art_cond, &art_mutex);
+    assert(ret == 0);
+    ret = pthread_mutex_unlock(&art_mutex);
+    assert(ret == 0);
 }
 
 
-void  ReadArtTracker::sendHead(const char *buf, size_t len)
+void  ReadArtTracker::getHead(const char *buf, size_t len)
 {
     const char *end = buf + len - head_start_LEN;
     // Set s to the start of the rotation part
@@ -746,10 +693,9 @@ int ReadArtTracker::processData()
 
         if(ret > MIN_LEN)
         {
-            sendHead(buf, ret);
-            sendWand(buf, ret);
+            getHead(buf, ret);
+            getWand(buf, ret);
         }
-
     }
     
     // Thread finished

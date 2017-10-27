@@ -4,7 +4,7 @@ CPPFLAGS = -fpic -I$(IR_ROOT)/include
 LDFLAGS = -shared -ldtk -L$(IR_ROOT)/lib -lInstantIO\
  -Wl,-rpath=/usr/local/lib
 
-built := readUDP.iio readARTTrackerUDP.iio
+built := $(patsubst %.cpp,%.iio,$(wildcard *.cpp))
 
 build: $(built)
 
@@ -16,4 +16,4 @@ build: $(built)
 
 clean cleaner:
 	rm -f *.lo $(built)
-	
+

@@ -668,10 +668,17 @@
         </RenderJob>
 
 
-        <IOSensor DEF='tracker'
-            type='readARTTrackerUDP'
-            isActive='TRUE'>
+        <IOSensor DEF='tracker' type='readARTTrackerUDP' isActive='TRUE'>
             <field accessType='outputOnly' name='head' type='SFMatrix4f'/>
+            <field accessType='outputOnly' name='wandmatrix' type='SFMatrix4f'/>
+            <field accessType='outputOnly' name='wandrotation' type='SFRotation'/>
+            <field accessType='outputOnly' name='wandposition' type='SFVec3f'/>
+            <field accessType='outputOnly' name='joystick_x_axis' type='SFFloat'/>
+            <field accessType='outputOnly' name='joystick_y_axis' type='SFFloat'/>
+            <field accessType='outputOnly' name='button_1' type='SFBool'/>
+            <field accessType='outputOnly' name='button_2' type='SFBool'/>
+            <field accessType='outputOnly' name='button_3' type='SFBool'/>
+            <field accessType='outputOnly' name='button_4' type='SFBool'/>
         </IOSensor>
 
         <IFhead>
@@ -794,10 +801,5 @@
             <Viewpoint position='0 0.2 1.8' description='sweet'/>
         </Scene>
     </IFdeepsixViewPoint>
-
-
-
-
-
 
 </X3D>
