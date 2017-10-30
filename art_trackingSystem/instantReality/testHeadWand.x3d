@@ -1,0 +1,79 @@
+<X3D>
+
+    <Engine>
+        <RenderJob DEF='render'>
+
+
+<WindowGroup>
+<LocalWindow border="FALSE" drawCursor="TRUE" drawToolBar="FALSE"
+fullScreen="FALSE" pipe=":0.0" position="0 0" size="2560 1600">
+<Viewarea leftBuffer="TRUE" lowerLeft="0 0" rightBuffer="FALSE" upperRight="2560 1600">
+<ProjectionViewModifier DEF="caveStereoLT_leftEye" eyeSeparation="0.065"
+leftEye="TRUE" mono="FALSE" rightEye="FALSE"
+surface="-1.524 -0.381 1.524, -1.524 -0.381 -1.524, -1.524 1.524 -1.524, -1.524 1.524 1.524">
+</ProjectionViewModifier>
+</Viewarea>
+</LocalWindow>
+</WindowGroup>
+<WindowGroup>
+<LocalWindow border="FALSE" drawCursor="TRUE" drawToolBar="FALSE"
+fullScreen="FALSE" pipe=":0.1" position="0 0" size="2560 1600">
+<Viewarea leftBuffer="FALSE" lowerLeft="0 0" rightBuffer="TRUE" upperRight="2560 1600">
+<ProjectionViewModifier DEF="caveStereoLT_rightEye" eyeSeparation="0.065"
+leftEye="FALSE" mono="FALSE" rightEye="TRUE"
+surface="-1.524 -0.381 1.524, -1.524 -0.381 -1.524, -1.524 1.524 -1.524, -1.524 1.524 1.524">
+</ProjectionViewModifier>
+</Viewarea>
+</LocalWindow>
+</WindowGroup>
+
+        </RenderJob>
+
+
+        <IOSensor DEF='readARTHead' type='readARTHead'>
+            <field accessType='outputOnly' name='head' type='SFMatrix4f'/>
+        </IOSensor>
+
+        <!-- Move the viewpoint based on "head" matrix from the tracker -->
+
+        <ROUTE fromNode='readARTHead' fromField='head'
+            toNode='caveStereoLT_leftEye' toField='set_eyeTransform'/>
+         <ROUTE fromNode='readARTHead' fromField='head'
+            toNode='caveStereoLT_rightEye' toField='set_eyeTransform'/>
+
+    </Engine>
+
+    <scene>
+
+        <IOSensor DEF='readARTWand' type='readARTWand'>
+            <field accessType='outputOnly' name='wandmatrix' type='SFMatrix4f'/>
+        </IOSensor>
+
+
+        <Viewpoint position='4 0 0' description='viewpoint0'/>
+
+        <MatrixTransform DEF="axis">
+            <inline url='axes.x3d' />
+         </MatrixTransform>
+
+
+        <MatrixTransform DEF="teapot">
+          <shape>
+            <appearance>
+              <material diffuseColor='1 0 0'/>
+            </appearance>
+            <teapot/>
+          </shape>
+        </MatrixTransform>
+
+        <transform scale='3.048 3.048 3.048'>
+            <inline url='cubeFrame.x3d' />
+        </transform>
+
+
+        <ROUTE fromNode='readARTWand' fromField='wandmatrix'
+            toNode='axis' toField='matrix'/>
+
+    </scene>
+
+</X3D>

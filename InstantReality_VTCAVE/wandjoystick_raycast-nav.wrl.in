@@ -1,11 +1,7 @@
 #X3D V3.0 utf8
 
 DEF iowand IOSensor {
-	type "dtkInstantIOWand"
-	initializeOnly SFString dtkShmWandName "wand"
-	initializeOnly SFString dtkShmJoystickName "joystick"
-	initializeOnly SFString dtkShmButtonsName "buttons"
-	initializeOnly SFFloat meterRatio 1.524
+	type "readARTWand"
 	eventOut SFMatrix4f wandmatrix
 	eventOut SFRotation wandrotation
 	eventOut SFVec3f wandposition
@@ -15,6 +11,8 @@ DEF iowand IOSensor {
 	eventOut SFBool button_2
 	eventOut SFBool button_3
 	eventOut SFBool button_4
+	eventOut SFBool button_5
+	eventOut SFBool button_6
 }
 
 NavigationInfo {
@@ -35,9 +33,12 @@ DEF navmap Script {
 	eventIn SFBool button_press_2
 	eventIn SFBool button_press_3
 	eventIn SFBool button_press_4
+	eventIn SFBool button_press_5
+	eventIn SFBool button_press_6
 	eventIn SFFloat joystick_move_x
 	eventIn SFFloat joystick_move_y
 	eventIn SFRotation wand_rotation_changed
+	eventIn SFRotation wand_position_changed
 
 	eventOut SFFloat joystick_x_adjusted
 	eventOut SFFloat joystick_y_adjusted
@@ -57,12 +58,12 @@ DEF navmap Script {
 		function button_press_1( value, time )
 		{
 			if( value )
-				nav.message = 'decreaseNavSpeed';
+				nav.message = 'nextView';
 		}
 		function button_press_2( value, time )
 		{
 			if( value )
-				nav.message = 'resetViewPosition';
+				nav.message = 'decreaseNavSpeed';
 		}
 		function button_press_3( value, time )
 		{
@@ -74,12 +75,20 @@ DEF navmap Script {
 			if( value )
 				nav.message = 'nextNavMode';
 		}
+		function button_press_5( value, time )
+		{
+		}
+		function button_press_6( value, time )
+		{
+		}
 		function joystick_move_x( value, time )
 		{
 			joystick_x_adjusted = -value;
+                        //print('joystick_x_adjusted = ' + joystick_x_adjusted);
 		}
 		function joystick_move_y( value, time )
 		{
+                        print('joystick_move_y() value = ' + value);
 			js_y = -value;
 			if( js_y > 0.05 || js_y < -0.05 )
 			{
@@ -89,6 +98,7 @@ DEF navmap Script {
 				translation_x = translation_vector.x;
 				translation_y = translation_vector.y;
 				translation_z = translation_vector.z;
+                                print('x y z =' + translation_x + ' ' + translation_y + ' ' + translation_z);
 			}
 			else
 			{
@@ -116,6 +126,13 @@ DEF navmap Script {
 				translation_z = 0.0;
 			}
 		}
+
+		function wand_position_changed( value, time )
+		{
+			print( 'x: ' + iowand.wandposition.x +
+                            '    y: ' + iowand.wandposition.y +
+                            '    z: ' + iowand.wandposition.z );
+		}
 	"
 	]
 }
@@ -132,4 +149,64 @@ ROUTE navmap.joystick_x_adjusted TO nav.set_yRotation
 ROUTE navmap.translation_x TO nav.set_xTranslation
 ROUTE navmap.translation_y TO nav.set_yTranslation
 ROUTE navmap.translation_z TO nav.set_zTranslation
+
+Viewspace {
+#	applyEyeTransform TRUE
+#	invert TRUE
+	scaleToScene TRUE
+	children [
+		DEF userBodyTrans Transform {
+			children [
+				DEF userBody UserBody {
+					children [
+						Transform {
+							translation 0 0 0
+							rotation 1 0 0 -1.57079632679
+#							scale .05 .05 .05
+							children [
+								Transform {
+									#translation 0 1.1 0
+									translation -0.03 1.1 0.12
+									children DEF CYL Shape {
+										appearance Appearance {
+											material Material {
+												diffuseColor 1 1 1
+												emissiveColor .1 .1 .1
+											}
+										}
+										geometry Cylinder {
+											height 2
+											radius .002
+										}
+									}
+								}
+								Transform {
+									#translation 0 0.1 0
+									translation -0.03 0.1 0.12
+									children Shape {
+										appearance Appearance {
+											material Material {
+												diffuseColor .2 .2 1
+												emissiveColor .1 .1 .1
+												specularColor .3 .3 .3
+											}
+										}
+										geometry Cone {
+											height 0.1
+											bottomRadius 0.01
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
+
+ROUTE iowand.button_6 TO userBody.hot
+ROUTE iowand.wandrotation TO userBodyTrans.set_rotation
+ROUTE iowand.wandposition TO userBodyTrans.set_translation
 

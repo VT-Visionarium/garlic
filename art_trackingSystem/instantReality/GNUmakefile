@@ -8,11 +8,13 @@ built := $(patsubst %.cpp,%.iio,$(wildcard *.cpp))
 
 build: $(built)
 
+readARTHead.lo readARTWand.lo: readARTCommon.h
+
 %.iio: %.lo
-	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $< -o $@ $(LDFLAGS)
 
 %.lo: %.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $^ -o $@
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean cleaner:
 	rm -f *.lo $(built)

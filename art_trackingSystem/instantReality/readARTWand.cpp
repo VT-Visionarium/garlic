@@ -1,6 +1,9 @@
+// NOTE: there is a calibration of the Wand tracker data in
+// readARTHead_plugin.cpp (or readARTHead.cpp).
+
 
 // define DEBUG_SPEW to have this spew every frame to stdout
-#define DEBUG_SPEW
+//#define DEBUG_SPEW
 
 
 //#define NDEBUG
@@ -19,6 +22,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <signal.h>
+#include <pthread.h>
+#include <dlfcn.h>
 
 #include <InstantIO/ThreadedNode.h>
 #include <InstantIO/NodeType.h>
@@ -27,9 +32,51 @@
 #include <InstantIO/Vec3.h>
 #include <InstantIO/Matrix4.h>
 
-#include "readARTCommon.h"
+// instead we use getenv() below:
+//#include "readARTCommon.h"
 
-#ifdef DEBUG_SPEW
+// We get addresses from the readARTHead.cpp module which runs in another
+// thread in this process.  It must have been started before this thread.
+//
+// Actually this will be called in dlsym() call in the main process of
+// InstantReality (IR), when IR loads this module just before running the
+// thread for the C++ object methods below.  so long as the other module
+// in readARTHead.cpp is loaded and started we'll be able to get these
+// addresses.
+template <class T>
+static T *getAddr(const char *sym)
+{
+    T *p;
+    char name[128];
+    snprintf(name, 128, "IR_SUCKS_%s", sym);
+    //printf("getting address of \"%s\"\n", sym);
+    const char *env = getenv(name);
+    printf("%s=%s\n", name, env);
+    assert(env);
+    p = (T*) (uintptr_t) strtoul(env, 0, 16);
+    assert(p);
+    return p;
+}
+
+
+// work around sucky InstantReality interface:
+// We need to access this data without InstantReality interfering.  The
+// interfaces that InstantReality provides slows thing down.  We want to
+// read this data and we will use our own faster synchronization
+// primitives thank you.
+pthread_mutex_t&     art_mutex        = *getAddr< pthread_mutex_t     >("art_mutex");
+pthread_cond_t&      art_cond         = *getAddr< pthread_cond_t      >("art_cond");
+bool&                art_havePosRot   = *getAddr< bool                >("art_havePosRot");
+InstantIO::Matrix4f& art_wandMatrix   = *getAddr< InstantIO::Matrix4f >("art_wandMatrix");
+InstantIO::Vec3f&    art_wandPosition = *getAddr< InstantIO::Vec3f    >("art_wandPosition");
+InstantIO::Rotation& art_wandRotation = *getAddr< InstantIO::Rotation >("art_wandRotation");
+float&               art_wandXAxis    = *getAddr< float               >("art_wandXAxis");
+float&               art_wandYAxis    = *getAddr< float               >("art_wandYAxis");
+uint32_t&            art_buttons      = *getAddr< uint32_t            >("art_buttons");
+
+
+
+#if 1
 #  define SPEW()   std::cerr << __BASE_FILE__ << ":" << __LINE__\
   << " " <<  __func__ << "()" << std::endl
 #else
@@ -43,6 +90,11 @@ namespace InstantIO
 template <class T> class OutSlot;
 class Wand : public ThreadedNode
 {
+
+public:
+    // Factory method to create an instance of Wand.
+    static Node *create();
+
 protected:
     // Gets called when the Wand is enabled.
     virtual void initialize();
@@ -54,9 +106,6 @@ protected:
     virtual int processData ();
   
 private:
-    // Factory method to create an instance of Wand.
-    static Node *create();
-
     Wand(void);
     virtual ~Wand();
 
@@ -68,7 +117,7 @@ private:
 
     float oldJoyX;
     float oldJoyY;
-    
+
     OutSlot<Matrix4f> *wand_matrix;
     OutSlot<Rotation> *wand_rotation;
     OutSlot<Vec3f> *wand_position;
@@ -87,12 +136,12 @@ private:
 
 // Somehow InstantReality reads this data structure
 // no matter what it's called.
-static NodeType _type_InstantReality_stupid_data(
+static NodeType InstantReality_stupid_data(
     "readARTWand" /*typeName must be the same as plugin filename */,
     &Wand::create,
-    "head and wand Tracker to InstantIO" /*shortDescription*/,
+    "wand Tracker to InstantIO" /*shortDescription*/,
     /*longDescription*/
-    "head and wand Tracker to InstantIO",
+    "wand Tracker to InstantIO",
     "lance"/*author*/,
     0/*fields*/,
     0/sizeof(Field));
@@ -217,8 +266,16 @@ int Wand::processData()
         // We wait for data from readHeadARTHead.cpp to
         // write to the art_* data.  They will signal us
         // via pthread_cond_signal().
+        //
+        // We will loose the mutex lock while we wait.
         ret = pthread_cond_wait(&art_cond, &art_mutex);
+        
+        // Now we have the mutex lock again.
         assert(ret == 0);
+
+        // We wake up and just push the data that the
+        // readARTHead.cpp module got for us and then
+        // loop, and do it again.
 
         if(oldButtons != art_buttons)
         {
@@ -237,20 +294,29 @@ int Wand::processData()
         {    
             oldWandXAxis = art_wandXAxis;
             joystick_x_axis->push(art_wandXAxis);
+            //std::cout << "xaxis=" << art_wandXAxis << std::endl;
         }
+
 
         if(oldWandYAxis != art_wandYAxis)
         {    
             oldWandYAxis = art_wandYAxis;
             joystick_y_axis->push(art_wandYAxis);
+            //std::cout << "       yaxis=" << art_wandYAxis << std::endl;
         }
 
         if(art_havePosRot)
         {
-            wand_matrix->push(art_wandMat);
+            wand_matrix->push(art_wandMatrix);
             wand_position->push(art_wandPosition);
             wand_rotation->push(art_wandRotation);
+#ifdef DEBUG_SPEW
+            std::cout << "----- art_wandMatrix -----" << std::endl;
+            std::cout << art_wandMatrix << std::endl;
+#endif
         }
+
+        // loop
     }
 
     ret = pthread_mutex_unlock(&art_mutex);

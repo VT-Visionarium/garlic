@@ -48,7 +48,7 @@ scripts = $(sort $(patsubst %.in, %, $(shell\
  grep -Ev '(_test|\.bash$$)')))
 
 # installed models, may not be for just InstantReality
-models = $(sort $(filter-out %_test.%, $(wildcard *.wrl *.x3d)))
+models = $(sort $(filter-out %_test.%, $(wildcard *.x3d)))
 
 # shared library InstantIO plug-ins
 plugins = $(sort $(patsubst %_plugin.cpp, %.iio, $(wildcard *_plugin.cpp)))
@@ -114,6 +114,7 @@ build: $(built)
 debug:
 	@echo " plugins=$(plugins) inst_plugins=$(inst_plugins)"
 	@echo " navwalk_from_in_files=$(navwalk_from_in_files)"
+	@echo "navs=$(navs)"
 
 
 $(bash_from_in_files): %: %.in

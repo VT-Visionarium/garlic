@@ -87,12 +87,14 @@ fr 24981717
 #include "readARTCommon.h"
 
 
-#ifdef DEBUG_SPEW
+#if 1
 #  define SPEW()   std::cerr << __BASE_FILE__ << ":" << __LINE__\
   << " " <<  __func__ << "()" << std::endl
 #else
 #  define SPEW()  /*empty macro*/
 #endif
+
+
 
 //////////////////////////////////////////////////////////////////////////
 // We have two IOSensors which we connect with pthread condition signals:
@@ -102,17 +104,21 @@ fr 24981717
 //
 //
 pthread_mutex_t art_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t art_cond = PTHREAD_COND_INITIALIZER;
+pthread_cond_t  art_cond  = PTHREAD_COND_INITIALIZER;
 
 //////////////////////////////////////////////////////////////////////////
 //        SHARED DATA
 //////////////////////////////////////////////////////////////////////////
-Matrix4f art_wandMat;
-Vec3f    art_wandPosition
-Rotation art_wandRotation;
-float    art_wandXAxis,
-         art_wandYAxis;
-uint32_t art_buttons;
+
+// art_havePosRot is do we have matrix/position/rotation data set
+bool                art_havePosRot;
+InstantIO::Matrix4f art_wandMatrix;
+InstantIO::Vec3f    art_wandPosition;
+InstantIO::Rotation art_wandRotation;
+float               art_wandXAxis;
+float               art_wandYAxis;
+uint32_t            art_buttons;
+
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
@@ -120,26 +126,30 @@ uint32_t art_buttons;
 namespace InstantIO
 {
 
+
+
 template <class T> class OutSlot;
 class ReadArtTracker : public ThreadedNode
 {
+public:
+    // Factory method to create an instance of ReadArtTracker.
+    static Node *create(void);
 
 protected:
     // Gets called when the ReadArtTracker is enabled.
-    virtual void initialize();
+    virtual void initialize(void);
   
     // Gets called when the ReadArtTracker is disabled.
-    virtual void shutdown();
+    virtual void shutdown(void);
   
     // thread method to send/receive data.
-    virtual int processData ();
+    virtual int processData(void);
   
 private:
-    // Factory method to create an instance of ReadArtTracker.
-    static Node *create();
+    ReadArtTracker(void);
+    virtual ~ReadArtTracker(void);
 
-    ReadArtTracker();
-    virtual ~ReadArtTracker();
+    void signalWandIOSensor(void);
 
     template <class T>
     OutSlot<T> *getSlot(const char *desc, const char *name);
@@ -154,9 +164,13 @@ private:
     const size_t wand_start_any_LEN;
     const size_t wand_checkstr_LEN;
 
+
+    Matrix4f &wm; //art_wandMatrix by a shorter name
+    
     // A constant calibration which we multiple by the
     // tracker head viewpoint matrix.
     Matrix4f headCal; // Calibration matrix
+    Matrix4f wandCal; // Calibration matrix
 
     int fd; // UDP/IP socket file descriptor
 
@@ -164,26 +178,55 @@ private:
 };
 
 
-
 // Somehow InstantReality reads this data structure
 // no matter what it's called.
-static NodeType _type_InstantReality_stupid_data(
+static NodeType InstantReality_stupid_data(
     "readARTHead" /*typeName must be the same as plugin filename */,
     &ReadArtTracker::create,
-    "head and wand Tracker to InstantIO" /*shortDescription*/,
+    // Note, stupid InstantReality does not let you provide a
+    // factory destroyer which is clearly a novice error. 
+    "head Tracker to InstantIO" /*shortDescription*/,
     /*longDescription*/
-    "head and wand Tracker to InstantIO",
+    "head Tracker to InstantIO",
     "lance"/*author*/,
     0/*fields*/,
     0/sizeof(Field));
 
 
+// Our kludge to get the address of variable in this code to the code in
+// readARTWand.cpp.  We tried methods like
+// 
+//   1. just reading it as an extern global.  That fails because
+//      InstantantReality loads the modules with dlopen()
+//      with RTLD_LOCAL, and so in a sense variable are kept hidden
+//      between modules.
+//   2. loading it with dlsym(RTLD_NEXT, "sym") will not work for
+//      the same reason as 1.
+//   3. then this ...
+//
+// We are just letting the other thread know the value of these pointers
+// by putting them in environment variables.
+//
+static inline void shareAddress(const char *sym, void *ptr)
+{
+    char name[128], addr[64];
+    snprintf(name, 128, "IR_SUCKS_%s", sym);
+    // example:  IR_SUCKS_art_mutex=0x7fef503cd890
+    snprintf(addr, 64, "%p", ptr);
+    printf("%s=%s\n", name, addr);
+    int ret = setenv(name, addr, 1);
+    assert(ret == 0);
+}
+
+
 ReadArtTracker::ReadArtTracker(): head_start_LEN(strlen(HEAD_START)),
     wand_start_any_LEN(strlen(WAND_START_ANY)),
     wand_checkstr_LEN(strlen(WAND_CHECKSTR)),
-    fd(-1), oldButtons(0)
+    wm(art_wandMatrix),
+    fd(-1)
 {
     SPEW();
+
     // Add external route
     addExternalRoute("*", "{NamespaceLabel}/{SlotLabel}");
 
@@ -218,29 +261,42 @@ ReadArtTracker::ReadArtTracker(): head_start_LEN(strlen(HEAD_START)),
             //
             // This will get seen if they ran something like 'ssh cube -X'
             // to start the program.
-            system("xmessage \"There may be another HyperCube InstantReality program already running\n"
+            system("xmessage \"There may be another HyperCube Instant"
+                    "Reality program already running\n"
                     "\nYou need to try to find and kill that program.\n"
                     "\nMaybe try running:   ssh cube killall -9 sax\n\" &");
-            // This is more likely to be seen:
-            printf("\n\nThere may be another HyperCube InstantReality program already running\n"
+            // Maybe this seen:
+            printf("\n\nThere may be another HyperCube InstantReality"
+                    " program already running\n"
                     "\nYou need to try to find and kill that program.\n"
                     "\nMaybe try running:   ssh cube killall -9 sax\n\n\n");
+            return;
         }
-        return;
     }
 
     SPEW();
 }
 
-ReadArtTracker::~ReadArtTracker()
+ReadArtTracker::~ReadArtTracker(void)
 {
     if(fd >= 0) close(fd);
     SPEW();
 }
 
-Node *ReadArtTracker::create()
+Node *ReadArtTracker::create(void)
 {
     SPEW();
+
+    // Make these variable accessible to readARTWand.cpp:
+    shareAddress("art_mutex", &art_mutex);
+    shareAddress("art_cond", &art_cond);
+    shareAddress("art_havePosRot", &art_havePosRot);
+    shareAddress("art_wandMatrix", &art_wandMatrix);
+    shareAddress("art_wandPosition", &art_wandPosition);
+    shareAddress("art_wandRotation", &art_wandRotation);
+    shareAddress("art_wandXAxis", &art_wandXAxis);
+    shareAddress("art_wandYAxis", &art_wandYAxis);
+    shareAddress("art_buttons", &art_buttons);
 
     ReadArtTracker *ht;
 
@@ -251,7 +307,7 @@ Node *ReadArtTracker::create()
         delete ht;
         // TODO: this will make stupid sax segfault.
         // You'd think that they at least check the return value
-        // from a factory function.
+        // from a factory function.  Hence sax is stupid.
         //
         // We do not know how else to make sax fail and exit.
         // Calling exit() does not work.
@@ -261,8 +317,12 @@ Node *ReadArtTracker::create()
     return ht;
 }
 
-#if 0
-NodeType *ReadArtTracker::type() const
+#if 0 // This never got called so we removed it.
+// Somehow sax (InstantReality) get the type from file static data.  I'd
+// argue that is a way to add more ways to make the code fail by working
+// around the linker/loader.  InstantReality uses a much too convoluted
+// approach to C++ module loading.
+NodeType *ReadArtTracker::type(void) const
 {
     SPEW(); 
     return &_type;
@@ -288,7 +348,7 @@ void ReadArtTracker::removeSlot(T *slot, const char *name)
     delete slot;
 }
 
-void ReadArtTracker::initialize()
+void ReadArtTracker::initialize(void)
 {
     SPEW();
 
@@ -300,7 +360,7 @@ void ReadArtTracker::initialize()
     head_matrix = getSlot<Matrix4f>("matrix of head", "head");
 }
 
-void ReadArtTracker::shutdown()
+void ReadArtTracker::shutdown(void)
 {
      // handle state and namespace updates
     Node::shutdown();
@@ -312,6 +372,18 @@ void ReadArtTracker::shutdown()
     removeSlot(head_matrix, "head");
 }
 
+
+void ReadArtTracker::signalWandIOSensor(void)
+{
+    // Signal the Wand IOSensor module which is calling
+    // pthread_cond_wait().  If it is not, it does not matter,
+    // we just signal for nothing.
+    int ret;
+    ret = pthread_cond_signal(&art_cond);
+    assert(ret == 0);
+    ret = pthread_mutex_unlock(&art_mutex);
+    assert(ret == 0);
+}
 
 
 // These variable name are as the ART tracker defines them.  We must
@@ -434,57 +506,62 @@ void  ReadArtTracker::getWand(const char *buf, size_t len)
 
     int ret;
     ret = pthread_mutex_lock(&art_mutex);
+    // We will unlock after we signal the Wand IOSensor
     assert(ret == 0);
 
+    // copy to thread module shared data.
     art_wandXAxis = xjoy;
-    art_wandXAxis = xjoy;
+    art_wandYAxis = yjoy;
     art_buttons = buttons;
     art_havePosRot = havePos;
 
     if(!havePos)
-        goto signal;
+    {
+        signalWandIOSensor();
+        return;
+    }
 
+    // A little pre-calibration in ART coorinates
+    x -= 0.0F;/*ART x millimeters*/
+    y += 0.0F;/*ART z millimeters*/
+    z -= 0.0F;/*ART y millimeters*/
+
+
+
+    // In this case, we have Wand matrix, position and rotation data too.
+    //
     // This completes that rotation "T" as defined above.
     r20 *= -1.0F;
     r21 *= -1.0F;
     r22 *= -1.0F;
     z *= -1.0F;
+
  
     // scale millimeters in and meters out:
     const float scale = 0.001F;
     // We can add the following calibration offset to x, y, z Instant
     // Reality positions in meters
     const float
-        x_offset = 0.0F/*meters*/,
-        y_offset = 0.0F/*meters*/,
-        z_offset = 0.0F/*meters*/;
+        x_offset =  0.0F/*meters*/,
+        y_offset =  0.0F/*meters*/,
+        z_offset =  0.0F/*meters*/;
 
-    art_wandMat[0] = r00; art_wandMat[1] = r01; art_wandMat[2]  = r02; art_wandMat[3]  = x * scale + x_offset;
-    art_wandMat[4] = r10; art_wandMat[5] = r11; art_wandMat[6]  = r12; art_wandMat[7]  = y * scale + y_offset;
-    art_wandMat[8] = r20; art_wandMat[9] = r21; art_wandMat[10] = r22; art_wandMat[11] = z * scale + z_offset;
-    art_wandMat[12] = art_wandMat[13] = art_wandMat[14] = 0.0F; art_wandMat[15] = 1.0F;
+    // Set the Wand Matrix wm is a reference to art_wandMatrix
+    // We just did that to make the next few line more readable.
+    wm[0] = r00; wm[1] = r01; wm[2]  = r02;  wm[3]  = x * scale + x_offset;
+    wm[4] = r10; wm[5] = r11; wm[6]  = r12;  wm[7]  = y * scale + y_offset;
+    wm[8] = r20; wm[9] = r21; wm[10] = r22;  wm[11] = z * scale + z_offset;
+    wm[12] =    wm[13] =      wm[14] = 0.0F; wm[15] = 1.0F;
 
     // multiple  mult() or multLeft() which is it.  There documentation
     // does not explain it.  We want  mat = wandCal * mat.
-    art_wandMat.mult(wandCal);
+    wm.mult(wandCal);
 
-    Vec3f s;
-    art_wandMat.getTransform(art_wandPosition, art_wandRotation, s);
+    Vec3f s; // s (scale) is used but required as an argument to
+    // getTransform().
+    wm.getTransform(art_wandPosition, art_wandRotation, s);
 
-    ret = pthread_mutex_lock(&art_mutex);
-    assert(ret == 0);
-    ret = pthread_cond_signal(&art_cond, &art_mutex);
-    assert(ret == 0);
-
-#ifdef DEBUG_SPEW
-    std::cout << mat << std::endl;
-#endif
-    
-signal:
-    ret = pthread_cond_signal(&art_cond, &art_mutex);
-    assert(ret == 0);
-    ret = pthread_mutex_unlock(&art_mutex);
-    assert(ret == 0);
+    signalWandIOSensor();
 }
 
 
@@ -661,10 +738,12 @@ int ReadArtTracker::processData()
     // waitThread() seems to be the hook that lets instant reality know
     // when we are starting/ending a cycle and we can continue running
     // if it returns true.
-    // By it's name it's clear that they are catering to stupid
+    //
+    // By how it sleeps it's clear that they are catering to stupid
     // programmers that put sleeps in their code, and don't know that the
     // OS has other blocking calls, besides sleep, that handle system
-    // resources very efficiently. 
+    // resources much more efficiently than sleep. We're hoping it does
+    // not sleep if the time is zero.
     //
     while(waitThread(0))
     {

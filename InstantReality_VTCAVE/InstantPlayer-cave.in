@@ -390,9 +390,11 @@ EOF
 
 function catcher()
 {
+    set -x
     # InstantReality does not seem to exit after getting a
     # SIGINT so we give it a SIGTERM here
-    kill -TERM $pid
+    # Looks like SIGTERM fails to stop it too.  So KILL!!!
+    kill -KILL $pid
     # This would be if InstantReality did a poor job cleaning
     # itself up:
     #killall $player 2> /dev/null
