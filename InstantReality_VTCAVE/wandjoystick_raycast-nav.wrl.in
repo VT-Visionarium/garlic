@@ -88,7 +88,7 @@ DEF navmap Script {
 		}
 		function joystick_move_y( value, time )
 		{
-                        print('joystick_move_y() value = ' + value);
+                        //print('joystick_move_y() value = ' + value);
 			js_y = -value;
 			if( js_y > 0.05 || js_y < -0.05 )
 			{
@@ -98,7 +98,7 @@ DEF navmap Script {
 				translation_x = translation_vector.x;
 				translation_y = translation_vector.y;
 				translation_z = translation_vector.z;
-                                print('x y z =' + translation_x + ' ' + translation_y + ' ' + translation_z);
+                                //print('x y z =' + translation_x + ' ' + translation_y + ' ' + translation_z);
 			}
 			else
 			{
@@ -129,9 +129,9 @@ DEF navmap Script {
 
 		function wand_position_changed( value, time )
 		{
-			print( 'x: ' + iowand.wandposition.x +
-                            '    y: ' + iowand.wandposition.y +
-                            '    z: ' + iowand.wandposition.z );
+			//print( 'x: ' + iowand.wandposition.x +
+                        //    '    y: ' + iowand.wandposition.y +
+                        //    '    z: ' + iowand.wandposition.z );
 		}
 	"
 	]
