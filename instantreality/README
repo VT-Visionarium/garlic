@@ -49,3 +49,19 @@ than:
         cp 2016_IR-license.xml /opt/instantReality/bin/license.xml
 
 
+
+
+
+LAST CUBE INSTALL 
+
+wget \
+ftp://ftp.igd.fraunhofer.de/irbuild/RedHat-7-x86_64/InstantReality-RedHat-7-x64-2.10.2.46077.rpm
+
+
+        yum list | grep InstantReality
+
+        yum remove InstantReality-bla-bla
+
+        yum install InstantReality-*.rpm
+
+
