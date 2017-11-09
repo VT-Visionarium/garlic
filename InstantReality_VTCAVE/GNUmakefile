@@ -12,7 +12,7 @@
 # number is only defined here.
 # Try running: 'make PREFIX=/my/prefix' to override this
 # default PREFIX value.
-PREFIX := /usr/local/encap/instantReality_VTCAVE-0.2
+PREFIX := /usr/local/encap/instantReality_VTCAVE-0.3
 
 # common compiler options used by all compiler commands
 #CXXFLAGS = -Wall -Werror

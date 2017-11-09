@@ -17,9 +17,12 @@ extern pthread_cond_t  art_cond;
 //        SHARED DATA
 //////////////////////////////////////////////////////////////////////////
 
-// art_havePosRot is do we have matrix/position/rotation data set
-extern bool                art_havePosRot;
+// art_haveWandPosRot: Do we have new wand matrix/position/rotation data set?
+extern bool                art_haveWandPosRot;
+// art_haveHead: Do we have new head matrix data?
+extern bool                art_haveHead;
 
+extern InstantIO::Matrix4f art_headMatrix;
 extern InstantIO::Matrix4f art_wandMatrix;
 extern InstantIO::Vec3f    art_wandPosition;
 extern InstantIO::Rotation art_wandRotation;

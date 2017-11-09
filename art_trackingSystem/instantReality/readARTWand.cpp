@@ -61,18 +61,20 @@ static T *getAddr(const char *sym)
 
 // work around sucky InstantReality interface:
 // We need to access this data without InstantReality interfering.  The
-// interfaces that InstantReality provides slows thing down.  We want to
-// read this data and we will use our own faster synchronization
-// primitives thank you.
-pthread_mutex_t&     art_mutex        = *getAddr< pthread_mutex_t     >("art_mutex");
-pthread_cond_t&      art_cond         = *getAddr< pthread_cond_t      >("art_cond");
-bool&                art_havePosRot   = *getAddr< bool                >("art_havePosRot");
-InstantIO::Matrix4f& art_wandMatrix   = *getAddr< InstantIO::Matrix4f >("art_wandMatrix");
-InstantIO::Vec3f&    art_wandPosition = *getAddr< InstantIO::Vec3f    >("art_wandPosition");
-InstantIO::Rotation& art_wandRotation = *getAddr< InstantIO::Rotation >("art_wandRotation");
-float&               art_wandXAxis    = *getAddr< float               >("art_wandXAxis");
-float&               art_wandYAxis    = *getAddr< float               >("art_wandYAxis");
-uint32_t&            art_buttons      = *getAddr< uint32_t            >("art_buttons");
+// interfaces that InstantReality provides slows things down.  We want to
+// read this data and we will use our own synchronization primitives,
+// thank you.
+pthread_mutex_t&     art_mutex          = *getAddr< pthread_mutex_t     >("art_mutex");
+pthread_cond_t&      art_cond           = *getAddr< pthread_cond_t      >("art_cond");
+bool&                art_haveWandPosRot = *getAddr< bool                >("art_haveWandPosRot");
+bool&                art_haveHead       = *getAddr< bool                >("art_haveHead");
+InstantIO::Matrix4f& art_headMatrix     = *getAddr< InstantIO::Matrix4f >("art_headMatrix");
+InstantIO::Matrix4f& art_wandMatrix     = *getAddr< InstantIO::Matrix4f >("art_wandMatrix");
+InstantIO::Vec3f&    art_wandPosition   = *getAddr< InstantIO::Vec3f    >("art_wandPosition");
+InstantIO::Rotation& art_wandRotation   = *getAddr< InstantIO::Rotation >("art_wandRotation");
+float&               art_wandXAxis      = *getAddr< float               >("art_wandXAxis");
+float&               art_wandYAxis      = *getAddr< float               >("art_wandYAxis");
+uint32_t&            art_buttons        = *getAddr< uint32_t            >("art_buttons");
 
 
 
@@ -114,23 +116,19 @@ private:
 
     template <class T>
     void removeSlot(T *slot, const char *name);
+    void updateButtons(void);
 
+    uint32_t oldButtons;
     float oldJoyX;
     float oldJoyY;
 
+    OutSlot<Matrix4f> *head_matrix;
     OutSlot<Matrix4f> *wand_matrix;
     OutSlot<Rotation> *wand_rotation;
     OutSlot<Vec3f> *wand_position;
     OutSlot<float> *joystick_x_axis;
     OutSlot<float> *joystick_y_axis;
-    OutSlot<bool> *button_1;
-    OutSlot<bool> *button_2;
-    OutSlot<bool> *button_3;
-    OutSlot<bool> *button_4;
-    OutSlot<bool> *button_5;
-    OutSlot<bool> *button_6;
-    OutSlot<bool> *button_7;
-    OutSlot<bool> *button_8;
+    OutSlot<bool> *button[8];
 };
 
 
@@ -192,22 +190,23 @@ void Wand::initialize()
     // handle state and namespace updates
     Node::initialize();
 
+    head_matrix = getSlot<Matrix4f>("matrix of head", "headmatrix");
     wand_matrix = getSlot<Matrix4f>("matrix of wand", "wandmatrix");
-    
+
     wand_rotation = getSlot<Rotation>("Rotation of wand", "wandrotation");
     wand_position = getSlot<Vec3f>( "Position of wand", "wandposition");
-    
+ 
     joystick_x_axis = getSlot<float>("Joystick x axis", "joystick_x_axis");
     joystick_y_axis = getSlot<float>("Joystick y axis", "joystick_y_axis");
 
-    button_1 = getSlot<bool>("Button 1", "button_1");
-    button_2 = getSlot<bool>("Button 2", "button_2");
-    button_3 = getSlot<bool>("Button 3", "button_3");
-    button_4 = getSlot<bool>("Button 4", "button_4");
-    button_5 = getSlot<bool>("Button 5", "button_5");
-    button_6 = getSlot<bool>("Button 6", "button_6");
-    button_7 = getSlot<bool>("Button 7", "button_7");
-    button_8 = getSlot<bool>("Button 8", "button_8");
+    button[0] = getSlot<bool>("Button 1", "button_1");
+    button[1] = getSlot<bool>("Button 2", "button_2");
+    button[2] = getSlot<bool>("Button 3", "button_3");
+    button[3] = getSlot<bool>("Button 4", "button_4");
+    button[4] = getSlot<bool>("Button 5", "button_5");
+    button[5] = getSlot<bool>("Button 6", "button_6");
+    button[6] = getSlot<bool>("Button 7", "button_7");
+    button[7] = getSlot<bool>("Button 8", "button_8");
 }
 
 void Wand::shutdown()
@@ -217,6 +216,7 @@ void Wand::shutdown()
 
     SPEW();
 
+    removeSlot(head_matrix, "headmatrix");
     removeSlot(wand_matrix, "wandmatrix");
 
     removeSlot(wand_rotation, "wandrotation");
@@ -225,15 +225,33 @@ void Wand::shutdown()
     removeSlot(joystick_x_axis, "joystick_x_axis");
     removeSlot(joystick_y_axis, "joystick_y_axis");
 
-    removeSlot(button_1, "button_1");
-    removeSlot(button_2, "button_2");
-    removeSlot(button_3, "button_3");
-    removeSlot(button_4, "button_4");
+    removeSlot(button[0], "button_1");
+    removeSlot(button[1], "button_2");
+    removeSlot(button[2], "button_3");
+    removeSlot(button[3], "button_4");
 
-    removeSlot(button_5, "button_5");
-    removeSlot(button_6, "button_6");
-    removeSlot(button_7, "button_7");
-    removeSlot(button_8, "button_8");
+    removeSlot(button[4], "button_5");
+    removeSlot(button[5], "button_6");
+    removeSlot(button[6], "button_7");
+    removeSlot(button[7], "button_8");
+}
+
+
+// We need a art_mutex lock to call this.
+void Wand::updateButtons(void)
+{
+    oldButtons = art_buttons;
+    // This needs to be where we map bit to button.
+    // We should not "push" buttons anywhere else in
+    // this code.
+    button[0]->push((01   ) & art_buttons);
+    button[1]->push((01<<1) & art_buttons);
+    button[2]->push((01<<2) & art_buttons);
+    button[3]->push((01<<3) & art_buttons);
+    button[4]->push((01<<4) & art_buttons);
+    button[5]->push((01<<5) & art_buttons);
+    button[6]->push((01<<6) & art_buttons);
+    button[7]->push((01<<7) & art_buttons);
 }
 
 
@@ -245,12 +263,36 @@ int Wand::processData()
 
     setState(NODE_RUNNING);
 
-    uint32_t oldButtons = 0;
+    oldButtons = 0;
     float oldWandXAxis = 0, oldWandYAxis = 0;
     int ret;
 
     ret = pthread_mutex_lock(&art_mutex);
     assert(ret == 0);
+
+
+    //////////////////////////////////////////////////////////////
+    // Initialize the slots
+    //
+    // We are assuming that this module is loaded after the
+    // readARTHead module.
+    //
+    updateButtons();
+
+    oldWandXAxis = art_wandXAxis;
+    joystick_x_axis->push(art_wandXAxis);
+
+    oldWandYAxis = art_wandYAxis;
+    joystick_y_axis->push(art_wandYAxis);
+            
+    wand_matrix->push(art_wandMatrix);
+    wand_position->push(art_wandPosition);
+    wand_rotation->push(art_wandRotation);
+
+    head_matrix->push(art_headMatrix);
+    //
+    //
+    //////////////////////////////////////////////////////////////
 
     //
     // waitThread() seems to be the hook that lets instant reality know
@@ -269,6 +311,8 @@ int Wand::processData()
         //
         // We will loose the mutex lock while we wait.
         ret = pthread_cond_wait(&art_cond, &art_mutex);
+
+        // We now have the lock.
         
         // Now we have the mutex lock again.
         assert(ret == 0);
@@ -278,17 +322,7 @@ int Wand::processData()
         // loop, and do it again.
 
         if(oldButtons != art_buttons)
-        {
-            oldButtons = art_buttons;
-            button_1->push((01   ) & art_buttons);
-            button_2->push((01<<1) & art_buttons);
-            button_3->push((01<<2) & art_buttons);
-            button_4->push((01<<3) & art_buttons);
-            button_5->push((01<<4) & art_buttons);
-            button_6->push((01<<5) & art_buttons);
-            button_7->push((01<<6) & art_buttons);
-            button_8->push((01<<7) & art_buttons);
-        }
+            updateButtons();
 
         if(oldWandXAxis != art_wandXAxis)
         {    
@@ -305,7 +339,7 @@ int Wand::processData()
             //std::cout << "       yaxis=" << art_wandYAxis << std::endl;
         }
 
-        if(art_havePosRot)
+        if(art_haveWandPosRot)
         {
             wand_matrix->push(art_wandMatrix);
             wand_position->push(art_wandPosition);
@@ -315,6 +349,14 @@ int Wand::processData()
             std::cout << art_wandMatrix << std::endl;
 #endif
         }
+
+        if(art_haveHead)
+            // We already have this head matrix in readARTHead*.cpp but
+            // that module is not visible from the <scene> node so
+            // we copy the same head matrix to this IOSensor too.
+            // Yup, working around Instant Reality's lack of documenting
+            // how to ROUTE data from the Engine node to the scene node.
+            head_matrix->push(art_headMatrix);
 
         // loop
     }

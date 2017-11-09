@@ -110,8 +110,12 @@ pthread_cond_t  art_cond  = PTHREAD_COND_INITIALIZER;
 //        SHARED DATA
 //////////////////////////////////////////////////////////////////////////
 
-// art_havePosRot is do we have matrix/position/rotation data set
-bool                art_havePosRot;
+// art_haveWandPosRot: Do we have new wand matrix/position/rotation data set?
+bool                art_haveWandPosRot;
+// art_haveHead: Do we have new head matrix data?
+bool                art_haveHead;
+
+InstantIO::Matrix4f art_headMatrix;
 InstantIO::Matrix4f art_wandMatrix;
 InstantIO::Vec3f    art_wandPosition;
 InstantIO::Rotation art_wandRotation;
@@ -126,6 +130,14 @@ uint32_t            art_buttons;
 namespace InstantIO
 {
 
+
+enum WandDataType {
+
+    // We have 3 Wand reading event states
+    NO_WAND_DATA = 0,
+    HAVE_JUST_WAND_BUTTONS,
+    HAVE_ALL_WAND_DATA
+};
 
 
 template <class T> class OutSlot;
@@ -149,16 +161,14 @@ private:
     ReadArtTracker(void);
     virtual ~ReadArtTracker(void);
 
-    void signalWandIOSensor(void);
-
     template <class T>
     OutSlot<T> *getSlot(const char *desc, const char *name);
     
     template <class T>
     void removeSlot(T *slot, const char *name);
 
-    void getHead(const char *buf, size_t len);
-    void getWand(const char *buf, size_t len);
+    bool getHead(const char *buf, size_t len);
+    enum WandDataType getWand(const char *buf, size_t len);
 
     const size_t head_start_LEN;
     const size_t wand_start_any_LEN;
@@ -290,7 +300,9 @@ Node *ReadArtTracker::create(void)
     // Make these variable accessible to readARTWand.cpp:
     shareAddress("art_mutex", &art_mutex);
     shareAddress("art_cond", &art_cond);
-    shareAddress("art_havePosRot", &art_havePosRot);
+    shareAddress("art_haveWandPosRot", &art_haveWandPosRot);
+    shareAddress("art_haveHead", &art_haveHead);
+    shareAddress("art_headMatrix", &art_headMatrix);
     shareAddress("art_wandMatrix", &art_wandMatrix);
     shareAddress("art_wandPosition", &art_wandPosition);
     shareAddress("art_wandRotation", &art_wandRotation);
@@ -373,18 +385,6 @@ void ReadArtTracker::shutdown(void)
 }
 
 
-void ReadArtTracker::signalWandIOSensor(void)
-{
-    // Signal the Wand IOSensor module which is calling
-    // pthread_cond_wait().  If it is not, it does not matter,
-    // we just signal for nothing.
-    int ret;
-    ret = pthread_cond_signal(&art_cond);
-    assert(ret == 0);
-    ret = pthread_mutex_unlock(&art_mutex);
-    assert(ret == 0);
-}
-
 
 // These variable name are as the ART tracker defines them.  We must
 // transform them into the Instant Reality defined coordinates.  The
@@ -444,15 +444,16 @@ void ReadArtTracker::signalWandIOSensor(void)
 //  position of the elements as they are read in the sscanf()
 //
 
-void  ReadArtTracker::getWand(const char *buf, size_t len)
+
+enum WandDataType ReadArtTracker::getWand(const char *buf, size_t len)
 {
     // We have 3 cases:
     //
-    //     1 - Both buttons/joystick and position/rotation
+    //     HAVE_ALL_WAND_DATA - Both buttons/joystick and position/rotation
     //
-    //     2 - Just buttons/joystick
+    //     HAVE_JUST_WAND_BUTTONS - Just buttons/joystick
     //
-    //     3 - Neither
+    //     NO_WAND_DATA - Neither
     //
 
     const char *end = buf + len - wand_start_any_LEN;
@@ -464,7 +465,7 @@ void  ReadArtTracker::getWand(const char *buf, size_t len)
     if(end <= buf + MIN_LEN)
         // We did not get flystick tracker frame.  We assume that the
         // tracker is out range.
-        return;
+        return NO_WAND_DATA;
 
     bool havePos = false;
     if(*buf == WAND_CHECKCHR)
@@ -474,7 +475,7 @@ void  ReadArtTracker::getWand(const char *buf, size_t len)
 
     if(strncmp(buf, WAND_CHECKSTR, wand_checkstr_LEN))
             // We got data that we did not expect:
-            return;
+            return NO_WAND_DATA;
     buf += wand_checkstr_LEN;
 
     float x, y, z, r00, r01, r02, r10, r11, r12, r20, r21, r22;
@@ -494,8 +495,8 @@ void  ReadArtTracker::getWand(const char *buf, size_t len)
     if(n != 15)
         // We did not get head tracker frame. This time we got more data,
         // but it was not head tracker data.  We assume that the head
-        // tracker is out range.
-        return;
+        // tracker is out of physical tracking range.
+        return NO_WAND_DATA;
 
     //std::cout << mat << std::endl;
 
@@ -504,22 +505,14 @@ void  ReadArtTracker::getWand(const char *buf, size_t len)
 
     // Joystick and Buttons
 
-    int ret;
-    ret = pthread_mutex_lock(&art_mutex);
-    // We will unlock after we signal the Wand IOSensor
-    assert(ret == 0);
 
-    // copy to thread module shared data.
+    // copy to thread module shared data for buttons and joystick.
     art_wandXAxis = xjoy;
     art_wandYAxis = yjoy;
     art_buttons = buttons;
-    art_havePosRot = havePos;
+    art_haveWandPosRot = havePos;
 
-    if(!havePos)
-    {
-        signalWandIOSensor();
-        return;
-    }
+    if(!havePos) return HAVE_JUST_WAND_BUTTONS;
 
     // A little pre-calibration in ART coorinates
     x -= 0.0F;/*ART x millimeters*/
@@ -561,12 +554,14 @@ void  ReadArtTracker::getWand(const char *buf, size_t len)
     // getTransform().
     wm.getTransform(art_wandPosition, art_wandRotation, s);
 
-    signalWandIOSensor();
+    return HAVE_ALL_WAND_DATA;
 }
 
 
-void  ReadArtTracker::getHead(const char *buf, size_t len)
+bool ReadArtTracker::getHead(const char *buf, size_t len)
 {
+    // return true if we have new head data.
+
     const char *end = buf + len - head_start_LEN;
     // Set s to the start of the rotation part
     for(; buf < end; ++buf)
@@ -576,7 +571,7 @@ void  ReadArtTracker::getHead(const char *buf, size_t len)
     if(end <= buf + MIN_LEN)
         // We did not get head tracker frame.  We assume that the
         // tracker is out range.
-        return;
+        return false;
 
     float x, y, z, rx, ry, rz, r00, r01, r02, r10, r11, r12, r20, r21, r22;
     int n = sscanf(buf, "%f %f %f %f %f %f][%f %f %f %f %f %f %f %f %f",
@@ -591,7 +586,7 @@ void  ReadArtTracker::getHead(const char *buf, size_t len)
         // We did not get head tracker frame. This time we got more data,
         // but it was not head tracker data.  We assume that the head
         // tracker is out range.
-        return;
+        return false;
 
     // This completes that rotation "T" as defined above.
     r20 *= -1.0F;
@@ -625,6 +620,7 @@ void  ReadArtTracker::getHead(const char *buf, size_t len)
 #ifdef DEBUG_SPEW
     std::cout << mat << std::endl;
 #endif
+    return true; // Yes we have new head tracker data.
 }
 
 static inline void setHeadCalibration(Matrix4f &m)
@@ -734,6 +730,7 @@ int ReadArtTracker::processData()
 
     setState(NODE_RUNNING);
 
+
     //
     // waitThread() seems to be the hook that lets instant reality know
     // when we are starting/ending a cycle and we can continue running
@@ -772,8 +769,24 @@ int ReadArtTracker::processData()
 
         if(ret > MIN_LEN)
         {
-            getHead(buf, ret);
-            getWand(buf, ret);
+            int ret;
+            ret = pthread_mutex_lock(&art_mutex);
+            assert(ret == 0);
+
+            art_haveHead = getHead(buf, ret);
+            enum WandDataType wandType = getWand(buf, ret);
+            art_haveWandPosRot = (wandType == HAVE_ALL_WAND_DATA);
+
+            // Signal if we have any new data.
+            if(art_haveHead || wandType)
+            {
+                // We have at least some new data for the other
+                // IOSenser thread.
+                ret = pthread_cond_signal(&art_cond);
+                assert(ret == 0);
+            }
+            ret = pthread_mutex_unlock(&art_mutex);
+            assert(ret == 0);
         }
     }
     
