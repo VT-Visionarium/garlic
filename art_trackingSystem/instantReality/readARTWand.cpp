@@ -244,14 +244,15 @@ void Wand::updateButtons(void)
     // This needs to be where we map bit to button.
     // We should not "push" buttons anywhere else in
     // this code.
-    button[0]->push((01   ) & art_buttons);
-    button[1]->push((01<<1) & art_buttons);
-    button[2]->push((01<<2) & art_buttons);
-    button[3]->push((01<<3) & art_buttons);
-    button[4]->push((01<<4) & art_buttons);
-    button[5]->push((01<<5) & art_buttons);
-    button[6]->push((01<<6) & art_buttons);
-    button[7]->push((01<<7) & art_buttons);
+    button[0]->push((01<<4) & art_buttons);// IIO button 1
+    button[1]->push((01<<3) & art_buttons);// IIO button 2
+    button[2]->push((01<<2) & art_buttons);// IIO button 3
+    button[3]->push((01<<1) & art_buttons);// IIO button 4
+
+    button[4]->push((01<<5) & art_buttons);// IIO button 5
+    button[5]->push((01) & art_buttons);// IIO button 6
+    button[6]->push((01<<6) & art_buttons);// IIO button 7
+    button[7]->push((01<<7) & art_buttons);// IIO button 8
 }
 
 

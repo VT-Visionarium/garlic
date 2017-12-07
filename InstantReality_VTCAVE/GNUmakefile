@@ -12,7 +12,7 @@
 # number is only defined here.
 # Try running: 'make PREFIX=/my/prefix' to override this
 # default PREFIX value.
-PREFIX := /usr/local/encap/instantReality_VTCAVE-0.3
+PREFIX := /usr/local/encap/instantReality_VTCAVE-0.4
 
 # common compiler options used by all compiler commands
 #CXXFLAGS = -Wall -Werror
@@ -25,7 +25,7 @@ ENGINES_DIR = $(PREFIX)/share/instantReality_engines
 PLUGINS_DIR = $(PREFIX)/lib/instantReality_plugins
 BIN_DIR = $(PREFIX)/bin
 
-
+# TODO: remove the dtk stuff.
 DTK_ROOT = /usr/local
 IR_ROOT = /opt/instantReality
 
@@ -36,8 +36,7 @@ CPPFLAGS = -fpic -I$(DTK_ROOT)/include -I$(IR_ROOT)/include
 
 # All the linking stuff in making the shared object libraries.
 # No need to separate linker arguments into parts like LIBADD and shit.
-LDFLAGS = -shared -L$(DTK_ROOT)/lib -ldtk -L$(IR_ROOT)/lib -lInstantIO\
- -Wl,-rpath=/usr/local/lib
+LDFLAGS = -shared -L$(IR_ROOT)/lib -lInstantIO -Wl,-rpath=/usr/local/lib
 
 # butt ugly UNIX shell hack to find bash shell scripts to install
 scripts = $(sort $(patsubst %.in, %, $(shell\

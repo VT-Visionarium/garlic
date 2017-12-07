@@ -567,7 +567,9 @@ bool ReadArtTracker::getHead(const char *buf, size_t len)
     for(; buf < end; ++buf)
         if(!strncmp(buf, HEAD_START, head_start_LEN))
             break;
+
     buf += head_start_LEN;
+
     if(end <= buf + MIN_LEN)
         // We did not get head tracker frame.  We assume that the
         // tracker is out range.
@@ -582,6 +584,7 @@ bool ReadArtTracker::getHead(const char *buf, size_t len)
             // and here they are with the transformation applied
             // but without some minus signs:
             &r00, &r20, &r10, &r01, &r21, &r11, &r02, &r22, &r12);
+
     if(n != 15)
         // We did not get head tracker frame. This time we got more data,
         // but it was not head tracker data.  We assume that the head
@@ -617,7 +620,7 @@ bool ReadArtTracker::getHead(const char *buf, size_t len)
 
     head_matrix->push(mat);
 
-#ifdef DEBUG_SPEW
+#if 0
     std::cout << mat << std::endl;
 #endif
     return true; // Yes we have new head tracker data.
@@ -750,8 +753,8 @@ int ReadArtTracker::processData()
 
         // This should block until there is data to read.  Which is a very
         // efficient to get the data as soon as possible.
-        ssize_t ret = recv(fd, buf, BUFLEN, 0);
-        if(ret <= 0)
+        ssize_t rret = recv(fd, buf, BUFLEN, 0);
+        if(rret <= 0)
         {
             char errStr[256];
             printf("recv() failed: errno=%d: %s\n",
@@ -761,20 +764,20 @@ int ReadArtTracker::processData()
         }
 
         // terminate the string.
-        buf[ret] = '\0';
+        buf[rret] = '\0';
 
-#ifdef DEBUG_SPEW
-        printf("read(%zd bytes) = %s\n", ret, buf);
+#if 0
+        printf("read(%zd bytes) = %s\n", rret, buf);
 #endif
 
-        if(ret > MIN_LEN)
+        if(rret > MIN_LEN)
         {
             int ret;
             ret = pthread_mutex_lock(&art_mutex);
             assert(ret == 0);
 
-            art_haveHead = getHead(buf, ret);
-            enum WandDataType wandType = getWand(buf, ret);
+            art_haveHead = getHead(buf, rret);
+            enum WandDataType wandType = getWand(buf, rret);
             art_haveWandPosRot = (wandType == HAVE_ALL_WAND_DATA);
 
             // Signal if we have any new data.
