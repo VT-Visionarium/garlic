@@ -47,12 +47,19 @@ surface="-1.524 -0.381 1.524, -1.524 -0.381 -1.524, -1.524 1.524 -1.524, -1.524 
 
         <IOSensor DEF='readARTWand' type='readARTWand'>
             <field accessType='outputOnly' name='wandmatrix' type='SFMatrix4f'/>
+            <field accessType='outputOnly' name='handmatrix' type='SFMatrix4f'/>
         </IOSensor>
+
 
 
         <Viewpoint position='4 0 0' description='viewpoint0'/>
 
-        <MatrixTransform DEF="axis">
+        <MatrixTransform DEF="wandaxis">
+            <inline url='axes.x3d' />
+         </MatrixTransform>
+
+
+        <MatrixTransform DEF="handaxis">
             <inline url='axes.x3d' />
          </MatrixTransform>
 
@@ -72,7 +79,11 @@ surface="-1.524 -0.381 1.524, -1.524 -0.381 -1.524, -1.524 1.524 -1.524, -1.524 
 
 
         <ROUTE fromNode='readARTWand' fromField='wandmatrix'
-            toNode='axis' toField='matrix'/>
+            toNode='wandaxis' toField='matrix'/>
+
+        <ROUTE fromNode='readARTWand' fromField='handmatrix'
+            toNode='handaxis' toField='matrix'/>
+
 
     </scene>
 

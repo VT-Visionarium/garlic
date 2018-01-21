@@ -16,6 +16,7 @@ sax --num-aspects 4 testWand.x3d
 
 sax --num-aspects 4 testHead.x3d
 
+# Tests head (teapot) wand (axis thingy) hand (another axis thingy)
 sax --num-aspects 4 testHeadWand.x3d
 
 
@@ -44,7 +45,7 @@ generic ART tracking IOSensor code built into instant reality, but we
 could not get it to work in two days of trying.  We know that we can read
 UDP sockets with C++ code and it beats working with a fucking black box
 with no reasonable documentation.  We have to write custom code for our
-CAVE anyway, so what just a little more code to get is started.
+CAVE anyway, so what's just a little more code to get it started.
 
 
 Ports:

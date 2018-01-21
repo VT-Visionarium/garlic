@@ -68,7 +68,9 @@ pthread_mutex_t&     art_mutex          = *getAddr< pthread_mutex_t     >("art_m
 pthread_cond_t&      art_cond           = *getAddr< pthread_cond_t      >("art_cond");
 bool&                art_haveWandPosRot = *getAddr< bool                >("art_haveWandPosRot");
 bool&                art_haveHead       = *getAddr< bool                >("art_haveHead");
+bool&                art_haveHand       = *getAddr< bool                >("art_haveHand");
 InstantIO::Matrix4f& art_headMatrix     = *getAddr< InstantIO::Matrix4f >("art_headMatrix");
+InstantIO::Matrix4f& art_handMatrix     = *getAddr< InstantIO::Matrix4f >("art_handMatrix");
 InstantIO::Matrix4f& art_wandMatrix     = *getAddr< InstantIO::Matrix4f >("art_wandMatrix");
 InstantIO::Vec3f&    art_wandPosition   = *getAddr< InstantIO::Vec3f    >("art_wandPosition");
 InstantIO::Rotation& art_wandRotation   = *getAddr< InstantIO::Rotation >("art_wandRotation");
@@ -123,6 +125,7 @@ private:
     float oldJoyY;
 
     OutSlot<Matrix4f> *head_matrix;
+    OutSlot<Matrix4f> *hand_matrix;
     OutSlot<Matrix4f> *wand_matrix;
     OutSlot<Rotation> *wand_rotation;
     OutSlot<Vec3f> *wand_position;
@@ -191,6 +194,7 @@ void Wand::initialize()
     Node::initialize();
 
     head_matrix = getSlot<Matrix4f>("matrix of head", "headmatrix");
+    hand_matrix = getSlot<Matrix4f>("matrix of hand", "handmatrix");
     wand_matrix = getSlot<Matrix4f>("matrix of wand", "wandmatrix");
 
     wand_rotation = getSlot<Rotation>("Rotation of wand", "wandrotation");
@@ -217,6 +221,7 @@ void Wand::shutdown()
     SPEW();
 
     removeSlot(head_matrix, "headmatrix");
+    removeSlot(hand_matrix, "handmatrix");
     removeSlot(wand_matrix, "wandmatrix");
 
     removeSlot(wand_rotation, "wandrotation");
@@ -291,6 +296,7 @@ int Wand::processData()
     wand_rotation->push(art_wandRotation);
 
     head_matrix->push(art_headMatrix);
+    hand_matrix->push(art_handMatrix);
     //
     //
     //////////////////////////////////////////////////////////////
@@ -359,6 +365,14 @@ int Wand::processData()
             // how to ROUTE data from the Engine node to the scene node.
             head_matrix->push(art_headMatrix);
 
+        if(art_haveHand)
+        {
+            hand_matrix->push(art_handMatrix);
+#if 1
+            std::cout << "----- art_handMatrix -----" << std::endl;
+            std::cout << art_handMatrix << std::endl;
+#endif
+        }
         // loop
     }
 

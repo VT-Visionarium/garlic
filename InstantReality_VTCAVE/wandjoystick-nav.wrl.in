@@ -3,6 +3,7 @@
 DEF iowand IOSensor {
 	type "readARTWand"
 	eventOut SFMatrix4f wandmatrix
+	eventOut SFMatrix4f handmatrix
 	eventOut SFRotation wandrotation
 	eventOut SFVec3f wandposition
 	eventOut SFFloat joystick_x_axis

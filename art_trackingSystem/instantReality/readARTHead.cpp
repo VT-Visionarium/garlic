@@ -27,6 +27,12 @@
 fr 24981717
 6d 1 [0 1.000][-475.292 -567.632 -53.704 135.5743 5.7618 -3.3069][0.993291 0.111352 0.031199 0.057393 -0.708916 0.702954 0.100393 -0.696447 -0.710551]
 6df2 1 1 [0 1.000 6 2][-48.603 -122.146 -389.220][0.175884 0.118374 -0.977268 0.887803 0.409816 0.209422 0.425290 -0.904455 -0.033013][0 0.00 0.00]
+
+With hand data:
+
+6d 2 [0 1.000][-278.570 -784.391 -365.781 142.1231 17.6924 -16.0997][0.915338 0.398159 0.060216 0.264193 -0.706632 0.656409 0.303906 -0.584928 -0.751998] [1 1.000][132.286 -857.570 -409.453 165.0484 -27.6313 32.7844][0.744831 -0.623745 -0.237002 -0.479724 -0.747459 0.459533 -0.463780 -0.228579 -0.855955]
+
+
 */
 // All frame as encoded in ASCII not binary
 
@@ -43,10 +49,14 @@ fr 24981717
 
 #define MIN_LEN   30
 
-//
-// Marks the start of valid head position data
-#define HEAD_START "6d 1 [0 1.000]["
-#define HEAD_END   "]["
+
+// Marks the start of valid head and/or hand position data
+#define H_START    "6d "
+#define HEAD_INDEX "[0 "
+#define HAND_INDEX "[1 "
+#define H_MARK     "][" // go through 2 sets of strings like this to get
+// to the rotation matrix data for both head and hand.
+
 
 // Marks the start of valid wand data  "6df2 1 1 [0 1.000 6 2]["
 //    or if just buttons and joystick  "6df2 1 1 [0 -1.000 6 2]["
@@ -112,10 +122,14 @@ pthread_cond_t  art_cond  = PTHREAD_COND_INITIALIZER;
 
 // art_haveWandPosRot: Do we have new wand matrix/position/rotation data set?
 bool                art_haveWandPosRot;
+// art_haveHand: Do we have new hand matrix data set?
+bool                art_haveHand;
+
 // art_haveHead: Do we have new head matrix data?
 bool                art_haveHead;
 
 InstantIO::Matrix4f art_headMatrix;
+InstantIO::Matrix4f art_handMatrix;
 InstantIO::Matrix4f art_wandMatrix;
 InstantIO::Vec3f    art_wandPosition;
 InstantIO::Rotation art_wandRotation;
@@ -167,19 +181,30 @@ private:
     template <class T>
     void removeSlot(T *slot, const char *name);
 
-    bool getHead(const char *buf, size_t len);
+    bool getMatrix(Matrix4f &mat,
+        const char *markerIndex,
+        size_t markerLen,
+        Matrix4f &cal,
+        const char *buf, size_t len);
+    
     enum WandDataType getWand(const char *buf, size_t len);
 
-    const size_t head_start_LEN;
+    const size_t h_start_LEN;
+    const size_t head_index_LEN;
+    const size_t hand_index_LEN;
+
+    const size_t h_mark_LEN;
+
     const size_t wand_start_any_LEN;
     const size_t wand_checkstr_LEN;
 
 
     Matrix4f &wm; //art_wandMatrix by a shorter name
-    
+
     // A constant calibration which we multiple by the
     // tracker head viewpoint matrix.
     Matrix4f headCal; // Calibration matrix
+    Matrix4f handCal; // Calibration matrix
     Matrix4f wandCal; // Calibration matrix
 
     int fd; // UDP/IP socket file descriptor
@@ -229,7 +254,11 @@ static inline void shareAddress(const char *sym, void *ptr)
 }
 
 
-ReadArtTracker::ReadArtTracker(): head_start_LEN(strlen(HEAD_START)),
+ReadArtTracker::ReadArtTracker(): 
+    h_start_LEN(strlen(H_START)),
+    head_index_LEN(strlen(HEAD_INDEX)),
+    hand_index_LEN(strlen(HAND_INDEX)),
+    h_mark_LEN(strlen(H_MARK)),
     wand_start_any_LEN(strlen(WAND_START_ANY)),
     wand_checkstr_LEN(strlen(WAND_CHECKSTR)),
     wm(art_wandMatrix),
@@ -302,7 +331,9 @@ Node *ReadArtTracker::create(void)
     shareAddress("art_cond", &art_cond);
     shareAddress("art_haveWandPosRot", &art_haveWandPosRot);
     shareAddress("art_haveHead", &art_haveHead);
+    shareAddress("art_haveHand", &art_haveHand);
     shareAddress("art_headMatrix", &art_headMatrix);
+    shareAddress("art_handMatrix", &art_handMatrix);
     shareAddress("art_wandMatrix", &art_wandMatrix);
     shareAddress("art_wandPosition", &art_wandPosition);
     shareAddress("art_wandRotation", &art_wandRotation);
@@ -539,7 +570,7 @@ enum WandDataType ReadArtTracker::getWand(const char *buf, size_t len)
         y_offset =  0.0F/*meters*/,
         z_offset =  0.0F/*meters*/;
 
-    // Set the Wand Matrix wm is a reference to art_wandMatrix
+    // Set the Wand Matrix wm that is a reference to art_wandMatrix
     // We just did that to make the next few line more readable.
     wm[0] = r00; wm[1] = r01; wm[2]  = r02;  wm[3]  = x * scale + x_offset;
     wm[4] = r10; wm[5] = r11; wm[6]  = r12;  wm[7]  = y * scale + y_offset;
@@ -558,22 +589,42 @@ enum WandDataType ReadArtTracker::getWand(const char *buf, size_t len)
 }
 
 
-bool ReadArtTracker::getHead(const char *buf, size_t len)
+bool ReadArtTracker::getMatrix(
+        Matrix4f &mat,
+        const char *markerIndex,
+        size_t markerLen,
+        Matrix4f &cal,
+        const char *buf, size_t len)
 {
-    // return true if we have new head data.
+    // We assume that buf is '\0' terminated.
 
-    const char *end = buf + len - head_start_LEN;
-    // Set s to the start of the rotation part
-    for(; buf < end; ++buf)
-        if(!strncmp(buf, HEAD_START, head_start_LEN))
-            break;
+    // return true if we have new hand data.
 
-    buf += head_start_LEN;
+    // advance to "6d "
+    while(*buf && strncmp(buf, H_START, h_start_LEN)) ++buf;
+    if(! *buf)
+        return false; // no data
+    // Now we are at "6d "
+    buf += h_start_LEN;
 
-    if(end <= buf + MIN_LEN)
-        // We did not get head tracker frame.  We assume that the
-        // tracker is out range.
+    // There must be "1 " or "2 " for there to be hand data
+    if(strncmp(buf, "1 ", 2) && strncmp(buf, "2 ", 2))
+        return false; // no data
+
+    // Go to "[0 " or "[1 " if there is one.
+    while(*buf && strncmp(buf, markerIndex, markerLen)) ++buf;
+    if(! *buf)
+        // this buf is not pointing to HAND_INDEX string.
         return false;
+    buf += hand_index_LEN;
+
+    // Go to second H_MARK string "]["
+    while(*buf && strncmp(buf, H_MARK, h_mark_LEN)) ++buf;
+    if(! *buf) return false; // no data
+    buf += h_mark_LEN;
+    // now it points to the first float of the floats
+    // with the correct format, maybe ... if scanf() works
+    // below:
 
     float x, y, z, rx, ry, rz, r00, r01, r02, r10, r11, r12, r20, r21, r22;
     int n = sscanf(buf, "%f %f %f %f %f %f][%f %f %f %f %f %f %f %f %f",
@@ -607,7 +658,6 @@ bool ReadArtTracker::getHead(const char *buf, size_t len)
         y_offset = 0.03175F/*meters*/,
         z_offset = 0.0F/*meters*/;
 
-    Matrix4f mat;
     mat[0] = r00; mat[1] = r01; mat[2]  = r02; mat[3]  = x * scale + x_offset;
     mat[4] = r10; mat[5] = r11; mat[6]  = r12; mat[7]  = y * scale + y_offset;
     mat[8] = r20; mat[9] = r21; mat[10] = r22; mat[11] = z * scale + z_offset;
@@ -616,15 +666,34 @@ bool ReadArtTracker::getHead(const char *buf, size_t len)
 
     // multiple  mult() or multLeft() which is it.  There documentation
     // does not explain it.  We want  mat = headCal * mat.
-    mat.mult(headCal);
+    mat.mult(cal);
 
-    head_matrix->push(mat);
 
-#if 0
+#ifdef DEBUG_SPEW
     std::cout << mat << std::endl;
 #endif
     return true; // Yes we have new head tracker data.
 }
+
+static inline void setHandCalibration(Matrix4f &m)
+{
+    //////////////////////////////////////////////////////////////////
+    //         Calibrate the hand using this constant 4 x 4 matrix
+    //////////////////////////////////////////////////////////////////
+
+    // Rotations heading (h), pitch (p), and roll (r) as explained in setHeadCalibration()
+    const float h = 0, p = -45.0F*M_PI/180.0F, r = 0,
+        ch = cosf(h), sh = sinf(h),
+        sp = sinf(p), cp = cosf(p),
+        sr = sinf(r), cr = cosf(r),
+        s = 1.0F;
+
+    m[0] = (ch*cr - sh*sp*sr)*s;   m[1] = -sh*cp*s;   m[2] = (ch*sr + sh*sp*cr)*s;  m[3] = 0;// tx
+    m[4] = (sh*cr + ch*sp*sr)*s;   m[5] =  ch*cp*s;   m[6] = (sh*sr - ch*sp*cr)*s;  m[7] = 0;// ty
+    m[8] = -cp*sr*s;               m[9] = sp*s;       m[10]= cp*cr*s;               m[11]= 0;// tz
+    m[12]= 0;                      m[13]= 0;          m[14]= 0;                     m[15]= 1.0F;
+}
+
 
 static inline void setHeadCalibration(Matrix4f &m)
 {
@@ -729,6 +798,7 @@ int ReadArtTracker::processData()
     }
 
     setHeadCalibration(headCal);
+    setHandCalibration(handCal);
     setWandCalibration(wandCal);
 
     setState(NODE_RUNNING);
@@ -767,7 +837,9 @@ int ReadArtTracker::processData()
         buf[rret] = '\0';
 
 #if 0
+#ifdef DEBUG_SPEW
         printf("read(%zd bytes) = %s\n", rret, buf);
+#endif
 #endif
 
         if(rret > MIN_LEN)
@@ -776,12 +848,18 @@ int ReadArtTracker::processData()
             ret = pthread_mutex_lock(&art_mutex);
             assert(ret == 0);
 
-            art_haveHead = getHead(buf, rret);
+            if((art_haveHead = getMatrix(art_headMatrix, HEAD_INDEX,
+                            head_index_LEN, headCal, buf, rret)))
+                head_matrix->push(art_headMatrix);
+
+            art_haveHand = getMatrix(art_handMatrix, HAND_INDEX,
+                            hand_index_LEN, handCal, buf, rret);
+
             enum WandDataType wandType = getWand(buf, rret);
             art_haveWandPosRot = (wandType == HAVE_ALL_WAND_DATA);
 
             // Signal if we have any new data.
-            if(art_haveHead || wandType)
+            if(art_haveHand || art_haveHead || wandType)
             {
                 // We have at least some new data for the other
                 // IOSenser thread.
