@@ -4,7 +4,7 @@ scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
 cd "$scriptdir" || exit $?
 scriptdir="$PWD" # now we have full path
 source ../../common.bash
-    
+
 GitCreateClone https://github.com/VT-Visionarium/webLauncher.git
 GitToBuildDir
 #GitToBuildDir tag

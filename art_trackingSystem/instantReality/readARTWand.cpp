@@ -368,7 +368,7 @@ int Wand::processData()
         if(art_haveHand)
         {
             hand_matrix->push(art_handMatrix);
-#if 1
+#if 0
             std::cout << "----- art_handMatrix -----" << std::endl;
             std::cout << art_handMatrix << std::endl;
 #endif

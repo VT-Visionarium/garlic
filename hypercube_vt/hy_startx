@@ -43,7 +43,7 @@ set -x
 startx &
 
 # Trial and error shows that signaling the startx process will
-# not alway stop the X session, but signaling xfce4-session
+# not always stop the X session, but signaling xfce4-session
 # seems to be the correct thing to do.  So now we must find the
 # process id (PID) of the x-session-manager.  Then again why
 # bother looking for this PID here, just let killall do the work,
