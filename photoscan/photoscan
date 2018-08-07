@@ -12,9 +12,7 @@ PhotoScan=/home/lance/projects/PhotoScan/photoscan-pro/photoscan.sh
 
 set -ex
 
-[ -z "$DISPLAY" ] && DISPLAY="$default_DISPLAY"
-
-export DISPLAY
+export DISPLAY="$default_DISPLAY"
 
 # Move the pointer so that the user can use the pointer on the
 # QBenz monitor with should have X11 server displaying at screen
