@@ -1,0 +1,24 @@
+#!/bin/bash
+
+###################################
+# CONFIGURE
+
+default_DISPLAY=:0.10
+
+# where is the PhotoScan program
+PhotoScan=/home/lance/projects/PhotoScan/photoscan-pro/photoscan.sh
+
+###################################
+
+set -ex
+
+[ -z "$DISPLAY" ] && DISPLAY="$default_DISPLAY"
+
+# Move the pointer so that the user can use the pointer on the
+# QBenz monitor with should have X11 server displaying at screen
+# number 10 as in DISPLAY=:0.10 .  Otherwise you'll have to move
+# the pointer/mouse across 9 screens to get to it.
+
+PhotoScan_MovePointer
+
+exec $PhotoScan

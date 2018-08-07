@@ -1,0 +1,31 @@
+This little project was for running the proprietary software called
+photoscan on the computer named cube.  Odd thing about cube is that it has
+no regular monitor connected to it most of the time. Instead of monitors
+it has video projectors plugged into it via display port cables.
+
+This project is for a photoscan wrapper script named photoscan that runs
+photoscan will what is needed to have it use the display port QBenz
+monitor with the display port projector cable plugged into it from the
+LBL (left bottom left eye) projector, using X11 DISPLAY :0.10 .
+
+Dependencies:
+
+  Install small_utils from https:/github.com/lanceman2/small_utils.git
+
+  in particular we need "MovePointer" to be in your PATH.
+
+
+
+TO INSTALL:
+
+
+1. You need get PhotoScan at and unzip/untar it to some directory.
+
+2. Edit the photoscan file in this directory so it refers to where
+   you unpacked the photoscan directory with files like:
+
+   photoscan.sh libQt5DBus.so.5 libQt5Gui.so.5 and so on...
+
+3. Copy photoscan to from this directory to some directory like
+   /usr/local/bin/ or /usr/local/bin/photoscan-5.0.0/ or whatever.
+
