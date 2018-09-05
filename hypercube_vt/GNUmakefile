@@ -72,7 +72,7 @@ hy_edgeBlend_on hy_edgeBlend_off: %:%.in
 sudo_install:
 	chown root:root $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
 	chmod u+s $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
-	cp xorg.conf.cube_1920x1200 xorg.conf.cube_2560x1600 edid_CTL.bin /etc/X11/
+	cp xorg.conf.cube_1920x1200 xorg.conf.cube_2560x1600 /etc/X11/
 	cp xorg.conf.cube_2560x1600 /etc/X11/xorg.conf
 	if [ ! -f xinitrc.OLD ] ; then mv /etc/X11/xinit/xinitrc xinitrc.OLD ; echo ; fi
 	cp xinitrc /etc/X11/xinit/xinitrc

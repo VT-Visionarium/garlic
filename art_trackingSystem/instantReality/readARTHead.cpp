@@ -829,8 +829,12 @@ int ReadArtTracker::processData()
             char errStr[256];
             printf("recv() failed: errno=%d: %s\n",
                 errno, strerror_r(errno, errStr, 256));
-            close(fd);
-            fd = -1;
+
+            // What do we do?  Try again...
+            continue;
+
+            //close(fd);
+            //fd = -1;
         }
 
         // terminate the string.
