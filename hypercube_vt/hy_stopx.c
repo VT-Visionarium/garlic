@@ -13,6 +13,9 @@ int usage(const char *argv0)
         "  shutdown, like logout.  This runs until it sees that the\n"
         "  x session has stopped, so that when this returns you can be\n"
         "  assured that the X session no longer exists.\n"
+        "\n"
+        "    Or that's what it should do, but it's not working so we\n"
+        "  now just kill (-9) the X server.\n"
         "\n", argv0);
     return 1;
 }
@@ -23,6 +26,19 @@ int main(int argc, char **argv)
 
     if(argc > 1)
         return usage(argv[0]);
+
+#if 1
+    
+    // First Easy
+    //system("/usr/bin/killall /usr/bin/X");
+
+    //sleep(1);
+
+    // Then Hard
+    system("/usr/bin/killall -9 /usr/bin/X");
+
+
+#else // This no longer works
 
     // xfce4-session-logout does not work for our case
     // we get and error and it fails.
@@ -76,6 +92,7 @@ int main(int argc, char **argv)
 
     // TODO: See if there was a process and check
     // for failure if there was.
+#endif
 
     printf("%s finished\n", argv[0]);
 

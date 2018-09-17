@@ -18,7 +18,6 @@ function usage()
        # If the demoRunner server was running it may have
        # ran these for us already, but if not we do this
        # anyway:
-       hy_kill_dtk-server     kill any dtk-server programs
        hy_stopx               turn off all user X sessions 
        hy_projectors_off      turn off the projectors
 
@@ -51,8 +50,6 @@ done
 # --timeout=10 is 10 seconds
 wget --timeout=10 --tries=1 http://localhost:8080/QUIT -O -
 
-#Run hy_kill_dtk-server
-Run dtk-shutdownServer
 Run hy_projectors_off
 Run hy_stopx
 

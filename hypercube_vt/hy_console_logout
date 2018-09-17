@@ -12,7 +12,6 @@ function usage()
 
   Runs the following 3 programs (on hyperCube) via hy_stop:
       
-       hy_kill_dtk-server     kill any dtk-server programs
        hy_stopx               turn off all user X sessions 
        hy_projectors_off      turn off the projectors
 

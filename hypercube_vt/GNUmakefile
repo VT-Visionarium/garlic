@@ -3,7 +3,7 @@
 # Butt-ugly make files are so fun!
 # But only if you're a make expert.
 
-PREFIX := /usr/local/encap/hypercube_vt-0.2
+PREFIX := /usr/local/encap/hypercube_vt-0.4
 
 BIN = $(PREFIX)/bin
 ETC = $(PREFIX)/etc
@@ -70,17 +70,17 @@ hy_edgeBlend_on hy_edgeBlend_off: %:%.in
 	chmod 755 $@
 
 sudo_install:
-	chown root:root $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
-	chmod u+s $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
+	chown root:root $(BIN)/hy_stopx
+	chmod u+s $(BIN)/hy_stopx
 	cp xorg.conf.cube_1920x1200 xorg.conf.cube_2560x1600 /etc/X11/
 	cp xorg.conf.cube_2560x1600 /etc/X11/xorg.conf
 	if [ ! -f xinitrc.OLD ] ; then mv /etc/X11/xinit/xinitrc xinitrc.OLD ; echo ; fi
 	cp xinitrc /etc/X11/xinit/xinitrc
-	cp _hy_checkX11Session.desktop /etc/xdg/autostart/hy_checkX11Session.desktop
+	#cp _hy_checkX11Session.desktop /etc/xdg/autostart/hy_checkX11Session.desktop
 
 install: build
 ifeq ($(HOSTNAME),cube)
-	sudo rm -f $(BIN)/hy_stopx $(BIN)/hy_kill_dtk-server
+	sudo rm -f $(BIN)/hy_stopx
 endif
 	mkdir -p $(BIN) $(ETC)
 	cp $(inst_files) $(BIN)
