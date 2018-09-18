@@ -13,6 +13,9 @@ default_conf=xorg.conf.cube_2560x1600
 
 ###########################################################
 
+# killfile must be the same path as in hy_stopx
+killfile=/tmp/hy_startx_KILLFILE
+
 export XORGCONFIG="${XORGCONFIG:-$default_conf}"
 echo "XORGCONFIG=${XORGCONFIG}"
 
@@ -32,6 +35,9 @@ function usage()
   You can run with lower resolution 1920x1200 pixel per root window by
   setting env XORGCONFIG=xorg.conf.cube_1920x1200 .
 
+  This script will try to stop any running instances of it self before
+  trying to 
+
 EOF
     exit 1
 }
@@ -40,7 +46,54 @@ EOF
 
 
 set -x
-startx &
+
+
+function start()
+{
+    local count=0
+
+    while [ -e "$killfile" ] ; do
+        # the hy_startx script reads this file fifo for a "signal"
+        echo "DIE YOU RAT" >> $killfile
+
+        # This sleep sucks, but what else can you do.
+        sleep 0.7
+
+        let count=$count+1
+        if [ "$count" = "5" ] ; then
+            echo "There seems to be an unusable: $killfile"
+            break;
+        fi
+    done
+
+    rm -f $killfile
+
+    # make a new and empty kill file
+    mkfifo -m 666 $killfile
+
+    startx &
+    pid=$?
+
+    # This should block until something writes $killfile
+    # See hy_stopx.
+    #
+    read line < $killfile
+
+    set +x
+
+    echo "read \"$line\" from: $killfile"
+
+    set -x
+
+    # Kill my child.
+    kill $pid
+
+    # Remove the kill file
+    rm -f $killfile
+}
+
+start &
+
 
 # Trial and error shows that signaling the startx process will
 # not always stop the X session, but signaling xfce4-session
