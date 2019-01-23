@@ -16,8 +16,9 @@ FILES:
   centOS/
 
       has files in info to install on TSM client software
-      on CentOS using rpms.  At the time of writnig this it's
-      just for one machine anvil.sv.vt.edu
+      on CentOS using rpms.  At the time of writing this it's
+      just for one machine anvil.sv.vt.edu (edit: now also
+      cube.sv.vt.edu).
 
 
   backupRestore/
