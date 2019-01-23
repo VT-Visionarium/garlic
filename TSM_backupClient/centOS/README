@@ -23,3 +23,6 @@ yum localinstall TIVsm-BA.x86_64.rpm
 #
 cp dsm.opt dsm.sys /opt/tivoli/tsm/client/ba/bin/
 
+# to run the client TSM backup service run as root:
+service dsmcad start
+

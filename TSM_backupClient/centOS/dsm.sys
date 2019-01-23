@@ -1,8 +1,8 @@
 SErvername  adsm
    COMMMethod         tcpip
    TCPPort            1500
-   TCPServeraddress   canoe.cc.vt.edu
-   nodename           ANVIL.SV.VT.EDU
+   TCPServeraddress   yacht.cc.vt.edu
+   nodename           CUBE.SV.VT.EDU
    Passwordaccess     generate
    schedlogretention  10
    schedlogname       /var/log/dsmsched.log

@@ -35,8 +35,8 @@ function usage()
   You can run with lower resolution 1920x1200 pixel per root window by
   setting env XORGCONFIG=xorg.conf.cube_1920x1200 .
 
-  This script will try to stop any running instances of it self before
-  trying to 
+  This script will try to stop any running instances of its self before
+  trying to run startx.
 
 EOF
     exit 1
@@ -45,26 +45,39 @@ EOF
 [ -n "$1" ] && usage
 
 
-set -x
 
+
+function catcher()
+{
+    set -x
+    rm -f $killfile
+    killall -ew xfce4-session
+    killall -ew /usr/bin/X
+    killall -ew startx
+    set -x
+    echo "Can't run X server, Waiting for X servers to stop"
+    set -x
+    sleep 20
+    killall hy_startx
+    exit
+}
+
+
+trap catcher SIGINT SIGTERM SIGQUIT
 
 function start()
 {
     local count=0
 
-    while [ -e "$killfile" ] ; do
-        # the hy_startx script reads this file fifo for a "signal"
-        echo "DIE YOU RAT" >> $killfile
+    if [ -e "$killfile" ] ; then
 
-        # This sleep sucks, but what else can you do.
-        sleep 0.7
+        # The user that ran this is a bad user in this case.
 
-        let count=$count+1
-        if [ "$count" = "5" ] ; then
-            echo "There seems to be an unusable: $killfile"
-            break;
-        fi
-    done
+        # We make this user pay:
+        #
+        catcher
+        exit
+    fi
 
     rm -f $killfile
 
@@ -72,26 +85,28 @@ function start()
     mkfifo -m 666 $killfile
 
     startx &
-    pid=$?
+    pid=$!
 
     # This should block until something writes $killfile
     # See hy_stopx.
     #
     read line < $killfile
-
-    set +x
-
-    echo "read \"$line\" from: $killfile"
-
-    set -x
-
-    # Kill my child.
-    kill $pid
-
     # Remove the kill file
     rm -f $killfile
-}
 
+    set +x
+    echo "read \"$line\" from: $killfile"
+    set -x
+
+    killall -ew xfce4-session
+    # Kill my child, startx
+    kill $pid
+ }
+
+ set -x
+
+# We run this function in the background an than return.
+#
 start &
 
 
