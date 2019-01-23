@@ -19,7 +19,7 @@ function Install()
     GitToBuildDir $1
     # We are now in the newly created build dir
     ./bootstrap --force || Fail
-    CFLAGS="-g -Werror -Wall"\
+    CFLAGS="-g -Wall"\
  ./configure\
  --prefix=$prefix\
  --enable-repobuild\
