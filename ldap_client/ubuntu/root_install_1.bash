@@ -9,14 +9,17 @@ function Fail()
 # run as root or not at all
 [ "$(id -u)" = 0 ] || Fail "You must run this as root"
 
-scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit $?
-cd "$scriptdir" || exit $?
+set -xe
+
+scriptdir="$(dirname ${BASH_SOURCE[0]})"
+cd "$scriptdir"
 scriptdir="$PWD"
 
-set -x
 # at this point we have just updated with apt-get dist-upgrade
 export DEBIAN_FRONTEND=noninteractive
-# cross your fingers that the distro have not broken this yet.
+# cross your fingers that the distro has not broken this yet.
+
+set +e
 
 # It may be that these are not running yet, and may not be
 # installed either, so failing here is fine.
@@ -39,14 +42,14 @@ set +x
 echo
 echo "It's okay if some of the last 5 commands failed."
 echo
-set -x
+set -xe
 
 # This will install:
 # nslcd ldap-utils libnss-ldapd libpam-ldapd nscd
-apt-get -y install nslcd libnss-ldapd || exit $?
+apt-get -y install nslcd libnss-ldapd
 
-cp ldap.conf /etc/ldap/ldap.conf || exit $?
-chmod 644 /etc/ldap/ldap.conf || exit $?
+cp ldap.conf /etc/ldap/ldap.conf
+chmod 644 /etc/ldap/ldap.conf
 
 
 set +x
