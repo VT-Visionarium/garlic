@@ -6,15 +6,16 @@ function Fail()
     exit 1
 }
 
+
 # run as root or not at all
 [ "$(id -u)" = 0 ] || Fail "You must run this as root"
 
-set -x
-apt-get update || exit $?
-apt-get dist-upgrade || exit $?
+set -xe
+apt-get update
+apt-get dist-upgrade
 
-mkdir /root/ORG_preLDAP || exit $?
-cp -a /etc /root/ORG_preLDAP || exit $?
+mkdir /root/ORG_preLDAP
+cp -a /etc /root/ORG_preLDAP
 set +x
 
 cat << EOF
