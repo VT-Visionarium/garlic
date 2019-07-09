@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -xe
+
+dir="$(dirname $(readlink -f ${BASH_SOURCE[0]}))"
+
+export  XORGCONFIG=$dir/xorg.conf.cube_1920x1200
+
+startx

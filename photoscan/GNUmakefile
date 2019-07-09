@@ -1,6 +1,6 @@
 # This is a GNU make file.
 
-VERSION = 0.2
+VERSION = 0.3
 PREFIX ?= /usr/local/encap/PhotoScan-$(VERSION)
 
 # These files are generated
@@ -19,7 +19,7 @@ build: $(built)
 
 install: $(built)
 	mkdir -p $(PREFIX)/bin
-	cp $(bin) $(PREFIX)/bin/
+	cp $(bin) xorg.conf.cube_1920x1200 photoscan_startx $(PREFIX)/bin/
 
 clean:
 	rm -f $(built)
